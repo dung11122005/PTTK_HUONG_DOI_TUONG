@@ -1,7 +1,11 @@
 package com.example.exam_portal.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.exam_portal.domain.enums.QuestionType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,8 +41,12 @@ public class Question {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "image_url")
-    private String imageUrl;
 
     private Float points;
+
+    @Column(name = "correct_answer") // dùng cho FILL_IN_BLANK
+    private String correctAnswer;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Choice> choices = new ArrayList<>();
 }

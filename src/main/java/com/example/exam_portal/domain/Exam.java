@@ -30,8 +30,8 @@ public class Exam {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "time_limit", nullable = false)
     private Integer timeLimit; // phút

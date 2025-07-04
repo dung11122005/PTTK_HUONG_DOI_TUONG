@@ -42,10 +42,7 @@
                     class="d-flex justify-content-between align-items-center"
                   >
                     <h3>Danh sách đề thi</h3>
-                    <a
-                      th:href="@{/teacher/exams/create}"
-                      class="btn btn-primary"
-                    >
+                    <a th:href="@{/admin/exam/create}" class="btn btn-primary">
                       + Tạo đề thi
                     </a>
                   </div>
@@ -70,27 +67,21 @@
                         <td th:text="${exam.timeLimit}">45</td>
                         <td>
                           <a
-                            th:href="@{'/teacher/exams/' + ${exam.id}}"
+                            th:href="@{'/admin/exam/' + ${exam.id}}"
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
                           <a
-                            th:href="@{'/teacher/exams/edit/' + ${exam.id}}"
+                            th:href="@{'/admin/exam/update/' + ${exam.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
-                            th:href="@{'/teacher/exams/delete/' + ${exam.id}}"
+                            th:href="@{'/admin/exam/delete/' + ${exam.id}}"
                             class="btn btn-danger btn-sm"
                             onclick="return confirm('Bạn chắc chắn muốn xóa đề này?')"
                           >
                             Xóa
-                          </a>
-                          <a
-                            th:href="@{'/teacher/exams/' + ${exam.id} + '/questions'}"
-                            class="btn btn-info btn-sm mt-1"
-                          >
-                            Câu hỏi
                           </a>
                         </td>
                       </tr>

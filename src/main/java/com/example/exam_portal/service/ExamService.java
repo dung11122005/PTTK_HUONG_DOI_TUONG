@@ -19,4 +19,14 @@ public class ExamService {
     public Page<Exam> getAllExamPagination(Pageable page) {
         return this.examRepository.findAll(page);
     }
+
+    public Exam handleSaveExam(Exam exam) {
+        Exam eric = this.examRepository.save(exam);
+        return eric;
+    }
+
+    public Exam getExamById(long id) {
+        return this.examRepository.findById(id);
+    }
+
 }

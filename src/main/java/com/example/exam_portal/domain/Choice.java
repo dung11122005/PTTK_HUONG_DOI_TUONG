@@ -29,4 +29,6 @@ public class Choice {
 
     @Column(name = "is_correct")
     private Boolean isCorrect;
+
+    
 }
