@@ -1,5 +1,7 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,17 @@ public class UserService {
         return this.roleRepository.findByName(name);
     }
 
+    public List<User> getUserRoleName(String name) {
+        return this.userRepository.findByRole_Name(name);
+    }
+
     public User handleSaveUser(User user) {
         User eric = this.userRepository.save(user);
         return eric;
+    }
+
+    public List<User> getAllUser() {
+        return this.userRepository.findAll();
     }
 
     public Page<User> getAllUserPagination(Pageable page) {

@@ -30,7 +30,7 @@
             <h1 class="mt-4">Dashboard</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">
-                <a href="/admin/user">Exam</a>
+                <a href="/admin/user">Class</a>
               </li>
               <li class="breadcrumb-item active">Delete</li>
             </ol>
@@ -40,18 +40,18 @@
                 <div class="col-12 mx-auto">
                   <div class="d-flex justify-content-between">
                     <h3>
-                      Delete the Exam with id = <span th:text="${id}"></span>
+                      Delete the Class with id = <span th:text="${id}"></span>
                     </h3>
                   </div>
                   <hr />
 
                   <div class="col-md-3">
                     <div class="alert alert-danger text-center" role="alert">
-                      Are you sure to delete this Exam?
+                      Are you sure to delete this Class?
                     </div>
                   </div>
 
-                  <form th:action="@{/admin/exam/delete}" method="post">
+                  <form th:action="@{/admin/Class/delete}" method="post">
                     <div class="mb-3" style="display: none">
                       <label class="form-label">Id:</label>
                       <input type="hidden" name="id" th:value="${id}" />

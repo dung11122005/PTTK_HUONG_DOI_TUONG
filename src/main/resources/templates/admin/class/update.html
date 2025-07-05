@@ -27,75 +27,69 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Sửa đề thi</h1>
+            <h1 class="mt-4">Tạo đề thi</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
-                <a th:href="@{/admin/exam}">Exam</a>
+                <a th:href="@{/admin}">Dashboard</a>
               </li>
-              <li class="breadcrumb-item active">Sửa đề thi</li>
+              <li class="breadcrumb-item">
+                <a th:href="@{/admin/exam}">Class</a>
+              </li>
+              <li class="breadcrumb-item active">Tạo đề thi</li>
             </ol>
 
             <div class="mt-4">
               <div class="row">
                 <div class="col-md-8 col-12 mx-auto">
                   <form
-                    th:action="@{/admin/exam/update/{id}(id=${newExam.id})}"
-                    th:object="${newExam}"
+                    th:action="@{/admin/class/update/{id}(id=${newClass.id})}"
+                    th:object="${newClass}"
                     method="post"
                     enctype="multipart/form-data"
                     class="row"
                   >
-                    <!-- Tên đề -->
+                    <!-- Mã lớp học -->
                     <div class="mb-3">
-                      <label class="form-label">Tên đề:</label>
+                      <label class="form-label">Mã lớp học:</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        th:field="*{classCode}"
+                        placeholder="Ví dụ: LOP10A1"
+                        required
+                      />
+                    </div>
+
+                    <!-- Tên lớp học -->
+                    <div class="mb-3">
+                      <label class="form-label">Tên lớp học:</label>
                       <input
                         type="text"
                         class="form-control"
                         th:field="*{name}"
-                        placeholder="Ví dụ: Đề kiểm tra Toán 15 phút"
+                        placeholder="Ví dụ: Lớp 10A1 - Toán nâng cao"
                         required
                       />
                     </div>
 
-                    <!-- Mô tả -->
-                    <div class="mb-3">
-                      <label class="form-label">Mô tả:</label>
-                      <textarea
-                        class="form-control"
-                        th:field="*{description}"
-                        placeholder="Mô tả ngắn về đề thi..."
-                      ></textarea>
-                    </div>
-
-                    <!-- Giới hạn thời gian -->
-                    <div class="mb-3">
-                      <label class="form-label"
-                        >Thời gian làm bài (phút):</label
-                      >
+                    <!-- Ngày tạo (readonly) -->
+                    <div class="mb-3" style="display: none">
+                      <label class="form-label">Ngày tạo:</label>
                       <input
-                        type="number"
+                        type="text"
                         class="form-control"
-                        min="1"
-                        th:field="*{timeLimit}"
-                        required
+                        th:value="${newClass.createdAt != null ? #temporals.format(newClass.createdAt, 'dd/MM/yyyy HH:mm') : ''}"
                       />
                     </div>
 
-                    <!-- Public hay không -->
-                    <div class="mb-3">
-                      <label class="form-label">Trạng thái:</label>
-                      <select class="form-select" th:field="*{isPublic}">
-                        <option value="true">Công khai</option>
-                        <option value="false">Riêng tư</option>
-                      </select>
-                    </div>
-
-                    <!-- Submit -->
+                    <!-- Nút submit -->
                     <div class="mb-4">
                       <button type="submit" class="btn btn-warning">
-                        Cập nhật đề
+                        Cập nhật
                       </button>
-                      <a th:href="@{/admin/exam}" class="btn btn-secondary ms-2"
+                      <a
+                        th:href="@{/admin/class}"
+                        class="btn btn-secondary ms-2"
                         >Hủy</a
                       >
                     </div>

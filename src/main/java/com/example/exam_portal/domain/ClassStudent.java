@@ -1,6 +1,5 @@
 package com.example.exam_portal.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,8 +29,4 @@ public class ClassStudent {
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
-
-    @Column(name = "join_code", nullable = false)
-    private String joinCode;
-
 }

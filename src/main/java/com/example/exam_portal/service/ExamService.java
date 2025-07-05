@@ -29,4 +29,7 @@ public class ExamService {
         return this.examRepository.findById(id);
     }
 
+    public void deleteAExam(long id) {
+        this.examRepository.deleteById(id);
+    }
 }

@@ -27,12 +27,12 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Exam</h1>
+            <h1 class="mt-4">Class</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">
                 <a th:href="@{/admin}">Dashboard</a>
               </li>
-              <li class="breadcrumb-item active">Exam</li>
+              <li class="breadcrumb-item active">Class</li>
             </ol>
 
             <div class="mt-5">
@@ -41,9 +41,9 @@
                   <div
                     class="d-flex justify-content-between align-items-center"
                   >
-                    <h3>Danh sách đề thi</h3>
-                    <a th:href="@{/admin/exam/create}" class="btn btn-primary">
-                      + Tạo đề thi
+                    <h3>Danh sách lớp</h3>
+                    <a th:href="@{/admin/class/create}" class="btn btn-primary">
+                      + Tạo lớp
                     </a>
                   </div>
                   <hr />
@@ -51,33 +51,33 @@
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>Tên đề</th>
-                        <th>Mô tả</th>
-                        <th>Thời gian (phút)</th>
+                        <th>Mã lớp</th>
+                        <th>Tên lớp</th>
+                        <th>Giảng viên</th>
                         <th>Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="exam : ${exams}">
-                        <td th:text="${exam.id}">1</td>
-                        <td th:text="${exam.name}">Đề Toán Giữa kỳ</td>
-                        <td th:text="${exam.description}">
-                          Kiểm tra chương 1–3
+                      <tr th:each="classRoom : ${classRooms}">
+                        <td th:text="${classRoom.id}">1</td>
+                        <td th:text="${classRoom.classCode}">CP001</td>
+                        <td th:text="${classRoom.name}">Nhập môn phần mềm</td>
+                        <td th:text="${classRoom.teacher.fullName}">
+                          Lương Trần Ngọc Khiết
                         </td>
-                        <td th:text="${exam.timeLimit}">45</td>
                         <td>
                           <a
-                            th:href="@{'/admin/exam/' + ${exam.id}}"
+                            th:href="@{'/admin/class/student/add/' + ${classRoom.id}}"
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
                           <a
-                            th:href="@{'/admin/exam/update/' + ${exam.id}}"
+                            th:href="@{'/admin/class/update/' + ${classRoom.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
-                            th:href="@{'/admin/exam/delete/' + ${exam.id}}"
+                            th:href="@{'/admin/class/delete/' + ${classRoom.id}}"
                             class="btn btn-danger btn-sm"
                           >
                             Xóa

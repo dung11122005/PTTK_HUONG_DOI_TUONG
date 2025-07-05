@@ -71,7 +71,7 @@ public class ExamController {
     }
 
     @PostMapping("/admin/exam/create")
-    public String createExam(@ModelAttribute("newExam") Exam form,
+    public String postCreateExam(@ModelAttribute("newExam") Exam form,
                              @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
 
@@ -86,6 +86,43 @@ public class ExamController {
         return "redirect:/admin/exam";
     }
 
+
+    @GetMapping("/admin/exam/update/{id}")
+    public String getUpdateExamPage(Model model, @PathVariable Long id) {
+        Exam exam=this.examService.getExamById(id);
+        model.addAttribute("newExam", exam);
+        return "admin/exam/update";
+    }
+
+
+    @PostMapping("/admin/exam/update/{id}")
+    public String postUpdateExam(@PathVariable Long id, Model model, @ModelAttribute("newExam") Exam form,
+                             @AuthenticationPrincipal UserDetails userDetails) {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+
+        Exam exam=this.examService.getExamById(id);
+        exam.setName(form.getName());
+        exam.setDescription(form.getDescription());
+        exam.setTimeLimit(form.getTimeLimit());
+        exam.setIsPublic(form.getIsPublic());
+        exam.setUser(teacher);
+
+        this.examService.handleSaveExam(exam);
+        return "redirect:/admin/exam";
+    }
+
+    @GetMapping("/admin/exam/delete/{id}")
+    public String getDeleteUserPage(Model model, @PathVariable long id) {
+        model.addAttribute("id", id);
+        return "admin/exam/delete";
+    }
+
+    @PostMapping("/admin/exam/delete")
+    public String postDeleteUser(@RequestParam("id") Long id) {
+        this.examService.deleteAExam(id);
+        return "redirect:/admin/exam";
+    }
+
     @GetMapping("/admin/exam/{id}")
     public String getQuestionsExam(@PathVariable Long id, Model model) {
         Exam exam = this.examService.getExamById(id);
@@ -95,7 +132,7 @@ public class ExamController {
         return "admin/question/create";
     }
 
-    @PostMapping("/admin/exam/create/question/{id}")
+    @PostMapping("/admin/exam/question/create/{id}")
     public String postCreateQuestion(@PathVariable Long id,
                               @RequestParam QuestionType type,
                               @RequestParam String content,
@@ -175,6 +212,7 @@ public class ExamController {
         this.questionService.deleteAQuestion(id);
         return "redirect:/admin/exam/" + examId;
     }
+
 
 
 
