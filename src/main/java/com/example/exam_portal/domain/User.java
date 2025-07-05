@@ -48,6 +48,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Exam> exams;
 
+    @OneToMany(mappedBy = "teacher")
+    private List<ExamSession> examSessions;
+
 
     private LocalDateTime createdAt;
 

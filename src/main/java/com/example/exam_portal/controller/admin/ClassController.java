@@ -34,7 +34,9 @@ public class ClassController {
     }
 
     @GetMapping("/admin/class")
-    public String getClassPage(Model model, @RequestParam("page") Optional<String> pageOptional) {
+    public String getClassPage(Model model, @RequestParam("page") Optional<String> pageOptional, 
+    @AuthenticationPrincipal UserDetails userDetails) {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         int page = 1;
         try {
             if (pageOptional.isPresent()) {
@@ -46,7 +48,7 @@ public class ClassController {
 
         }
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<ClassRoom> cl = this.classService.getAllClassRoomPagination(pageable);
+        Page<ClassRoom> cl = this.classService.getAllClassRoomPaginationByIdTeacher(teacher.getId(), pageable);
         List<ClassRoom> classRooms = cl.getContent();
         model.addAttribute("classRooms", classRooms);
         model.addAttribute("currentPage", page);

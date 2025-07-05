@@ -16,6 +16,10 @@ public class ExamService {
         this.examRepository=examRepository;
     }
 
+    public Page<Exam> getAllExamPaginationTeacherId(Long id, Pageable page) {
+        return this.examRepository.findByUserId(id, page);
+    }
+
     public Page<Exam> getAllExamPagination(Pageable page) {
         return this.examRepository.findAll(page);
     }

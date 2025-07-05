@@ -24,6 +24,10 @@ public class ClassService {
         this.classStudentRepository=classStudentRepository;
     }
 
+    public Page<ClassRoom> getAllClassRoomPaginationByIdTeacher(Long id, Pageable page) {
+        return this.classRepository.findByTeacherId(id, page);
+    }
+
     public Page<ClassRoom> getAllClassRoomPagination(Pageable page) {
         return this.classRepository.findAll(page);
     }

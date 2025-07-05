@@ -30,14 +30,17 @@ public class ExamSession {
     @JoinColumn(name = "class_id", nullable = false)
     private ClassRoom classroom; // Lớp thi
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User teacher; // Người tạo ca thi
+
+
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
-    @Column(name = "join_code", nullable = false, unique = true)
-    private String joinCode;
 
     @Column(name = "is_locked")
     private Boolean isLocked = false; // Không cho thi nữa sau khi khóa

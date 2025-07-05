@@ -44,7 +44,9 @@ public class ExamController {
     }
 
     @GetMapping("/admin/exam")
-    public String getExamPage(Model model, @RequestParam("page") Optional<String> pageOptional) {
+    public String getExamPage(Model model, @RequestParam("page") Optional<String> pageOptional,
+    @AuthenticationPrincipal UserDetails userDetails) {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         int page = 1;
         try {
             if (pageOptional.isPresent()) {
@@ -56,7 +58,7 @@ public class ExamController {
 
         }
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Exam> us = this.examService.getAllExamPagination(pageable);
+        Page<Exam> us = this.examService.getAllExamPaginationTeacherId(teacher.getId(), pageable);
         List<Exam> exams = us.getContent();
         model.addAttribute("exams", exams);
         model.addAttribute("currentPage", page);

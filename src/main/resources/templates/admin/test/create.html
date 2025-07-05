@@ -30,7 +30,7 @@
             <h1 class="mt-4">Tạo đề thi</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
-                <a th:href="@{/admin/exam}">Exam</a>
+                <a th:href="@{/admin/class}">Class</a>
               </li>
               <li class="breadcrumb-item active">Tạo đề thi</li>
             </ol>
@@ -39,63 +39,93 @@
               <div class="row">
                 <div class="col-md-8 col-12 mx-auto">
                   <form
-                    th:action="@{/admin/exam/create}"
-                    th:object="${newExam}"
+                    th:action="@{/admin/test/create}"
+                    th:object="${newExamSession}"
                     method="post"
-                    enctype="multipart/form-data"
                     class="row"
                   >
-                    <!-- Tên đề -->
+                    <!-- Chọn đề thi -->
                     <div class="mb-3">
-                      <label class="form-label">Tên đề:</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        th:field="*{name}"
-                        placeholder="Ví dụ: Đề kiểm tra Toán 15 phút"
-                        required
-                      />
-                    </div>
-
-                    <!-- Mô tả -->
-                    <div class="mb-3">
-                      <label class="form-label">Mô tả:</label>
-                      <textarea
-                        class="form-control"
-                        th:field="*{description}"
-                        placeholder="Mô tả ngắn về đề thi..."
-                      ></textarea>
-                    </div>
-
-                    <!-- Giới hạn thời gian -->
-                    <div class="mb-3">
-                      <label class="form-label"
-                        >Thời gian làm bài (phút):</label
-                      >
-                      <input
-                        type="number"
-                        class="form-control"
-                        min="1"
-                        th:field="*{timeLimit}"
-                        required
-                      />
-                    </div>
-
-                    <!-- Public hay không -->
-                    <div class="mb-3">
-                      <label class="form-label">Trạng thái:</label>
-                      <select class="form-select" th:field="*{isPublic}">
-                        <option value="true">Công khai</option>
-                        <option value="false">Riêng tư</option>
+                      <label class="form-label">Đề thi:</label>
+                      <select class="form-select" th:field="*{exam}" required>
+                        <option
+                          th:each="exam : ${exams}"
+                          th:value="${exam}"
+                          th:text="${exam.name}"
+                        ></option>
                       </select>
                     </div>
 
-                    <!-- Submit -->
+                    <!-- Chọn lớp thi -->
+                    <div class="mb-3">
+                      <label class="form-label">Lớp thi:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{classroom}"
+                        required
+                      >
+                        <option
+                          th:each="classRoom : ${classRooms}"
+                          th:value="${classRoom}"
+                          th:text="${classRoom.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Chọn giảng viên -->
+                    <div class="mb-3">
+                      <label class="form-label">Giảng viên phụ trách:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{teacher}"
+                        required
+                      >
+                        <option
+                          th:each="user : ${teachers}"
+                          th:value="${user}"
+                          th:text="${user.fullName}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Thời gian bắt đầu -->
+                    <div class="mb-3">
+                      <label class="form-label">Thời gian bắt đầu:</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control"
+                        th:field="*{startTime}"
+                        required
+                      />
+                    </div>
+
+                    <!-- Thời gian kết thúc -->
+                    <div class="mb-3">
+                      <label class="form-label">Thời gian kết thúc:</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control"
+                        th:field="*{endTime}"
+                        required
+                      />
+                    </div>
+
+                    <!-- Trạng thái khóa -->
+                    <div class="mb-3 form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        th:field="*{isLocked}"
+                      />
+                      <label class="form-check-label">Khóa ca thi ngay</label>
+                    </div>
+
+                    <!-- Nút submit -->
                     <div class="mb-4">
                       <button type="submit" class="btn btn-primary">
-                        Tạo đề
+                        Tạo ca thi
                       </button>
-                      <a th:href="@{/admin/exam}" class="btn btn-secondary ms-2"
+                      <a th:href="@{/admin/test}" class="btn btn-secondary ms-2"
                         >Hủy</a
                       >
                     </div>
