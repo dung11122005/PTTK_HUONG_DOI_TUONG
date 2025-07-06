@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -110,6 +111,7 @@ public class TestClientController {
 
     @PostMapping("/exam/submit")
     public String submitExam(@RequestParam Map<String, String> params,
+                             @RequestParam MultiValueMap<String, String> multiParams,
                              @RequestParam("examSessionId") Long examSessionId,
                              @AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
@@ -121,57 +123,80 @@ public class TestClientController {
         float totalPoints = 0f;
         float score = 0f;
                             
-        Map<Long, String> userAnswers = new HashMap<>();
+        Map<Long, Object> userAnswers = new HashMap<>();
                             
         for (Question q : exam.getQuestions()) {
             String paramKey = "answers[" + q.getId() + "]";
-            String userAnswer = params.get(paramKey);
         
-            if (userAnswer != null) {
-                userAnswers.put(q.getId(), userAnswer);
-            
-                totalPoints += q.getPoints();
-            
-                // Chấm điểm
-                if (q.getChoices().size() > 0) {
-                    // Trắc nghiệm
-                    Choice correct = q.getChoices().stream()
-                        .filter(Choice::getIsCorrect)
-                        .findFirst().orElse(null);
+            totalPoints += q.getPoints();
+        
+            switch (q.getType()) {
+                case SINGLE:
+                case TRUE_FALSE:
+                    String singleAns = params.get(paramKey);
+                    if (singleAns != null) {
+                        userAnswers.put(q.getId(), singleAns);
+                    
+                        Choice correct = q.getChoices().stream()
+                            .filter(Choice::getIsCorrect)
+                            .findFirst().orElse(null);
+                    
+                        if (correct != null && correct.getContent().equalsIgnoreCase(singleAns.trim())) {
+                            score += q.getPoints();
+                        }
+                    }
+                    break;
                 
-                    if (correct != null && correct.getContent().equalsIgnoreCase(userAnswer.trim())) {
-                        score += q.getPoints();
+                case MULTIPLE:
+                    List<String> multiAns = multiParams.get(paramKey);
+                    if (multiAns != null) {
+                        userAnswers.put(q.getId(), multiAns);
+                    
+                        List<String> correctAnswers = q.getChoices().stream()
+                            .filter(Choice::getIsCorrect)
+                            .map(Choice::getContent)
+                            .sorted()
+                            .toList();
+                    
+                        List<String> userSelected = multiAns.stream().map(String::trim).sorted().toList();
+                    
+                        if (userSelected.equals(correctAnswers)) {
+                            score += q.getPoints();
+                        }
                     }
-                } else {
-                    // Tự luận/điền
-                    if (q.getCorrectAnswer() != null &&
-                        q.getCorrectAnswer().trim().equalsIgnoreCase(userAnswer.trim())) {
-                        score += q.getPoints();
+                    break;
+                
+                case FILL_IN_BLANK:
+                    String inputAns = params.get(paramKey);
+                    if (inputAns != null) {
+                        userAnswers.put(q.getId(), inputAns);
+                        if (q.getCorrectAnswer() != null &&
+                            q.getCorrectAnswer().trim().equalsIgnoreCase(inputAns.trim())) {
+                            score += q.getPoints();
+                        }
                     }
-                }
+                    break;
             }
         }
     
         float finalScore = (totalPoints == 0) ? 0f : (score / totalPoints) * 10;
     
-        // Lưu kết quả
         ExamResult result = new ExamResult();
         result.setStudent(student);
         result.setExam(exam);
         result.setExamSession(session);
-        result.setScore(score); // điểm thực
+        result.setScore(score);
         result.setSubmittedAt(LocalDateTime.now());
         result.setAnswersJson(new Gson().toJson(userAnswers));
-        result.setDurationUsed(0); // TODO: tính thời gian thực tế nếu cần
+        result.setDurationUsed(0); // TODO nếu có thời gian
     
-         // inject repo nếu chưa có
+        examResultService.handleSaveExam(result);
     
-         this.examResultService.handleSaveExam(result);
-
         model.addAttribute("result", result);
         model.addAttribute("exam", exam);
-        return "client/exam/result"; // Trang hiển thị điểm
+        return "client/exam/result";
     }
+
     
     
 }

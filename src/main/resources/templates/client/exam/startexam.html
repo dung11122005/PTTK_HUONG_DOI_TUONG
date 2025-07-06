@@ -100,46 +100,83 @@
                   th:value="${examSession.id}"
                 />
 
+                <!-- Lặp từng câu hỏi -->
                 <div
                   th:each="question, iterStat : ${questions}"
-                  class="question-box"
+                  style="margin-bottom: 10px"
                   th:id="'q' + ${iterStat.index}"
                 >
-                  <h2>
-                    <strong>Câu [[${iterStat.count}]]:</strong>
+                  <p style="margin-bottom: 4px">
+                    <strong>Câu [[${iterStat.index + 1}]]:</strong>
                     <span th:text="${question.content}"></span>
-                    <span class="badge bg-info text-dark ms-2"
-                      >[[${question.points}]] điểm</span
-                    >
-                  </h2>
+                    <span
+                      class="badge bg-info text-dark ms-2"
+                      th:text="${question.points + ' điểm'}"
+                    ></span>
+                  </p>
 
-                  <!-- Nếu có lựa chọn -->
-                  <div th:if="${question.choices.size() > 0}" class="ms-3">
+                  <!-- SINGLE hoặc TRUE_FALSE -->
+                  <div
+                    th:if="${question.type.name() == 'SINGLE' or question.type.name() == 'TRUE_FALSE'}"
+                    class="ms-3"
+                    style="margin-bottom: 6px"
+                  >
                     <div th:each="choice : ${question.choices}">
-                      <label>
-                        <input
-                          type="radio"
-                          th:name="'answers[' + ${question.id} + ']'"
-                          th:value="${choice.content}"
-                          class="answer-input"
-                          data-index="[[${iterStat.index}]]"
-                          required
-                        />
-                        <span th:text="${choice.content}"></span> </label
-                      ><br />
+                      <div
+                        th:if="${choice.content != null and !choice.content.isEmpty()}"
+                      >
+                        <label style="display: block; margin-bottom: 2px">
+                          <input
+                            type="radio"
+                            th:name="'answers[' + ${question.id} + ']'"
+                            th:value="${choice.content}"
+                            class="answer-input"
+                            required
+                          />
+                          <span th:text="${choice.content}"></span>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Nếu là dạng điền -->
-                  <div th:if="${question.choices.size() == 0}">
+                  <!-- MULTIPLE -->
+                  <div
+                    th:if="${question.type.name() == 'MULTIPLE'}"
+                    class="ms-3"
+                    style="margin-bottom: 6px"
+                  >
+                    <div th:each="choice : ${question.choices}">
+                      <div
+                        th:if="${choice.content != null and !choice.content.isEmpty()}"
+                      >
+                        <label style="display: block; margin-bottom: 2px">
+                          <input
+                            type="checkbox"
+                            th:name="'answers[' + ${question.id} + ']'"
+                            th:value="${choice.content}"
+                            class="answer-input"
+                          />
+                          <span th:text="${choice.content}"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FILL_IN_BLANK -->
+                  <div
+                    th:if="${question.type.name() == 'FILL_IN_BLANK'}"
+                    style="margin-bottom: 6px"
+                  >
                     <input
                       type="text"
-                      class="form-control mt-2 answer-input"
+                      class="form-control mt-1 answer-input"
                       th:name="'answers[' + ${question.id} + ']'"
-                      data-index="[[${iterStat.index}]]"
                       required
+                      style="font-size: 18px; height: 36px; padding: 5px"
                     />
                   </div>
+
+                  <hr style="margin: 8px 0" />
                 </div>
 
                 <button class="btn btn-primary mt-4" type="submit">
@@ -175,6 +212,15 @@
     <div id="back-top">
       <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
     </div>
+
+    <script>
+      function scrollToQuestion(index) {
+        const element = document.getElementById("q" + index);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    </script>
     <script>
       function scrollToQuestion(index) {
         const qEl = document.getElementById("q" + index);
