@@ -3,6 +3,7 @@ package com.example.exam_portal.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -50,6 +51,13 @@ public class User {
 
     @OneToMany(mappedBy = "teacher")
     private List<ExamSession> examSessions;
+
+    @ManyToOne
+    @JoinColumn(name = "class_id")
+    private ClassRoom classRoom;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClassStudent> classStudents;
 
 
     private LocalDateTime createdAt;

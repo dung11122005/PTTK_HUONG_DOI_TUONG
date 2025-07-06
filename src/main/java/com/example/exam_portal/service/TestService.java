@@ -30,6 +30,10 @@ public class TestService {
         return this.testRepositoty.findAll();
     }
 
+    public List<ExamSession> getAllExamSessionListClassId(List<Long> classIds) {
+        return this.testRepositoty.findByClassroom_IdIn(classIds);
+    }
+
     public ExamSession handleSaveExamSession(ExamSession examSession) {
         ExamSession eric = this.testRepositoty.save(examSession);
         return eric;

@@ -11,16 +11,24 @@
     });
 
 /* 2. sticky And Scroll UP */
-    $(window).on('scroll', function () {
-      var scroll = $(window).scrollTop();
-      if (scroll < 400) {
-        $(".header-sticky").removeClass("sticky-bar");
-        $('#back-top').fadeOut(500);
-      } else {
-        $(".header-sticky").addClass("sticky-bar");
-        $('#back-top').fadeIn(500);
-      }
-    });
+$(document).ready(function () {
+  // Luôn thêm class sticky-bar khi trang load
+  $(".header-sticky").addClass("sticky-bar");
+
+  // Xử lý cuộn như thường
+  $(window).on('scroll', function () {
+    var scroll = $(window).scrollTop();
+    $(".header-sticky").addClass("sticky-bar"); // Luôn giữ sticky-bar
+
+    if (scroll >= 400) {
+      $('#back-top').fadeIn(500);
+    } else {
+      $('#back-top').fadeOut(500);
+    }
+  });
+});
+
+
 
   // Scroll Up
     $('#back-top a').on("click", function () {

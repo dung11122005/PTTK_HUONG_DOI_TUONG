@@ -30,6 +30,11 @@ public class ExamResult {
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
 
+    @ManyToOne
+    @JoinColumn(name = "exam_session_id", nullable = false)
+    private ExamSession examSession;
+
+
     private Float score;
 
     @Column(name = "submitted_at")

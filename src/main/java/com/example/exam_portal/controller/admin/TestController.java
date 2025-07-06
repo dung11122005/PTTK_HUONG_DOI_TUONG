@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.Exam;
+import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.ExamSession;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ClassService;
+import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.service.ExamService;
 import com.example.exam_portal.service.TestService;
 import com.example.exam_portal.service.UserService;
@@ -32,13 +34,17 @@ public class TestController {
     private final UserService userService;
     private final ExamService examService;
     private final ClassService classService;
+    private final ExamResultService examResultService;
 
 
-    public TestController(TestService testService, UserService userService, ExamService examService, ClassService classService){
+    public TestController(TestService testService, UserService userService, 
+        ExamService examService, ClassService classService,
+        ExamResultService examResultService){
         this.testService=testService;
         this.userService=userService;
         this.examService=examService;
         this.classService=classService;
+        this.examResultService=examResultService;
     }
 
 
@@ -70,6 +76,36 @@ public class TestController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ex.getTotalPages());
         return "admin/test/show";
+    }
+
+    @GetMapping("/admin/test/{id}")
+    public String getResultTestPage(Model model, @RequestParam("page") Optional<String> pageOptional,
+    @AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+        int page = 1;
+        try {
+            if (pageOptional.isPresent()) {
+                page = Integer.parseInt(pageOptional.get());
+            } else {
+                page = 1;
+            }
+        } catch (Exception e) {
+
+        }
+        Page<ExamResult> ex;
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        
+        if(teacher.getRole().getName().equals("ADMIN")){
+            ex = this.examResultService.getAllResulrExamPagination(pageable);
+        }else{
+            ex = this.examResultService.getAllResulrExamPaginationTeacherId(id, pageable);
+        }
+
+        List<ExamResult> examResults =  ex.getContent();
+        model.addAttribute("examResults", examResults);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", ex.getTotalPages());
+        return "admin/test/detail";
     }
 
     @GetMapping("/admin/test/create")
