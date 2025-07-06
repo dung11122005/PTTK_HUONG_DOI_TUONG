@@ -32,6 +32,10 @@ public class ClassService {
         return this.classRepository.findAll(page);
     }
 
+    public List<ClassRoom> getAllClassRoom() {
+        return this.classRepository.findAll();
+    }
+
     public ClassRoom handleSaveClassRoom(ClassRoom classrRoom) {
         ClassRoom eric = this.classRepository.save(classrRoom);
         return eric;
@@ -43,6 +47,10 @@ public class ClassService {
 
     public List<ClassStudent> getClassStudentById(long id) {
         return this.classStudentRepository.findByClassroom_Id(id);
+    }
+
+    public List<ClassRoom> getClassByTeacherId(long id) {
+        return this.classRepository.findByTeacherId(id);
     }
 
     public List<ClassStudent> getClassRoomByClassIdAndStudentId(Long classId, Long studentId) {

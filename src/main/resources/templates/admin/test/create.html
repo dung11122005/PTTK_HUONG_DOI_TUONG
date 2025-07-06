@@ -27,12 +27,12 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Tạo đề thi</h1>
+            <h1 class="mt-4">Tạo lịch kiểm tra</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
                 <a th:href="@{/admin/class}">Class</a>
               </li>
-              <li class="breadcrumb-item active">Tạo đề thi</li>
+              <li class="breadcrumb-item active">Tạo lịch kiểm tra</li>
             </ol>
 
             <div class="mt-4">
@@ -47,10 +47,15 @@
                     <!-- Chọn đề thi -->
                     <div class="mb-3">
                       <label class="form-label">Đề thi:</label>
-                      <select class="form-select" th:field="*{exam}" required>
+                      <select
+                        class="form-select"
+                        th:field="*{exam.id}"
+                        required
+                      >
+                        <option value="">-- Chọn đề thi --</option>
                         <option
                           th:each="exam : ${exams}"
-                          th:value="${exam}"
+                          th:value="${exam.id}"
                           th:text="${exam.name}"
                         ></option>
                       </select>
@@ -61,29 +66,14 @@
                       <label class="form-label">Lớp thi:</label>
                       <select
                         class="form-select"
-                        th:field="*{classroom}"
+                        th:field="*{classroom.id}"
                         required
                       >
+                        <option value="">-- Chọn lớp thi --</option>
                         <option
                           th:each="classRoom : ${classRooms}"
-                          th:value="${classRoom}"
+                          th:value="${classRoom.id}"
                           th:text="${classRoom.name}"
-                        ></option>
-                      </select>
-                    </div>
-
-                    <!-- Chọn giảng viên -->
-                    <div class="mb-3">
-                      <label class="form-label">Giảng viên phụ trách:</label>
-                      <select
-                        class="form-select"
-                        th:field="*{teacher}"
-                        required
-                      >
-                        <option
-                          th:each="user : ${teachers}"
-                          th:value="${user}"
-                          th:text="${user.fullName}"
                         ></option>
                       </select>
                     </div>

@@ -17,6 +17,8 @@ public interface ExamRepository extends JpaRepository<Exam, Long>{
 
     List<Exam> findAll();
 
+    List<Exam> findByUserId(Long id);
+
     Page<Exam> findByUserId(Long id, Pageable pageable);
 
     Exam findById(long id);

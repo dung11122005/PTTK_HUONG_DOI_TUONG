@@ -91,7 +91,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/exams?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/exam?page=' + ${currentPage - 1}}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
@@ -104,7 +104,7 @@
                         <a
                           class="page-link"
                           th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/exams?page=' + ${i}}"
+                          th:href="@{'/admin/exam?page=' + ${i}}"
                           th:text="${i}"
                           >1</a
                         >

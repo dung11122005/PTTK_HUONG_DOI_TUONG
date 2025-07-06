@@ -1,5 +1,7 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,10 @@ public class ExamService {
         return this.examRepository.findAll(page);
     }
 
+    public List<Exam> getAllExam() {
+        return this.examRepository.findAll();
+    }
+
     public Exam handleSaveExam(Exam exam) {
         Exam eric = this.examRepository.save(exam);
         return eric;
@@ -31,6 +37,10 @@ public class ExamService {
 
     public Exam getExamById(long id) {
         return this.examRepository.findById(id);
+    }
+
+    public List<Exam> getExamByTeacherId(long id) {
+        return this.examRepository.findByUserId(id);
     }
 
     public void deleteAExam(long id) {

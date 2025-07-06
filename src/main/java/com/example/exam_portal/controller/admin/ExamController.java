@@ -57,8 +57,14 @@ public class ExamController {
         } catch (Exception e) {
 
         }
+        Page<Exam> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Exam> us = this.examService.getAllExamPaginationTeacherId(teacher.getId(), pageable);
+        if(teacher.getRole().getName().equals("ADMIN")){
+            us = this.examService.getAllExamPagination(pageable);
+        }else{
+            us = this.examService.getAllExamPaginationTeacherId(teacher.getId(), pageable);
+        }
+        
         List<Exam> exams = us.getContent();
         model.addAttribute("exams", exams);
         model.addAttribute("currentPage", page);

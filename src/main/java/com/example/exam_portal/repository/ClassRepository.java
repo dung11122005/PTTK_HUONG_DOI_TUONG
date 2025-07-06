@@ -15,6 +15,8 @@ public interface ClassRepository extends JpaRepository<ClassRoom, Long>{
 
     List<ClassRoom> findAll();
 
+    List<ClassRoom> findByTeacherId(Long id);
+
     Page<ClassRoom> findByTeacherId(Long teacherId, Pageable pageable);
 
     ClassRoom findById(long id);

@@ -51,51 +51,54 @@
                         <th>Tên đề thi</th>
                         <th>Lớp thi</th>
                         <th>Giảng viên</th>
-                        <th>bắt đầu</th>
-                        <th>kết thúc</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="session : ${examSessions}">
-                        <td th:text="${session.id}">1</td>
-                        <td th:text="${session.exam.name}">Đề thi Toán</td>
-                        <td th:text="${session.classroom.name}">Lớp 12A1</td>
-                        <td th:text="${session.teacher.fullName}">
-                          Nguyễn Văn A
+                      <tr th:each="examSession : ${examSessions}">
+                        <td th:text="${examSession.id}">1</td>
+                        <td th:text="${examSession.exam?.name} ?: '---'">
+                          Đề thi
+                        </td>
+                        <td th:text="${examSession.classroom?.name} ?: '---'">
+                          Lớp
+                        </td>
+                        <td th:text="${examSession.teacher?.fullName} ?: '---'">
+                          GV
                         </td>
                         <td
-                          th:text="${#temporals.format(session.startTime, 'dd/MM/yyyy HH:mm')}"
+                          th:text="${examSession.startTime != null} ? ${#temporals.format(examSession.startTime, 'dd/MM/yyyy HH:mm')} : '---'"
                         >
                           01/01/2025 08:00
                         </td>
                         <td
-                          th:text="${#temporals.format(session.endTime, 'dd/MM/yyyy HH:mm')}"
+                          th:text="${examSession.endTime != null} ? ${#temporals.format(examSession.endTime, 'dd/MM/yyyy HH:mm')} : '---'"
                         >
                           01/01/2025 09:00
                         </td>
                         <td>
                           <span
-                            th:text="${session.isLocked} ? 'Đã khóa' : 'Đang mở'"
-                            >Đang mở</span
+                            th:text="${examSession.isLocked} ? 'Đã khóa' : 'Đang mở'"
+                            >Trạng thái</span
                           >
                         </td>
                         <td>
                           <a
-                            th:href="@{'/admin/test/view/' + ${session.id}}"
+                            th:href="@{'/admin/test/' + ${examSession.id}}"
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
                           <a
-                            th:href="@{'/admin/test/update/' + ${session.id}}"
+                            th:href="@{'/admin/test/update/' + ${examSession.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
-                            th:href="@{'/admin/test/delete/' + ${session.id}}"
+                            th:href="@{'/admin/test/delete/' + ${examSession.id}}"
                             class="btn btn-danger btn-sm"
-                            onclick="return confirm('Bạn có chắc muốn xóa ca thi này không?')"
                             >Xóa</a
                           >
                         </td>
@@ -110,7 +113,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/exam-sessions?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/test?page=' + ${currentPage - 1}}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
@@ -123,7 +126,7 @@
                         <a
                           class="page-link"
                           th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/exam-sessions?page=' + ${i}}"
+                          th:href="@{'/admin/test?page=' + ${i}}"
                           th:text="${i}"
                           >1</a
                         >

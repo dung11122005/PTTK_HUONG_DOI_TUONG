@@ -47,8 +47,15 @@ public class ClassController {
         } catch (Exception e) {
 
         }
+
+        Page<ClassRoom> cl;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<ClassRoom> cl = this.classService.getAllClassRoomPaginationByIdTeacher(teacher.getId(), pageable);
+        if(teacher.getRole().getName().equals("ADMIN")){
+            cl = this.classService.getAllClassRoomPagination(pageable);
+        }else{
+            cl = this.classService.getAllClassRoomPaginationByIdTeacher(teacher.getId(), pageable);
+        }
+        
         List<ClassRoom> classRooms = cl.getContent();
         model.addAttribute("classRooms", classRooms);
         model.addAttribute("currentPage", page);

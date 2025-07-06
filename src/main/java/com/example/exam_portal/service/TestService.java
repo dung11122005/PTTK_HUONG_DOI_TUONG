@@ -1,5 +1,7 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,10 @@ public class TestService {
 
     public Page<ExamSession> getAllExamSessionPagination(Pageable page) {
         return this.testRepositoty.findAll(page);
+    }
+
+    public List<ExamSession> getAllExamSession() {
+        return this.testRepositoty.findAll();
     }
 
     public ExamSession handleSaveExamSession(ExamSession examSession) {
