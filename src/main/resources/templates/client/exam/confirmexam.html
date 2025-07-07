@@ -84,14 +84,18 @@
               <span th:text="${examSession.exam.name}"></span><br />
               <strong>Lớp:</strong>
               <span th:text="${examSession.classroom.name}"></span><br />
-              <strong>Thời gian:</strong>
+              <strong>Khung giờ làm bài:</strong>
               <span
                 th:text="${#temporals.format(examSession.startTime, 'dd/MM/yyyy HH:mm')}"
               ></span>
               -
               <span
                 th:text="${#temporals.format(examSession.endTime, 'dd/MM/yyyy HH:mm')}"
-              ></span>
+              ></span
+              ><br />
+              <strong>Thời gian làm bài:</strong>
+              <span th:text="${examSession.exam.timeLimit + ' phút'}"></span
+              ><br />
             </p>
 
             <div class="mt-4">

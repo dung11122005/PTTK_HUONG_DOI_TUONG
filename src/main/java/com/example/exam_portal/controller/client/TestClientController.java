@@ -101,6 +101,13 @@ public class TestClientController {
             return "redirect:/exam";
         }
        
+        // ✅ Kiểm tra thời gian hiện tại có nằm trong khung giờ làm bài
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(examSession.getStartTime()) || now.isAfter(examSession.getEndTime())) {
+            redirectAttributes.addFlashAttribute("error", "Chưa đến hoặc đã quá thời gian làm bài.");
+            return "redirect:/exam";
+        }
+
         List<Question> questions = exam.getQuestions();
     
         model.addAttribute("examSession", examSession);
@@ -113,6 +120,7 @@ public class TestClientController {
     public String submitExam(@RequestParam Map<String, String> params,
                              @RequestParam MultiValueMap<String, String> multiParams,
                              @RequestParam("examSessionId") Long examSessionId,
+                             @RequestParam(value = "autoSubmit", defaultValue = "false") boolean autoSubmit,
                              @AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
                             
@@ -124,17 +132,18 @@ public class TestClientController {
         float score = 0f;
                             
         Map<Long, Object> userAnswers = new HashMap<>();
+        boolean hasAnyAnswer = false; // <-- để xác định người dùng có làm bài không
                             
         for (Question q : exam.getQuestions()) {
             String paramKey = "answers[" + q.getId() + "]";
-        
             totalPoints += q.getPoints();
         
             switch (q.getType()) {
                 case SINGLE:
                 case TRUE_FALSE:
                     String singleAns = params.get(paramKey);
-                    if (singleAns != null) {
+                    if (singleAns != null && !singleAns.trim().isEmpty()) {
+                        hasAnyAnswer = true;
                         userAnswers.put(q.getId(), singleAns);
                     
                         Choice correct = q.getChoices().stream()
@@ -149,7 +158,8 @@ public class TestClientController {
                 
                 case MULTIPLE:
                     List<String> multiAns = multiParams.get(paramKey);
-                    if (multiAns != null) {
+                    if (multiAns != null && !multiAns.isEmpty()) {
+                        hasAnyAnswer = true;
                         userAnswers.put(q.getId(), multiAns);
                     
                         List<String> correctAnswers = q.getChoices().stream()
@@ -168,8 +178,10 @@ public class TestClientController {
                 
                 case FILL_IN_BLANK:
                     String inputAns = params.get(paramKey);
-                    if (inputAns != null) {
+                    if (inputAns != null && !inputAns.trim().isEmpty()) {
+                        hasAnyAnswer = true;
                         userAnswers.put(q.getId(), inputAns);
+                    
                         if (q.getCorrectAnswer() != null &&
                             q.getCorrectAnswer().trim().equalsIgnoreCase(inputAns.trim())) {
                             score += q.getPoints();
@@ -179,16 +191,22 @@ public class TestClientController {
             }
         }
     
+        // Nếu không trả lời câu nào => cho 0 điểm và đánh dấu gian lận
         float finalScore = (totalPoints == 0) ? 0f : (score / totalPoints) * 10;
     
         ExamResult result = new ExamResult();
         result.setStudent(student);
         result.setExam(exam);
         result.setExamSession(session);
-        result.setScore(score);
+        result.setScore(hasAnyAnswer ? score : 0f);
         result.setSubmittedAt(LocalDateTime.now());
         result.setAnswersJson(new Gson().toJson(userAnswers));
-        result.setDurationUsed(0); // TODO nếu có thời gian
+        result.setDurationUsed(0); // TODO: Tính thời gian nếu muốn
+    
+        if (autoSubmit && userAnswers.isEmpty()) {
+            result.setScore(0f);
+        }
+    
     
         examResultService.handleSaveExam(result);
     
@@ -197,6 +215,5 @@ public class TestClientController {
         return "client/exam/result";
     }
 
-    
     
 }

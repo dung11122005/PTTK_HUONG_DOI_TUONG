@@ -1,5 +1,6 @@
 package com.example.exam_portal.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,8 @@ import jakarta.servlet.DispatcherType;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -87,6 +90,19 @@ public class SecurityConfiguration {
                 .invalidSessionUrl("/logout?expired")
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
+            )
+        //     .logout(logout -> logout
+        //     .logoutUrl("/logout")
+        //     .logoutSuccessUrl("/login?logout")
+        //     .deleteCookies("JSESSIONID") // <-- Chỉ xóa khi người dùng logout thật sự
+        //     .invalidateHttpSession(true) // <-- Không liên quan đến reload hay chuyển tab
+        // )
+
+            .rememberMe(remember -> remember
+                .key("uniqueAndSecretKey")
+                .rememberMeParameter("remember-me") // tùy tên checkbox
+                .tokenValiditySeconds(10000)
+                .userDetailsService(userDetailsService) // 👈 BẮT BUỘC
             )
 
             .exceptionHandling(ex -> ex.accessDeniedPage("/access-deny"))

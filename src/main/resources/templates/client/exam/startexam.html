@@ -65,7 +65,58 @@
         color: white !important;
         border-color: #28a745;
       }
+
+      /* Không cho bôi đen, không cho copy, không cho chuột phải */
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+      }
+
+      .no-copy * {
+        user-select: none;
+        pointer-events: auto;
+      }
+
+      input.answer-input {
+        user-select: auto; /* Cho phép nhập, nhưng không cho copy nội dung bên cạnh */
+      }
+
+      /* Ngăn chuột phải */
+      body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      body,
+      input,
+      button {
+        -webkit-user-drag: none;
+        -moz-user-drag: none;
+        user-drag: none;
+      }
     </style>
+
+    <script>
+      // Ngăn chuột phải
+      document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+
+      // Ngăn kéo văn bản
+      document.addEventListener("dragstart", function (e) {
+        e.preventDefault();
+      });
+
+      // Ngăn copy
+      document.addEventListener("copy", function (e) {
+        e.preventDefault();
+      });
+    </script>
   </head>
 
   <body>
@@ -93,7 +144,24 @@
           <div class="row">
             <!-- Câu hỏi -->
             <div class="col-md-9">
-              <form method="post" th:action="@{/exam/submit}">
+              <!-- Thanh đếm ngược -->
+              <div id="countdown-wrapper" style="margin-bottom: 20px">
+                <p>
+                  ⏰ <strong>Thời gian còn lại:</strong>
+                  <span
+                    id="countdown"
+                    style="font-weight: bold; font-size: 18px; color: green"
+                    >--:--</span
+                  >
+                </p>
+              </div>
+
+              <form
+                method="post"
+                th:action="@{/exam/submit}"
+                id="examForm"
+                class="no-select"
+              >
                 <input
                   type="hidden"
                   th:name="examSessionId"
@@ -105,6 +173,7 @@
                   th:each="question, iterStat : ${questions}"
                   style="margin-bottom: 10px"
                   th:id="'q' + ${iterStat.index}"
+                  class="no-copy"
                 >
                   <p style="margin-bottom: 4px">
                     <strong>Câu [[${iterStat.index + 1}]]:</strong>
@@ -131,7 +200,6 @@
                             th:name="'answers[' + ${question.id} + ']'"
                             th:value="${choice.content}"
                             class="answer-input"
-                            required
                           />
                           <span th:text="${choice.content}"></span>
                         </label>
@@ -168,10 +236,14 @@
                     style="margin-bottom: 6px"
                   >
                     <input
+                      type="hidden"
+                      th:name="'answers[' + ${question.id} + ']'"
+                      value=""
+                    />
+                    <input
                       type="text"
                       class="form-control mt-1 answer-input"
                       th:name="'answers[' + ${question.id} + ']'"
-                      required
                       style="font-size: 18px; height: 36px; padding: 5px"
                     />
                   </div>
@@ -251,6 +323,143 @@
             }
           })(inputs[i]);
         }
+      });
+    </script>
+    <script th:inline="javascript">
+      const examId = [[${examSession.id}]];
+      const timeLimitMinutes = [[${examSession.exam.timeLimit}]];
+      const timeLimitSeconds = timeLimitMinutes * 60;
+      const storageKey = "exam_start_time_" + examId;
+
+      const form = document.getElementById("examForm");
+      const countdownEl = document.getElementById("countdown");
+      let submitted = false;
+
+      const now = Date.now();
+      let startTime = localStorage.getItem(storageKey);
+
+      if (!startTime) {
+        startTime = now;
+        localStorage.setItem(storageKey, startTime);
+      } else {
+        startTime = parseInt(startTime);
+      }
+
+      let remainingSeconds = timeLimitSeconds - Math.floor((now - startTime) / 1000);
+
+      // Nếu hết giờ và người dùng đã xóa localStorage để làm lại → reset lại luôn
+      if (remainingSeconds <= 0) {
+        startTime = now;
+        localStorage.setItem(storageKey, startTime);
+        remainingSeconds = timeLimitSeconds;
+      }
+
+      function updateCountdown() {
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+        countdownEl.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+        if (remainingSeconds <= timeLimitSeconds * 0.3) {
+          countdownEl.style.color = "red";
+          countdownEl.style.fontWeight = "bold";
+          countdownEl.style.animation = "blink 1s infinite";
+        }
+
+        if (remainingSeconds <= 0) {
+          clearInterval(timer);
+          submitExam();
+        }
+
+        remainingSeconds--;
+      }
+
+      function submitExam() {
+        if (submitted) return;
+        submitted = true;
+
+        if (!form) {
+          console.error("Không tìm thấy form!");
+          return;
+        }
+
+        form.querySelectorAll("[required]").forEach(el => el.removeAttribute("required"));
+
+        const autoInput = document.createElement("input");
+        autoInput.type = "hidden";
+        autoInput.name = "autoSubmit";
+        autoInput.value = "true";
+        form.appendChild(autoInput);
+
+        const submitButton = form.querySelector("button[type='submit'], input[type='submit']");
+        if (submitButton) {
+          submitButton.click();
+        } else {
+          form.submit();
+        }
+
+        localStorage.removeItem(storageKey);
+      }
+
+      const timer = setInterval(updateCountdown, 1000);
+      updateCountdown();
+
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes blink {
+          0% { opacity: 1; }
+          50% { opacity: 0.2; }
+          100% { opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) submitExam();
+      });
+
+      window.addEventListener("beforeunload", function () {
+        if (!submitted && remainingSeconds > 0) {
+          submitExam();
+        }
+      });
+
+      // 🛡️ Gửi request giữ session
+      setInterval(() => {
+        fetch('/keep-session-alive', {
+          method: 'GET',
+          credentials: 'include'
+        });
+      }, 60000); // mỗi phút
+    </script>
+    <script>
+      document.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", function (e) {
+          if (!submitted && remainingSeconds > 0) {
+            e.preventDefault(); // 🛑 chặn chuyển hướng
+            submitted = true;
+
+            // Bỏ required tránh lỗi
+            form
+              .querySelectorAll("[required]")
+              .forEach((el) => el.removeAttribute("required"));
+
+            const autoInput = document.createElement("input");
+            autoInput.type = "hidden";
+            autoInput.name = "autoSubmit";
+            autoInput.value = "true";
+            form.appendChild(autoInput);
+
+            // Gửi form, rồi chuyển trang sau khi gửi xong
+            form.addEventListener("submit", () => {
+              // delay một chút rồi mới chuyển tiếp
+              setTimeout(() => {
+                window.location.href = link.href;
+              }, 800); // đủ thời gian cho backend xử lý
+            });
+
+            form.submit();
+          }
+        });
       });
     </script>
 

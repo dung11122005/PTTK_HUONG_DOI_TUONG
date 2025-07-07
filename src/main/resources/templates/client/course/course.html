@@ -68,55 +68,57 @@
     <!-- Header End -->
     <main>
       <!--? slider Area Start-->
-      <section
-        class="slider-area"
-        style="background-color: #6c5ce7; padding: 10px 0"
-      >
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12 text-center">
-              <h1
-                style="
-                  font-weight: 800;
-                  color: white;
-                  font-size: 48px;
-                  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
-                "
-              >
-                Our Courses
-              </h1>
-              <nav aria-label="breadcrumb">
-                <ol
-                  class="breadcrumb justify-content-center"
-                  style="background-color: transparent"
-                >
-                  <li class="breadcrumb-item">
-                    <a href="/" style="color: #f1f1f1">Home</a>
-                  </li>
-                  <li
-                    class="breadcrumb-item active"
-                    aria-current="page"
-                    style="color: #fff"
-                  >
-                    Courses
-                  </li>
-                </ol>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- Courses area start -->
       <div class="courses-area mt-5 fix" style="margin-bottom: 70px">
         <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-8">
-              <div class="section-tittle text-center">
-                <h2>Khóa học</h2>
+          <div class="row justify-content-center mb-4">
+            <div class="row justify-content-center mb-4">
+              <!-- ✅ Thanh tìm kiếm đơn giản, đẹp, không lỗi hiển thị -->
+              <div
+                style="
+                  display: flex;
+                  justify-content: center;
+                  margin-bottom: 30px;
+                "
+              >
+                <form
+                  action="/courses/search"
+                  method="get"
+                  style="display: flex; width: 100%; max-width: 600px"
+                >
+                  <input
+                    type="text"
+                    name="keyword"
+                    placeholder="Tìm kiếm khóa học..."
+                    style="
+                      flex: 1;
+                      padding: 10px 15px;
+                      font-size: 16px;
+                      border: 1px solid #ccc;
+                      border-radius: 4px 0 0 4px;
+                      outline: none;
+                    "
+                  />
+                  <button
+                    type="submit"
+                    style="
+                      padding: 10px 20px;
+                      font-size: 16px;
+                      border: none;
+                      background-color: #6c5ce7;
+                      color: white;
+                      border-radius: 0 4px 4px 0;
+                      cursor: pointer;
+                    "
+                  >
+                    Tìm
+                  </button>
+                </form>
               </div>
             </div>
           </div>
+
           <div class="row">
             <div class="col-lg-4">
               <div class="properties properties2 mb-30">
