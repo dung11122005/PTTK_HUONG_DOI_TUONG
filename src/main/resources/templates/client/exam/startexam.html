@@ -236,23 +236,34 @@
                     style="margin-bottom: 6px"
                   >
                     <input
-                      type="hidden"
-                      th:name="'answers[' + ${question.id} + ']'"
-                      value=""
-                    />
-                    <input
                       type="text"
                       class="form-control mt-1 answer-input"
                       th:name="'answers[' + ${question.id} + ']'"
                       style="font-size: 18px; height: 36px; padding: 5px"
+                      autocomplete="off"
                     />
                   </div>
 
                   <hr style="margin: 8px 0" />
                 </div>
 
-                <button class="btn btn-primary mt-4" type="submit">
+                <!-- Nút gốc ẩn đi -->
+                <button
+                  class="btn btn-primary mt-4"
+                  type="submit"
+                  style="display: none !important"
+                  id="realSubmitBtn"
+                >
                   Nộp bài
+                </button>
+
+                <!-- Nút mới hiển thị -->
+                <button
+                  class="btn btn-danger mt-4"
+                  type="button"
+                  id="confirmSubmitBtn"
+                >
+                  🚨 Nộp bài
                 </button>
               </form>
             </div>
@@ -284,6 +295,31 @@
     <div id="back-top">
       <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
     </div>
+    <!-- sử lí nút nộp -->
+    <script>
+      document
+        .getElementById("confirmSubmitBtn")
+        .addEventListener("click", function () {
+          const confirmSubmit = confirm("Bạn có chắc chắn muốn nộp bài không?");
+          if (confirmSubmit) {
+            submitted = true;
+
+            // Bỏ required tránh lỗi
+            form
+              .querySelectorAll("[required]")
+              .forEach((el) => el.removeAttribute("required"));
+
+            const manualInput = document.createElement("input");
+            manualInput.type = "hidden";
+            manualInput.name = "manualSubmit";
+            manualInput.value = "true";
+            form.appendChild(manualInput);
+
+            // Submit thật
+            document.getElementById("realSubmitBtn").click();
+          }
+        });
+    </script>
 
     <script>
       function scrollToQuestion(index) {
