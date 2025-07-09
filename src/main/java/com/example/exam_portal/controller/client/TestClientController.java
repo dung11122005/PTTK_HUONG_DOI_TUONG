@@ -56,8 +56,15 @@ public class TestClientController {
             return "client/exam/examclient";
         }
 
+
         // Lấy các kỳ thi thuộc những lớp đó
-        List<ExamSession> examSessions = this.testService.getAllExamSessionListClassId(classIds);
+        List<ExamSession> allExamSessions = this.testService.getAllExamSessionListClassId(classIds);
+            
+        // Lọc ra những ca thi chưa bị khóa
+        List<ExamSession> examSessions = allExamSessions.stream()
+            .filter(es -> Boolean.FALSE.equals(es.getIsLocked()))
+            .collect(Collectors.toList());
+
 
         model.addAttribute("examSessions", examSessions);
          // Thymeleaf template
