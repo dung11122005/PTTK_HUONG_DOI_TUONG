@@ -26,6 +26,10 @@ public class Course {
 
     private String name;
 
+    @Column(name = "short_description", length = 255)
+    private String shortDescription;
+
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -42,5 +46,5 @@ public class Course {
     private String thumbnail;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseLesson> lessons;
+    private List<Chapter> chapters;
 }

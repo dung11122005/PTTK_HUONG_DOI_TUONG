@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/","/course", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**").permitAll()
             
-                .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**").hasAnyRole("TEACHER", "ADMIN")
+                .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**").hasAnyRole("TEACHER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
