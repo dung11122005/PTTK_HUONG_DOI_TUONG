@@ -48,34 +48,32 @@
         padding-top: 100px; /* Đẩy nội dung xuống dưới header để không bị che */
       }
 
-
       .green-btn {
         background-color: #28a745 !important;
         color: white !important;
         border-color: #28a745 !important;
-      }     
-      
+      }
+
       .pagination {
-        font-size: 1.5rem !important;
+        font-size: 2rem !important;
         margin-top: 20px !important;
       }
-    
+
       .pagination .page-link {
         padding: 15px 25px !important;
-        font-size: 1rem !important;
+        font-size: 1.5rem !important;
         border-radius: 8px !important;
       }
-    
+
       .pagination .page-item.active .page-link {
         background-color: #007bff !important;
         color: white !important;
         border-color: #007bff !important;
       }
-    
+
       .pagination .page-link:hover {
         background-color: #e9ecef !important;
       }
-      
     </style>
   </head>
 
@@ -201,12 +199,19 @@
               </div>
             </div>
           </div>
+          <div>
             <div class="row justify-content-center">
               <div class="col-12">
                 <nav aria-label="Page navigation">
-                  <ul class="pagination justify-content-center">
+                  <ul
+                    class="pagination justify-content-center"
+                    style="font-size: 20px"
+                  >
                     <!-- Nút Previous -->
-                    <li class="page-item" th:classappend="${currentPage == 1} ? ' disabled'">
+                    <li
+                      class="page-item"
+                      th:classappend="${currentPage == 1} ? ' disabled'"
+                    >
                       <a
                         class="page-link"
                         th:href="@{'/courses?page=' + ${currentPage - 1}}"
@@ -215,18 +220,26 @@
                         <span aria-hidden="true">&laquo;</span>
                       </a>
                     </li>
-                  
+
                     <!-- Các số trang -->
                     <li
                       class="page-item"
                       th:each="i : ${#numbers.sequence(1, totalPages)}"
                       th:classappend="${i == currentPage} ? ' active'"
                     >
-                      <a class="page-link" th:href="@{'/courses?page=' + ${i}}" th:text="${i}">1</a>
+                      <a
+                        class="page-link"
+                        th:href="@{'/courses?page=' + ${i}}"
+                        th:text="${i}"
+                        >1</a
+                      >
                     </li>
-                  
+
                     <!-- Nút Next -->
-                    <li class="page-item" th:classappend="${currentPage == totalPages} ? ' disabled'">
+                    <li
+                      class="page-item"
+                      th:classappend="${currentPage == totalPages} ? ' disabled'"
+                    >
                       <a
                         class="page-link"
                         th:href="@{'/courses?page=' + ${currentPage + 1}}"
@@ -242,7 +255,6 @@
           </div>
         </div>
       </div>
-     
     </main>
     <footer>
       <div th:replace="client/layout/footer"></div>

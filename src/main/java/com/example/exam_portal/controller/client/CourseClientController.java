@@ -2,6 +2,7 @@ package com.example.exam_portal.controller.client;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,10 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.exam_portal.domain.Course;
+import com.example.exam_portal.domain.CourseLesson;
+import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.CourseService;
+import com.example.exam_portal.service.PurchaseService;
 import com.example.exam_portal.service.UserService;
 
 
@@ -22,10 +27,12 @@ import com.example.exam_portal.service.UserService;
 public class CourseClientController {
     private final CourseService courseService;
     private final UserService userService;
+    private final PurchaseService purchaseService;
 
-    public CourseClientController(CourseService courseService, UserService userService){
+    public CourseClientController(CourseService courseService, UserService userService, PurchaseService purchaseService){
         this.courseService=courseService;
         this.userService=userService;
+        this.purchaseService=purchaseService;
     }
 
     @GetMapping("/courses")
@@ -56,4 +63,30 @@ public class CourseClientController {
         return "client/course/course";
     }
     
+    @GetMapping("/course/detail/{id}")
+    public String getCourseDetailtPage(Model model, @PathVariable long id, @AuthenticationPrincipal UserDetails userDetails) {
+        Course course=this.courseService.getCourseById(id);
+        User user = this.userService.getUserByEmail(userDetails.getUsername());
+        int totalLessons = course.getChapters().stream()
+            .flatMap(c -> c.getLessons().stream())
+            .collect(Collectors.toList())
+            .size();
+
+        int totalDuration = course.getChapters().stream()
+            .flatMap(c -> c.getLessons().stream())
+            .mapToInt(CourseLesson::getDurationMinutes)
+            .sum();
+
+        totalDuration=totalDuration/60;
+
+        boolean check=this.purchaseService.checkPurchaseStudentIdAndCourseId(user.getId(), id);
+        model.addAttribute("check", check);
+        model.addAttribute("course", course);
+        model.addAttribute("totalLessons", totalLessons);
+        model.addAttribute("totalDuration", totalDuration);
+        
+        return "client/course/coursedetailt";
+    }
+    
+
 }
