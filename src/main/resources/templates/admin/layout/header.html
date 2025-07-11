@@ -19,32 +19,44 @@
     <!-- Navbar Search-->
     <form
       class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"
-    >
-      <div class="input-group">
-        <input
-          class="form-control"
-          type="text"
-          placeholder="Search for..."
-          aria-label="Search for..."
-          aria-describedby="btnNavbarSearch"
-        />
-        <button class="btn btn-primary" id="btnNavbarSearch" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-    </form>
+    ></form>
     <!-- Navbar-->
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
       <li class="nav-item dropdown">
         <a
-          class="nav-link dropdown-toggle"
+          class="nav-link dropdown-toggle d-flex align-items-center text-white"
           id="navbarDropdown"
           href="#"
           role="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"
-          ><i class="fas fa-user fa-fw"></i
-        ></a>
+          style="gap: 12px"
+        >
+          <img
+            th:src="@{/uploads/images/avatars/{img}(img=${session.avatar})}"
+            alt="avatar"
+            class="rounded-circle shadow"
+            width="42"
+            height="42"
+            style="object-fit: cover"
+          />
+          <div class="text-start">
+            <div
+              th:text="${session.email}"
+              style="font-size: 1rem; font-weight: 500"
+            >
+              email@example.com
+            </div>
+            <div
+              th:text="${session.role}"
+              class="text-light"
+              style="font-size: 0.85rem"
+            >
+              ROLE
+            </div>
+          </div>
+        </a>
+
         <ul
           class="dropdown-menu dropdown-menu-end"
           aria-labelledby="navbarDropdown"

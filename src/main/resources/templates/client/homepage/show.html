@@ -38,6 +38,15 @@
     
 
     </style>
+
+    <style>
+      .green-btn {
+        background-color: #28a745 !important;
+        color: white !important;
+        border-color: #28a745 !important;
+      }      
+      
+    </style>
   </head>
 
   <body>
@@ -72,27 +81,22 @@
             </div>
           </div>
           <div class="courses-actives">
-            <!-- Single -->
-            <div class="properties pb-20">
+           
+            <div class="properties pb-20" th:each="course : ${courses}">
               <div class="properties__card">
                 <div class="properties__img overlay1">
-                  <a href="#"
-                    ><img src="/img/gallery/featured1.png" alt=""
-                  /></a>
+                  <a th:href="@{'/course/detail/' + ${course.id}}">
+                    <img th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}" alt="Course Image" />
+                  </a>
                 </div>
                 <div class="properties__caption">
-                  <p>User Experience</p>
+                  <p th:text="${course.teacher.fullName}">Tên giảng viên</p>
                   <h3>
-                    <a href="#">Fundamental of UX for Application design</a>
+                    <a th:href="@{'/course/detail/' + ${course.id}}" th:text="${course.name}">Tên khóa học</a>
                   </h3>
-                  <p>
-                    The automated process all your website tasks. Discover tools
-                    and techniques to engage effectively with vulnerable
-                    children and young people.
-                  </p>
-                  <div
-                    class="properties__footer d-flex justify-content-between align-items-center"
-                  >
+                  <p th:text="${course.shortDescription}">Mô tả ngắn</p>
+            
+                  <div class="properties__footer d-flex justify-content-between align-items-center">
                     <div class="restaurant-name">
                       <div class="rating">
                         <i class="fas fa-star"></i>
@@ -104,212 +108,28 @@
                       <p><span>(4.5)</span> based on 120</p>
                     </div>
                     <div class="price">
-                      <span>$135</span>
+                      <span th:if="${course.isFree}" th:text="'Free'"></span>
+                      <span th:unless="${course.isFree}" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                     </div>
+                    
                   </div>
-                  <a href="#" class="border-btn border-btn2">Find out more</a>
+            
+                  <a th:href="@{'/course/detail/' + ${course.id}}"
+                     th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'">
+                    Find out more
+                  </a>
+
                 </div>
               </div>
             </div>
-            <!-- Single -->
-            <!-- Single -->
-            <div class="properties pb-20">
-              <div class="properties__card">
-                <div class="properties__img overlay1">
-                  <a href="#"
-                    ><img src="/img/gallery/featured2.png" alt=""
-                  /></a>
-                </div>
-                <div class="properties__caption">
-                  <p>User Experience</p>
-                  <h3>
-                    <a href="#">Fundamental of UX for Application design</a>
-                  </h3>
-                  <p>
-                    The automated process all your website tasks. Discover tools
-                    and techniques to engage effectively with vulnerable
-                    children and young people.
-                  </p>
-                  <div
-                    class="properties__footer d-flex justify-content-between align-items-center"
-                  >
-                    <div class="restaurant-name">
-                      <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half"></i>
-                      </div>
-                      <p><span>(4.5)</span> based on 120</p>
-                    </div>
-                    <div class="price">
-                      <span>$135</span>
-                    </div>
-                  </div>
-                  <a href="#" class="border-btn border-btn2">Find out more</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single -->
-            <!-- Single -->
-            <div class="properties pb-20">
-              <div class="properties__card">
-                <div class="properties__img overlay1">
-                  <a href="#"
-                    ><img src="/img/gallery/featured3.png" alt=""
-                  /></a>
-                </div>
-                <div class="properties__caption">
-                  <p>User Experience</p>
-                  <h3>
-                    <a href="#">Fundamental of UX for Application design</a>
-                  </h3>
-                  <p>
-                    The automated process all your website tasks. Discover tools
-                    and techniques to engage effectively with vulnerable
-                    children and young people.
-                  </p>
-                  <div
-                    class="properties__footer d-flex justify-content-between align-items-center"
-                  >
-                    <div class="restaurant-name">
-                      <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half"></i>
-                      </div>
-                      <p><span>(4.5)</span> based on 120</p>
-                    </div>
-                    <div class="price">
-                      <span>$135</span>
-                    </div>
-                  </div>
-                  <a href="#" class="border-btn border-btn2">Find out more</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single -->
-            <!-- Single -->
-            <div class="properties pb-20">
-              <div class="properties__card">
-                <div class="properties__img overlay1">
-                  <a href="#"
-                    ><img src="/img/gallery/featured2.png" alt=""
-                  /></a>
-                </div>
-                <div class="properties__caption">
-                  <p>User Experience</p>
-                  <h3>
-                    <a href="#">Fundamental of UX for Application design</a>
-                  </h3>
-                  <p>
-                    The automated process all your website tasks. Discover tools
-                    and techniques to engage effectively with vulnerable
-                    children and young people.
-                  </p>
-                  <div
-                    class="properties__footer d-flex justify-content-between align-items-center"
-                  >
-                    <div class="restaurant-name">
-                      <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half"></i>
-                      </div>
-                      <p><span>(4.5)</span> based on 120</p>
-                    </div>
-                    <div class="price">
-                      <span>$135</span>
-                    </div>
-                  </div>
-                  <a href="#" class="border-btn border-btn2">Find out more</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single -->
+            
+            
           </div>
         </div>
       </div>
       <!-- Courses area End -->
 
-      <!-- About Area End -->
-      <!--? top subjects Area Start -->
-      <div class="topic-area mt-5" style="margin-bottom: 30px">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-8">
-              <div class="section-tittle text-center">
-                <h2>Khám phá các chủ đề hàng đầu</h2>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="single-topic text-center mb-30">
-                <div class="topic-img">
-                  <img src="/img/gallery/topic1.png" alt="" />
-                  <div class="topic-content-box">
-                    <div class="topic-content">
-                      <h3><a href="#">Toán</a></h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="single-topic text-center mb-30">
-                <div class="topic-img">
-                  <img src="/img/gallery/topic2.png" alt="" />
-                  <div class="topic-content-box">
-                    <div class="topic-content">
-                      <h3><a href="#">Lí</a></h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="single-topic text-center mb-30">
-                <div class="topic-img">
-                  <img src="/img/gallery/topic3.png" alt="" />
-                  <div class="topic-content-box">
-                    <div class="topic-content">
-                      <h3><a href="#">Hóa</a></h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="single-topic text-center mb-30">
-                <div class="topic-img">
-                  <img src="/img/gallery/topic4.png" alt="" />
-                  <div class="topic-content-box">
-                    <div class="topic-content">
-                      <h3><a href="#">Anh</a></h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-          <div class="row justify-content-center">
-            <div class="col-xl-12">
-              <div class="section-tittle text-center">
-                <a href="courses.html" class="border-btn">Xem thêm chủ đề</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- top subjects End -->
-      <!--? About Area-3 Start -->
+      
       <section class="about-area3 fix">
         <div class="support-wrapper align-items-center">
           <div class="right-content3">
