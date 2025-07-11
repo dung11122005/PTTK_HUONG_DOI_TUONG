@@ -1,7 +1,9 @@
 package com.example.exam_portal.controller.client;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,14 +15,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.exam_portal.domain.Course;
 import com.example.exam_portal.domain.CourseLesson;
+import com.example.exam_portal.domain.PaymentRequest;
+import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.CourseService;
+import com.example.exam_portal.service.PaymentService;
 import com.example.exam_portal.service.PurchaseService;
 import com.example.exam_portal.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 
 
 @Controller
@@ -28,11 +40,14 @@ public class CourseClientController {
     private final CourseService courseService;
     private final UserService userService;
     private final PurchaseService purchaseService;
+    private final PaymentService paymentService;
 
-    public CourseClientController(CourseService courseService, UserService userService, PurchaseService purchaseService){
+    public CourseClientController(CourseService courseService, UserService userService, 
+    PurchaseService purchaseService, PaymentService paymentService){
         this.courseService=courseService;
         this.userService=userService;
         this.purchaseService=purchaseService;
+        this.paymentService=paymentService;
     }
 
     @GetMapping("/courses")
@@ -86,6 +101,119 @@ public class CourseClientController {
         model.addAttribute("totalDuration", totalDuration);
         
         return "client/course/coursedetailt";
+    }
+    
+   @PostMapping("/course/purchase/{courseId}")
+    public String postPurchaseCourse(@PathVariable Long courseId,
+                                 HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+       
+
+        Long userId = (Long) session.getAttribute("id");
+
+        Course course = this.courseService.getCourseById(courseId); // lấy khóa học
+        if (course == null) return "redirect:/course/not-found";
+
+        String time = String.valueOf(System.currentTimeMillis());
+        String orderId = "MOMO" + time;
+        String requestId = orderId + "001";
+
+        //mã hóa không dấu
+        String courseName = course.getName();
+        String normalized = Normalizer.normalize(courseName, Normalizer.Form.NFD);
+        String courseNameNoAccent = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("");
+
+        String orderInfo = "Thanh toan khoa hoc " + courseNameNoAccent;
+
+
+        String amount = String.valueOf(course.getPrice().intValue()); // chuyển về chuỗi
+
+        // Tạo yêu cầu thanh toán MoMo
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setAmount(amount);
+        paymentRequest.setOrderId(orderId);
+        paymentRequest.setOrderInfo(orderInfo);
+        paymentRequest.setRequestId(requestId);
+        paymentRequest.setExtraData(""); // có thể mã hóa courseId và userId nếu muốn
+
+        String response = this.paymentService.createPayment(paymentRequest);
+        JsonNode json = new ObjectMapper().readTree(response);
+        String payUrl = json.path("payUrl").asText();
+
+        if (payUrl != null && !payUrl.isEmpty()) {
+            session.setAttribute("momoOrderId", orderId);
+            session.setAttribute("momoRequestId", requestId);
+            session.setAttribute("courseId", courseId);
+            session.setAttribute("userId", userId);
+            return "redirect:" + payUrl;
+        }
+
+        return "redirect:/thanks";
+    }
+
+    @GetMapping("/thanks")
+    public String pustHandleMomoReturn(Model model,
+            @RequestParam(value = "orderId", required = false) String orderId,
+            @RequestParam(value = "resultCode", required = false) Integer resultCode,
+            HttpServletRequest request
+    ) throws Exception {
+        HttpSession session = request.getSession(false);
+        
+        
+        String momoOrderId = (String) session.getAttribute("momoOrderId");
+        String momoRequestId = (String) session.getAttribute("momoRequestId");
+        Long courseId = (Long) session.getAttribute("courseId");
+        Long userId = (Long) session.getAttribute("userId");
+        Course course = this.courseService.getCourseById(courseId);
+        if (resultCode != null && resultCode != 0) {
+            model.addAttribute("course", course);
+            return "client/thank/failure";
+        }
+
+        if (momoOrderId != null && momoRequestId != null) {
+            String status = paymentService.queryTransactionStatus(momoOrderId, momoRequestId);
+            JsonNode json = new ObjectMapper().readTree(status);
+            int resultCodeFromApi = json.path("resultCode").asInt();
+
+            if (resultCodeFromApi == 0) {
+                // ✅ Giao dịch thành công – tiến hành lưu vào bảng purchases
+                
+                User user = this.userService.getUserById(userId);
+
+                if (course != null && user != null && ! this.purchaseService.checkPurchaseStudentIdAndCourseId(userId, courseId)) {
+                    Purchase purchase = new Purchase();
+                    purchase.setCourse(course);
+                    purchase.setStudent(user);
+                    this.purchaseService.handleSavePurchase(purchase); // gọi repository
+                }
+
+                // Xóa session tạm
+                session.removeAttribute("momoOrderId");
+                session.removeAttribute("momoRequestId");
+                session.removeAttribute("courseId");
+                session.removeAttribute("userId");
+                model.addAttribute("course", course);
+
+                return "client/thank/thank";
+            }
+        }
+        model.addAttribute("course", course);
+        return "client/thank/failure";
+    }
+
+    @GetMapping("/test/thank")
+    public String getTestThank(Model model) {
+        Course course=this.courseService.getCourseById(1);
+        model.addAttribute("course", course);
+        return "client/thank/thank";
+    }
+    
+
+    @GetMapping("/test/false")
+    public String getTestThankfalse(Model model) {
+        Course course=this.courseService.getCourseById(1);
+        model.addAttribute("course", course);
+        return "client/thank/failure";
     }
     
 

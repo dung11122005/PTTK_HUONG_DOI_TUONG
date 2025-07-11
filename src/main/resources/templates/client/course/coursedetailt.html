@@ -60,6 +60,16 @@
     .card-body {
       padding: 2rem !important;
     }
+
+    .custom-rounded {
+      border-radius: 12px;
+    }
+
+    .green-btn {
+      background-color: #28a745 !important;
+      color: white !important;
+      border-color: #28a745 !important;
+    }
   </style>
 
   <body>
@@ -179,7 +189,7 @@
           <div class="col-md-4">
             <img
               th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}"
-              class="img-fluid mb-3 rounded"
+              class="img-fluid mb-3 custom-rounded"
               alt="Thumbnail"
             />
 
@@ -200,12 +210,14 @@
                   <span th:text="${totalDuration + ' Giờ'}">0 Giờ</span>
                 </p>
                 <div th:if="${!course.isFree and !check}">
-                  <a
-                    th:href="@{'/course/buy/' + ${course.id}}"
-                    class="btn btn-success w-100 mt-3"
+                  <form
+                    th:action="@{/course/purchase/{id}(id=${course.id})}"
+                    method="post"
                   >
-                    Mua khóa học
-                  </a>
+                    <button type="submit" class="btn w-100 mt-3 green-btn">
+                      Mua khóa học
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

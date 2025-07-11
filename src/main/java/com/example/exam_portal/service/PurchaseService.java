@@ -2,6 +2,7 @@ package com.example.exam_portal.service;
 
 import org.springframework.stereotype.Service;
 
+import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.repository.PurchaseRepository;
 
 
@@ -15,5 +16,9 @@ public class PurchaseService {
 
     public boolean checkPurchaseStudentIdAndCourseId(Long studentId, Long courseId){
         return this.purchaseRepository.existsByStudentIdAndCourseId(studentId, courseId);
+    }
+
+    public void handleSavePurchase(Purchase purchase){
+        this.purchaseRepository.save(purchase);
     }
 }
