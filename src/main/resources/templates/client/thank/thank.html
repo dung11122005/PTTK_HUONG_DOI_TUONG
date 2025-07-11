@@ -81,11 +81,13 @@
               Chúng tôi đã gửi thông tin khóa học vào email của bạn.
             </h1>
 
-            <a href="/" class="btn btn-lg btn-primary mt-3"
-              >Quay về trang chủ</a
+            <a
+              th:href="@{'/course/detail/'+${course.id}}"
+              class="btn btn-lg btn-primary mt-3"
+              >Khóa học vừa mua</a
             >
             <a href="/my-courses" class="btn btn-lg btn-success mt-3 ms-2"
-              >Xem khóa học của tôi</a
+              >Xem các khóa học đã mua</a
             >
           </div>
         </div>

@@ -1,6 +1,8 @@
 package com.example.exam_portal.controller.client;
 
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -31,7 +33,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 
 
@@ -105,101 +106,87 @@ public class CourseClientController {
     
    @PostMapping("/course/purchase/{courseId}")
     public String postPurchaseCourse(@PathVariable Long courseId,
-                                 HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession(false);
-       
+                                     HttpServletRequest request) throws Exception {
+        Long userId = (Long) request.getSession(false).getAttribute("id");
 
-        Long userId = (Long) session.getAttribute("id");
-
-        Course course = this.courseService.getCourseById(courseId); // lấy khóa học
+        Course course = courseService.getCourseById(courseId);
         if (course == null) return "redirect:/course/not-found";
 
         String time = String.valueOf(System.currentTimeMillis());
         String orderId = "MOMO" + time;
         String requestId = orderId + "001";
 
-        //mã hóa không dấu
+        // Loại bỏ dấu tiếng Việt khỏi tên khóa học
         String courseName = course.getName();
         String normalized = Normalizer.normalize(courseName, Normalizer.Form.NFD);
-        String courseNameNoAccent = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("");
+        String courseNameNoAccent = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+                .matcher(normalized).replaceAll("");
 
         String orderInfo = "Thanh toan khoa hoc " + courseNameNoAccent;
+        String amount = String.valueOf(course.getPrice().intValue());
 
+        // Mã hóa userId và courseId vào extraData
+        String extraData = Base64.getEncoder().encodeToString((courseId + "," + userId)
+                .getBytes(StandardCharsets.UTF_8));
 
-        String amount = String.valueOf(course.getPrice().intValue()); // chuyển về chuỗi
-
-        // Tạo yêu cầu thanh toán MoMo
+        // Tạo request
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(amount);
         paymentRequest.setOrderId(orderId);
         paymentRequest.setOrderInfo(orderInfo);
         paymentRequest.setRequestId(requestId);
-        paymentRequest.setExtraData(""); // có thể mã hóa courseId và userId nếu muốn
+        paymentRequest.setExtraData(extraData);
 
-        String response = this.paymentService.createPayment(paymentRequest);
+        String response = paymentService.createPayment(paymentRequest);
         JsonNode json = new ObjectMapper().readTree(response);
         String payUrl = json.path("payUrl").asText();
 
-        if (payUrl != null && !payUrl.isEmpty()) {
-            session.setAttribute("momoOrderId", orderId);
-            session.setAttribute("momoRequestId", requestId);
-            session.setAttribute("courseId", courseId);
-            session.setAttribute("userId", userId);
-            return "redirect:" + payUrl;
-        }
-
-        return "redirect:/thanks";
+        return (payUrl != null && !payUrl.isEmpty()) ? "redirect:" + payUrl : "redirect:/thanks";
     }
 
     @GetMapping("/thanks")
-    public String pustHandleMomoReturn(Model model,
-            @RequestParam(value = "orderId", required = false) String orderId,
-            @RequestParam(value = "resultCode", required = false) Integer resultCode,
-            HttpServletRequest request
-    ) throws Exception {
-        HttpSession session = request.getSession(false);
-        
-        
-        String momoOrderId = (String) session.getAttribute("momoOrderId");
-        String momoRequestId = (String) session.getAttribute("momoRequestId");
-        Long courseId = (Long) session.getAttribute("courseId");
-        Long userId = (Long) session.getAttribute("userId");
-        Course course = this.courseService.getCourseById(courseId);
+    public String handleMomoReturn(Model model,
+                                   @RequestParam(value = "orderId", required = false) String orderId,
+                                   @RequestParam(value = "resultCode", required = false) Integer resultCode) throws Exception {
+                                
+        String requestId = orderId + "001"; // giống lúc tạo request
+                                
+        String statusResponse = paymentService.queryTransactionStatus(orderId, requestId);
+        JsonNode json = new ObjectMapper().readTree(statusResponse);
+                                
+        String encodedExtraData = json.path("extraData").asText();
+        String decoded = new String(Base64.getDecoder().decode(encodedExtraData), StandardCharsets.UTF_8);
+        String[] parts = decoded.split(",");
+        Long courseId = Long.parseLong(parts[0]);
+        Long userId = Long.parseLong(parts[1]);
+                                
+        Course course = courseService.getCourseById(courseId);
+        model.addAttribute("course", course); // luôn truyền về để hiển thị
+                                
+        int resultCodeFromApi = json.path("resultCode").asInt();
+                                
         if (resultCode != null && resultCode != 0) {
-            model.addAttribute("course", course);
-            return "client/thank/failure";
+            return "client/thank/failure"; // thất bại từ callback đầu tiên
         }
-
-        if (momoOrderId != null && momoRequestId != null) {
-            String status = paymentService.queryTransactionStatus(momoOrderId, momoRequestId);
-            JsonNode json = new ObjectMapper().readTree(status);
-            int resultCodeFromApi = json.path("resultCode").asInt();
-
-            if (resultCodeFromApi == 0) {
-                // ✅ Giao dịch thành công – tiến hành lưu vào bảng purchases
+    
+        if (resultCodeFromApi == 0) {
+            User user = userService.getUserById(userId);
+        
+            if (course != null && user != null &&
+                !purchaseService.checkPurchaseStudentIdAndCourseId(userId, courseId)) {
                 
-                User user = this.userService.getUserById(userId);
-
-                if (course != null && user != null && ! this.purchaseService.checkPurchaseStudentIdAndCourseId(userId, courseId)) {
-                    Purchase purchase = new Purchase();
-                    purchase.setCourse(course);
-                    purchase.setStudent(user);
-                    this.purchaseService.handleSavePurchase(purchase); // gọi repository
-                }
-
-                // Xóa session tạm
-                session.removeAttribute("momoOrderId");
-                session.removeAttribute("momoRequestId");
-                session.removeAttribute("courseId");
-                session.removeAttribute("userId");
-                model.addAttribute("course", course);
-
-                return "client/thank/thank";
+                Purchase purchase = new Purchase();
+                purchase.setCourse(course);
+                purchase.setStudent(user);
+                purchaseService.handleSavePurchase(purchase);
             }
+        
+            return "client/thank/thank"; // thành công
         }
-        model.addAttribute("course", course);
-        return "client/thank/failure";
+    
+        return "client/thank/failure"; // thất bại từ kết quả truy vấn
     }
+    
 
     @GetMapping("/test/thank")
     public String getTestThank(Model model) {
