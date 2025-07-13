@@ -155,17 +155,23 @@
                             <span
                               th:text="${lesson.sortOrder + '. ' + lesson.title}"
                             ></span>
-                            <small
-                              th:text="${lesson.durationMinutes + ' phút'}"
-                            ></small>
-                            <button
-                              class="btn btn-primary lesson-btn"
-                              th:attr="data-url=${lesson.videoUrl}"
-                              onclick="showVideoFromButton(this)"
-                              th:if="${course.isFree or check}"
+
+                            <div
+                              class="d-flex align-items-center gap-4 ms-auto"
                             >
-                              Xem
-                            </button>
+                              <small
+                                th:text="${lesson.durationMinutes + ' phút'}"
+                              ></small>
+
+                              <button
+                                class="btn btn-primary lesson-btn"
+                                th:attr="data-url=${lesson.videoUrl}"
+                                onclick="showVideoFromButton(this)"
+                                th:if="${course.isFree or check}"
+                              >
+                                Xem
+                              </button>
+                            </div>
                           </div>
                         </li>
                       </ul>
