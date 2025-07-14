@@ -47,7 +47,7 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Tên đề</th>
                         <th>Mô tả</th>
                         <th>Thời gian (phút)</th>
@@ -55,8 +55,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="exam : ${exams}">
-                        <td th:text="${exam.id}">1</td>
+                      <tr th:each="exam, stat : ${exams}">
+                        <td th:text="${stat.count}">1</td>
                         <td th:text="${exam.name}">Đề Toán Giữa kỳ</td>
                         <td th:text="${exam.description}">
                           Kiểm tra chương 1–3

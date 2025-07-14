@@ -48,7 +48,7 @@
                   <table class="table table-bordered table-hover table">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Email</th>
                         <th>Full Name</th>
                         <th>Role</th>
@@ -56,8 +56,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="user : ${users}">
-                        <td th:text="${user.id}">1</td>
+                      <tr th:each="user, stat : ${users}">
+                        <td th:text="${stat.count}">1</td>
                         <td th:text="${user.email}">user@example.com</td>
                         <td th:text="${user.fullName}">Nguyễn Văn A</td>
                         <td th:text="${user.role.name}">ADMIN</td>

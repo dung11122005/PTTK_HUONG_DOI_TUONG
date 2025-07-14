@@ -1,7 +1,12 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.exam_portal.domain.Course;
 import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.repository.PurchaseRepository;
 
@@ -20,5 +25,13 @@ public class PurchaseService {
 
     public void handleSavePurchase(Purchase purchase){
         this.purchaseRepository.save(purchase);
+    }
+
+    public Page<Purchase> getAllCourseSoldPaginationListCourseId(List<Course> courses, Pageable page) {
+        return this.purchaseRepository.findByCourseIn(courses, page);
+    }
+
+    public Page<Purchase> getAllCourseSoldPagination(Pageable page) {
+        return this.purchaseRepository.findAll(page);
     }
 }

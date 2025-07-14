@@ -50,7 +50,7 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Tên khóa học</th>
                         <th>Mô tả</th>
                         <th>Giá</th>
@@ -60,8 +60,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="course : ${courses}">
-                        <td th:text="${course.id}">1</td>
+                      <tr th:each="course, stat : ${courses}">
+                        <td th:text="${stat.count}">1</td>
                         <td th:text="${course.name}">Khóa Spring Boot</td>
                         <td th:text="${course.shortDescription}">
                           Chi tiết về Spring

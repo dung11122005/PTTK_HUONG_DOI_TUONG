@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.exam_portal.domain.Chapter;
 import com.example.exam_portal.domain.Course;
 import com.example.exam_portal.domain.CourseLesson;
+import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.CourseService;
+import com.example.exam_portal.service.PurchaseService;
 import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
 
@@ -32,12 +34,14 @@ public class CourseAdminController {
     private final CourseService courseService;
     private final UserService userService;
     private final UploadService uploadService;
+    private final PurchaseService purchaseService;
 
     public CourseAdminController(CourseService courseService, 
-    UserService userService, UploadService uploadService){
+    UserService userService, UploadService uploadService, PurchaseService purchaseService){
         this.courseService=courseService;
         this.userService=userService;
         this.uploadService=uploadService;
+        this.purchaseService=purchaseService;
     }
 
     @GetMapping("/admin/course")
@@ -246,5 +250,37 @@ public class CourseAdminController {
         this.courseService.deleteCourseLesson(lesson.getId());
 
         return "redirect:/admin/course/" + courseId;
+    }
+
+    @GetMapping("/admin/sold")
+    public String getCourseSold(Model model, @RequestParam("page") Optional<String> pageOptional,
+    @AuthenticationPrincipal UserDetails userDetails) {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+        int page = 1;
+        try {
+            if (pageOptional.isPresent()) {
+                page = Integer.parseInt(pageOptional.get());
+            } else {
+                page = 1;
+            }
+        } catch (Exception e) {
+
+        }
+
+        
+        Page<Purchase> us;
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        List<Course> courses=this.courseService.getCourseByTeacherId(teacher.getId());
+        if(teacher.getRole().getName().equals("ADMIN")){
+            us = this.purchaseService.getAllCourseSoldPagination(pageable);
+        }else{
+            us = this.purchaseService.getAllCourseSoldPaginationListCourseId(courses, pageable);
+        }
+        
+        List<Purchase> purchases = us.getContent();
+        model.addAttribute("purchases", purchases);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", us.getTotalPages());
+        return "admin/coursesold/show";
     }
 }

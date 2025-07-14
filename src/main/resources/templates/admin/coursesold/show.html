@@ -27,9 +27,9 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Class</h1>
+            <h1 class="mt-4">Khóa học đã bán</h1>
             <ol class="breadcrumb mb-4">
-              <li class="breadcrumb-item active">Class</li>
+              <li class="breadcrumb-item active">Danh sách khóa học đã bán</li>
             </ol>
 
             <div class="mt-5">
@@ -38,47 +38,44 @@
                   <div
                     class="d-flex justify-content-between align-items-center"
                   >
-                    <h3>Danh sách lớp</h3>
-                    <a th:href="@{/admin/class/create}" class="btn btn-primary">
-                      + Tạo lớp
-                    </a>
+                    <h3>Danh sách khóa học đã bán</h3>
                   </div>
                   <hr />
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Mã lớp</th>
-                        <th>Tên lớp</th>
-                        <th>Giảng viên</th>
-                        <th>Hành động</th>
+                        <th>Tên khóa học</th>
+                        <th>Giá</th>
+                        <th>Giáo viên</th>
+                        <th>email người mua</th>
+                        <th>Tên người mua</th>
+                        <th>Ngày mua</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="classRoom, stat : ${classRooms}">
+                      <tr th:each="purchase, stat : ${purchases}">
                         <td th:text="${stat.count}">1</td>
-                        <td th:text="${classRoom.classCode}">CP001</td>
-                        <td th:text="${classRoom.name}">Nhập môn phần mềm</td>
-                        <td th:text="${classRoom.teacher.fullName}">
-                          Lương Trần Ngọc Khiết
+                        <td th:text="${purchase.course.name}">
+                          Khóa Spring Boot
                         </td>
-                        <td>
-                          <a
-                            th:href="@{'/admin/class/student/add/' + ${classRoom.id}}"
-                            class="btn btn-success btn-sm"
-                            >Xem</a
-                          >
-                          <a
-                            th:href="@{'/admin/class/update/' + ${classRoom.id}}"
-                            class="btn btn-warning btn-sm mx-1"
-                            >Sửa</a
-                          >
-                          <a
-                            th:href="@{'/admin/class/delete/' + ${classRoom.id}}"
-                            class="btn btn-danger btn-sm"
-                          >
-                            Xóa
-                          </a>
+                        <td th:text="${purchase.course.price + ' VNĐ'}">
+                          100000 VNĐ
+                        </td>
+
+                        <td th:text="${purchase.course.teacher.fullName}">
+                          Hoàng Tấn Dũng
+                        </td>
+                        <td th:text="${purchase.student.email}">
+                          student@gmail.com
+                        </td>
+                        <td th:text="${purchase.student.fullName}">
+                          Nguyễn Văn A
+                        </td>
+                        <td
+                          th:text="${#temporals.format(purchase.purchasedAt, 'dd/MM/yyyy HH:mm')}"
+                        >
+                          14/07/2025 12:00
                         </td>
                       </tr>
                     </tbody>
@@ -91,7 +88,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/exams?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/sold?page=' + ${currentPage - 1}}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
@@ -104,7 +101,7 @@
                         <a
                           class="page-link"
                           th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/exams?page=' + ${i}}"
+                          th:href="@{'/admin/sold?page=' + ${i}}"
                           th:text="${i}"
                           >1</a
                         >
@@ -113,7 +110,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/exams?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/sold?page=' + ${currentPage + 1}}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>
@@ -126,6 +123,7 @@
             </div>
           </div>
         </main>
+
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>

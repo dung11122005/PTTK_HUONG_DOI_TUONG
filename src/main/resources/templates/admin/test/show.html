@@ -47,7 +47,7 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Tên đề thi</th>
                         <th>Lớp thi</th>
                         <th>Giảng viên</th>
@@ -58,8 +58,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="examSession : ${examSessions}">
-                        <td th:text="${examSession.id}">1</td>
+                      <tr th:each="examSession, stat : ${examSessions}">
+                        <td th:text="${stat.count}">1</td>
                         <td th:text="${examSession.exam?.name} ?: '---'">
                           Đề thi
                         </td>
