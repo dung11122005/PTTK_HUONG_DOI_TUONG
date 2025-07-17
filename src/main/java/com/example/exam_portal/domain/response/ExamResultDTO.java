@@ -10,7 +10,6 @@ import lombok.Setter;
 public class ExamResultDTO {
     private Long studentId;
     private String studentName;
-    private String examName;
     private Float score;
     private LocalDateTime submittedAt;
 

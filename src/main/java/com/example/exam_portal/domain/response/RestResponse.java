@@ -5,6 +5,7 @@ public class RestResponse<T> {
     private String error;
 
     private Object message;
+    // private Object examName;
     private T data;
 
     public int getStatusCode() {
@@ -30,6 +31,14 @@ public class RestResponse<T> {
     public void setMessage(Object message) {
         this.message = message;
     }
+
+    // public Object getExamName() {
+    //     return examName;
+    // }
+
+    // public void setExamName(Object examName) {
+    //     this.examName = examName;
+    // }
 
     public T getData() {
         return data;

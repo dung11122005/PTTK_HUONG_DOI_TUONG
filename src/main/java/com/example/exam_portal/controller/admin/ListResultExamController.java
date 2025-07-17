@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.response.ExamResultDTO;
+import com.example.exam_portal.domain.response.ExamResultListResponse;
 import com.example.exam_portal.domain.response.RestResponse;
 import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.util.annotation.ApiMessage;
@@ -32,31 +33,38 @@ public class ListResultExamController {
 
     @GetMapping("/listresult/{examSessionId}")
     @ApiMessage("Fetch exam result list")
-    public ResponseEntity<RestResponse<List<ExamResultDTO>>> getExamResultList(@PathVariable("examSessionId") long id) throws IdInvalidException{
+    public ResponseEntity<RestResponse<ExamResultListResponse>> getExamResultList(@PathVariable("examSessionId") long id) throws IdInvalidException{
         List<ExamResult> examResults = examResultService.getAllExamResultSessionId(id);
 
         if (examResults == null || examResults.isEmpty()) {
             throw new IdInvalidException("ExamSession với id = " + id + " không tồn tại hoặc không có kết quả nào.");
         }
     
+        // Lấy examName từ 1 kết quả bất kỳ vì cùng kỳ thi
+        String examName = examResults.get(0).getExam().getName();
+
         // Mapping sang DTO
         List<ExamResultDTO> dtos = examResults.stream().map(result -> {
             ExamResultDTO dto = new ExamResultDTO();
             dto.setStudentId(result.getStudent().getId());
             dto.setStudentName(result.getStudent().getFullName());
-            dto.setExamName(result.getExam().getName());
             dto.setScore(result.getScore());
             dto.setSubmittedAt(result.getSubmittedAt());
             return dto;
         }).collect(Collectors.toList());
-    
-        // Bọc kết quả vào RestResponse
-        RestResponse<List<ExamResultDTO>> res = new RestResponse<>();
+
+        // Gộp vào wrapper response
+        ExamResultListResponse data = new ExamResultListResponse();
+        data.setExamName(examName);
+        data.setResults(dtos);
+
+        // Bọc vào RestResponse
+        RestResponse<ExamResultListResponse> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.OK.value());
         res.setMessage("Lấy danh sách kết quả thành công.");
-        res.setData(dtos);
+        res.setData(data);
         res.setError(null);
-    
+
         return ResponseEntity.ok(res);
     }
     
