@@ -106,6 +106,12 @@
                 Đồng ý, vào thi
               </a>
               <a class="btn btn-secondary" href="/exam">Hủy</a>
+              <a
+                class="btn btn-secondary"
+                th:href="'http://localhost:3000/' + ${examSession.id}"
+                target="_blank"
+                >Điểm kì thi</a
+              >
             </div>
           </div>
         </div>
