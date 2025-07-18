@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +21,7 @@ import com.example.exam_portal.util.error.IdInvalidException;
 
 
 
+
 @RestController
 @RequestMapping("/api/v1")
 public class ListResultExamController {
@@ -31,7 +32,7 @@ public class ListResultExamController {
     }
 
 
-    @GetMapping("/listresult/{examSessionId}")
+    @PostMapping("/listresult/{examSessionId}")
     @ApiMessage("Fetch exam result list")
     public ResponseEntity<RestResponse<ExamResultListResponse>> getExamResultList(@PathVariable("examSessionId") long id) throws IdInvalidException{
         List<ExamResult> examResults = examResultService.getAllExamResultSessionId(id);
