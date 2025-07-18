@@ -34,18 +34,149 @@
     <link rel="stylesheet" href="/css/slick.css" />
     <link rel="stylesheet" href="/css/nice-select.css" />
     <link rel="stylesheet" href="/css/style.css" />
-    
-    
-
-    </style>
 
     <style>
       .green-btn {
         background-color: #28a745 !important;
         color: white !important;
         border-color: #28a745 !important;
-      }      
-      
+      }
+      #chatbot-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background: #007bff;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 28px;
+        text-align: center;
+        line-height: 60px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        z-index: 10000;
+      }
+
+      #chatbot-window {
+        display: none;
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 320px;
+        height: 400px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9999;
+        animation: fadeInUp 0.3s ease-in-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .chatbot-header {
+        background: #007bff !important;
+        color: #fff !important;
+        padding: 10px 12px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .chatbot-title {
+        flex-grow: 1 !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        margin-right: 10px !important;
+      }
+
+      .chatbot-close-btn {
+        width: 32px !important;
+        height: 32px !important;
+        background: transparent !important;
+        border: none !important;
+        color: #fff !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+        flex-shrink: 0 !important;
+      }
+
+      #chatbot-history {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: #f5f5f5;
+        height: 250px;
+      }
+
+      #chatbot-input {
+        width: 100%;
+        height: 60px;
+        border: none;
+        padding: 8px;
+        border-top: 1px solid #ccc;
+        resize: none;
+      }
+
+      #chatbot-window button {
+        width: 100%;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px;
+      }
+
+      .chat-message.user {
+        text-align: right;
+        margin: 6px 0;
+      }
+
+      .chat-message.user span {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 16px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      /* Tin nhắn chatbot */
+      .chat-message.bot {
+        text-align: left;
+        margin: 6px 0;
+      }
+
+      .chat-message.bot span {
+        display: inline-block;
+        background-color: #e0e0e0;
+        color: #000;
+        padding: 8px 12px;
+        border-radius: 16px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
     </style>
   </head>
 
@@ -81,22 +212,30 @@
             </div>
           </div>
           <div class="courses-actives">
-           
             <div class="properties pb-20" th:each="course : ${courses}">
               <div class="properties__card">
                 <div class="properties__img overlay1">
                   <a th:href="@{'/course/detail/' + ${course.id}}">
-                    <img th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}" alt="Course Image" />
+                    <img
+                      th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}"
+                      alt="Course Image"
+                    />
                   </a>
                 </div>
                 <div class="properties__caption">
                   <p th:text="${course.teacher.fullName}">Tên giảng viên</p>
                   <h3>
-                    <a th:href="@{'/course/detail/' + ${course.id}}" th:text="${course.name}">Tên khóa học</a>
+                    <a
+                      th:href="@{'/course/detail/' + ${course.id}}"
+                      th:text="${course.name}"
+                      >Tên khóa học</a
+                    >
                   </h3>
                   <p th:text="${course.shortDescription}">Mô tả ngắn</p>
-            
-                  <div class="properties__footer d-flex justify-content-between align-items-center">
+
+                  <div
+                    class="properties__footer d-flex justify-content-between align-items-center"
+                  >
                     <div class="restaurant-name">
                       <div class="rating">
                         <i class="fas fa-star"></i>
@@ -109,27 +248,27 @@
                     </div>
                     <div class="price">
                       <span th:if="${course.isFree}" th:text="'Free'"></span>
-                      <span th:unless="${course.isFree}" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                      <span
+                        th:unless="${course.isFree}"
+                        th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                      ></span>
                     </div>
-                    
                   </div>
-            
-                  <a th:href="@{'/course/detail/' + ${course.id}}"
-                     th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'">
+
+                  <a
+                    th:href="@{'/course/detail/' + ${course.id}}"
+                    th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'"
+                  >
                     Find out more
                   </a>
-
                 </div>
               </div>
             </div>
-            
-            
           </div>
         </div>
       </div>
       <!-- Courses area End -->
 
-      
       <section class="about-area3 fix">
         <div class="support-wrapper align-items-center">
           <div class="right-content3">
@@ -151,7 +290,8 @@
               </div>
               <div class="features-caption">
                 <p>
-                  Nắm vững kiến thức cốt lõi và kỹ năng thực hành để áp dụng ngay.
+                  Nắm vững kiến thức cốt lõi và kỹ năng thực hành để áp dụng
+                  ngay.
                 </p>
               </div>
             </div>
@@ -161,7 +301,8 @@
               </div>
               <div class="features-caption">
                 <p>
-                  Rèn luyện tư duy logic, phản xạ nhanh qua hệ thống đề thi thử sát thực tế.
+                  Rèn luyện tư duy logic, phản xạ nhanh qua hệ thống đề thi thử
+                  sát thực tế.
                 </p>
               </div>
             </div>
@@ -170,25 +311,84 @@
                 <img src="/img/icon/right-icon.svg" alt="" />
               </div>
               <div class="features-caption">
-                <p>
-                  Tự tin chinh phục các kỳ thi và đạt kết quả cao.
-                </p>
+                <p>Tự tin chinh phục các kỳ thi và đạt kết quả cao.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
-   
 
       <!-- About Area End -->
     </main>
     <footer>
       <div th:replace="client/layout/footer"></div>
     </footer>
-    <!-- Scroll Up -->
-    <div id="back-top">
-      <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
+
+    <!-- Chatbot toggle button -->
+    <div id="chatbot-toggle" onclick="toggleChatbot()">💬</div>
+
+    <!-- Chatbot window -->
+    <div id="chatbot-window">
+      <div class="chatbot-header">
+        <div class="chatbot-title">🤖 Trợ lý học tập</div>
+        <button class="chatbot-close-btn" onclick="toggleChatbot()">×</button>
+      </div>
+      <div id="chatbot-history"></div>
+      <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
+      <button onclick="sendChat(event)">Gửi</button>
     </div>
+    <script>
+      async function sendChat(event) {
+        event.preventDefault(); // Ngăn submit form
+        const input = document.getElementById("chatbot-input");
+        const history = document.getElementById("chatbot-history");
+
+        const userText = input.value.trim();
+        if (!userText) return;
+
+        // Giao diện người dùng
+        const userMsg = document.createElement("div");
+        userMsg.className = "chat-message user";
+        userMsg.innerHTML = `<span>${userText} 🧑</span>`;
+        history.appendChild(userMsg);
+
+        // Giao diện phản hồi chatbot
+        const botMsg = document.createElement("div");
+        botMsg.className = "chat-message bot";
+        botMsg.innerHTML = `<span>🤖 Đang trả lời...</span>`;
+        history.appendChild(botMsg);
+
+        input.value = "";
+        history.scrollTop = history.scrollHeight;
+
+        // Gửi đến backend sử dụng OpenAI
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: userText }),
+          });
+
+          const data = await response.json();
+          botMsg.innerHTML = `<span>🤖 ${data.reply}</span>`;
+        } catch (error) {
+          botMsg.innerHTML = `<span>🤖 Có lỗi xảy ra khi gọi API.</span>`;
+        }
+
+        history.scrollTop = history.scrollHeight;
+      }
+    </script>
+    <script>
+      function toggleChatbot() {
+        const chatWindow = document.getElementById("chatbot-window");
+        chatWindow.style.display =
+          chatWindow.style.display === "none" || chatWindow.style.display === ""
+            ? "flex"
+            : "none";
+      }
+    </script>
 
     <!-- JS here -->
     <script src="/js/vendor/modernizr-3.5.0.min.js"></script>
