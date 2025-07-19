@@ -59,10 +59,14 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**") // bỏ CSRF cho API
+            )
+
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                 .requestMatchers("/","/courses", "/login/**", "/register", "/product/**", "/products/**",
-                 "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**", "/api/chat/**").permitAll()
+                 "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/**", "/api/chat/**").permitAll()
             
                 .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**"
                 ,"/admin/sold/**").hasAnyRole("TEACHER", "ADMIN")
