@@ -1,35 +1,43 @@
 package com.example.exam_portal.controller.admin;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.exam_portal.domain.ActivityLog;
 import com.example.exam_portal.domain.ExamResult;
+import com.example.exam_portal.domain.dto.ResultPaginationDTO;
 import com.example.exam_portal.domain.response.ExamResultDTO;
 import com.example.exam_portal.domain.response.ExamResultListResponse;
 import com.example.exam_portal.domain.response.RestResponse;
+import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.ExamResultService;
+import com.example.exam_portal.spec.SpecificationBuilder;
 import com.example.exam_portal.util.annotation.ApiMessage;
 import com.example.exam_portal.util.error.IdInvalidException;
 
 
-
-
-
-
 @RestController
 @RequestMapping("/api/v1")
-public class ListResultExamController {
+public class ListTestApiController {
+
+    private final ActivityLogService activityLogService;
     private final ExamResultService examResultService;
 
-    public ListResultExamController(ExamResultService examResultService){
+    public ListTestApiController(ExamResultService examResultService, ActivityLogService activityLogService){
         this.examResultService=examResultService;
+        this.activityLogService = activityLogService;
     }
 
 
@@ -70,4 +78,13 @@ public class ListResultExamController {
         return ResponseEntity.ok(res);
     }
     
+
+    @GetMapping("/activity-logs")
+    public ResponseEntity<ResultPaginationDTO> getAllLogs(
+        @RequestParam Map<String, String> params,
+        Pageable pageable) {
+
+        Specification<ActivityLog> spec = new SpecificationBuilder<ActivityLog>().buildFromParams(params);
+        return ResponseEntity.ok(activityLogService.fetchAllLogs(spec, pageable));
+    }
 }
