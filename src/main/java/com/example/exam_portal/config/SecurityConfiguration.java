@@ -29,6 +29,9 @@ public class SecurityConfiguration {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -85,6 +88,7 @@ public class SecurityConfiguration {
 
             .logout(logout -> logout
                 .logoutUrl("/logout")
+                .logoutSuccessHandler(customLogoutSuccessHandler)
                 .logoutSuccessUrl("/login?logout")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)

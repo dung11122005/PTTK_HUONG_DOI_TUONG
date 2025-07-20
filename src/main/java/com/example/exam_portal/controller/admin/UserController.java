@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Controller
@@ -30,13 +34,16 @@ public class UserController {
     private final UserService userService;
     private  final UploadService uploadService;
     private final PasswordEncoder passwordEncoder;
+    private final ActivityLogService activityLogService;
 
     public UserController(UserService userService, 
-    UploadService uploadService,
-    PasswordEncoder passwordEncoder){
+        UploadService uploadService,
+        PasswordEncoder passwordEncoder,
+        ActivityLogService activityLogService){
         this.userService=userService;
         this.uploadService=uploadService;
         this.passwordEncoder=passwordEncoder;
+        this.activityLogService=activityLogService;
     }
 
 
@@ -71,13 +78,16 @@ public class UserController {
     public String createUserPage(Model model,
             @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
-            @RequestParam("anhFile") MultipartFile file) {
+            @RequestParam("anhFile") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
 
         // List<FieldError> errors = newUserBindingResult.getFieldErrors();
         // for (FieldError error : errors) {
         // System.out.println(">>>>> >>>>>" + error.getField() + " - " +
         // error.getDefaultMessage());
         // }
+        
 
         if (newUserBindingResult.hasErrors()) {
             return "admin/user/create";
@@ -89,7 +99,12 @@ public class UserController {
         hoidanit.setAvatar(avatar);
         hoidanit.setPassword(hashPassword);
         hoidanit.setRole(this.userService.getRoleByName(hoidanit.getRole().getName()));
+
+        //ActivitiLog
+        String ip = request.getRemoteAddr();
+        activityLogService.handleSaveActivityLog(userDetails.getUsername(), "Tạo user", "POST", "/admin/user/create", ip, 200);
         // Save
+        
         this.userService.handleSaveUser(hoidanit);
         return "redirect:/admin/user";
     }
@@ -111,7 +126,9 @@ public class UserController {
     @PostMapping("/admin/user/update")
     public String postUpdateUser(@ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
-            @RequestParam("anhFile") MultipartFile file) {
+            @RequestParam("anhFile") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
         User currentUser = this.userService.getUserById(hoidanit.getId());
         if (currentUser != null) {
             // update new image
@@ -122,7 +139,9 @@ public class UserController {
             currentUser.setFullName(hoidanit.getFullName());
             currentUser.setAddress(hoidanit.getAddress());
             currentUser.setPhone(hoidanit.getPhone());
-
+            
+            String ip = request.getRemoteAddr();
+            this.activityLogService.handleSaveActivityLog(userDetails.getUsername(), "Sửa user", "POST", "/admin/user/update/" + hoidanit.getId(), ip, 200);
             this.userService.handleSaveUser(currentUser);
         }
         return "redirect:/admin/user";
@@ -135,7 +154,10 @@ public class UserController {
     }
 
     @PostMapping("/admin/user/delete")
-    public String postDeleteUser(@RequestParam("id") Long id) {
+    public String postDeleteUser(@RequestParam("id") Long id, @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        this.activityLogService.handleSaveActivityLog(userDetails.getUsername(), "Xóa user", "POST", "/admin/user/delete/" + id, ip, 200);
         this.userService.deleteAUser(id);
         return "redirect:/admin/user";
     }
