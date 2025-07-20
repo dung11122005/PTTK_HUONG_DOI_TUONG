@@ -52,6 +52,18 @@
               course sold
             </a>
           </div>
+          <div sec:authorize="hasAnyRole('ADMIN')">
+            <a
+              class="nav-link"
+              target="_blank"
+              href="http://localhost:3000/auditlogs"
+            >
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              Activity Log
+            </a>
+          </div>
         </div>
       </div>
       <div class="sb-sidenav-footer">
