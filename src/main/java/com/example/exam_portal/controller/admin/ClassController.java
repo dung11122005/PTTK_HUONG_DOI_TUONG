@@ -1,5 +1,8 @@
 package com.example.exam_portal.controller.admin;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +24,8 @@ import com.example.exam_portal.domain.ClassStudent;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.UserService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class ClassController {
@@ -128,6 +133,25 @@ public class ClassController {
         return "admin/class/addStudent"; // tên template Thymeleaf
     }
 
+    @GetMapping("/admin/class/student/add/{classId}/export")
+    public void exportToExcelClassStudent(@PathVariable("classId") Long id, HttpServletResponse response,
+                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+        List<ClassStudent> classStudents;
+        
+        classStudents = this.classService.getClassStudentById(id);
+
+        // Thiết lập header response
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String timestamp = LocalDateTime.now().format(formatter);
+
+        // Tên file có thêm thời gian
+        String fileName = "Class-student" + timestamp + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+
+        // Ghi file Excel
+        this.classService.writeExcelFileClassStudent(classStudents, response.getOutputStream());
+    }
 
     @PostMapping("/admin/class/student/add/{classId}")
     public String addStudentToClass(@PathVariable Long classId,

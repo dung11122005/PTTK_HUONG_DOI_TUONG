@@ -27,14 +27,25 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Tạo đề thi</h1>
+            <h1 class="mt-4">Tạo lớp học</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
                 <a th:href="@{/admin/class}">Class</a>
               </li>
-              <li class="breadcrumb-item active">Tạo đề thi</li>
+              <li class="breadcrumb-item active">Tạo lớp học</li>
             </ol>
-
+            <ol class="breadcrumb mb-4">
+              <li class="breadcrumb-item">
+                <a
+                  th:href="@{'/admin/class/student/add/' + ${classId} + '/export'}"
+                  class="btn btn-success"
+                  target="_blank"
+                  download
+                >
+                  Xuất Excel
+                </a>
+              </li>
+            </ol>
             <div class="mt-4">
               <div class="row">
                 <form

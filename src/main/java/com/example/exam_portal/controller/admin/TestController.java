@@ -1,5 +1,8 @@
 package com.example.exam_portal.controller.admin;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,8 @@ import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.service.ExamService;
 import com.example.exam_portal.service.TestService;
 import com.example.exam_portal.service.UserService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 
 @Controller
@@ -95,17 +100,34 @@ public class TestController {
         Page<ExamResult> ex;
         Pageable pageable = PageRequest.of(page - 1, 10);
         
-        if(teacher.getRole().getName().equals("ADMIN")){
-            ex = this.examResultService.getAllResulrExamPagination(pageable);
-        }else{
-            ex = this.examResultService.getAllResulrExamPaginationTeacherId(id, pageable);
-        }
+        ex = this.examResultService.getAllResulrExamPaginationTeacherId(id, pageable);
+        
 
         List<ExamResult> examResults =  ex.getContent();
         model.addAttribute("examResults", examResults);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ex.getTotalPages());
         return "admin/test/detail";
+    }
+
+    @GetMapping("/admin/test/{id}/export")
+    public void exportToExcelExamResult(@PathVariable Long id, HttpServletResponse response,
+                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+        List<ExamResult> examResults;
+        
+        examResults = this.examResultService.getAllExamResultSessionId(id);
+
+        // Thiết lập header response
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String timestamp = LocalDateTime.now().format(formatter);
+
+        // Tên file có thêm thời gian
+        String fileName = "exam-results_" + timestamp + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+
+        // Ghi file Excel
+        this.examResultService.writeExcelFileExamResult(examResults, response.getOutputStream());
     }
 
     @GetMapping("/admin/test/create")
