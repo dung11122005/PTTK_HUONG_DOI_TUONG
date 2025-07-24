@@ -56,6 +56,7 @@
                         th:field="*{email}"
                         th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
                         class="form-control"
+                        autocomplete="off"
                       />
                       <div
                         class="invalid-feedback"
@@ -72,6 +73,7 @@
                         th:field="*{password}"
                         th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
                         class="form-control"
+                        autocomplete="off"
                       />
                       <div
                         class="invalid-feedback"
@@ -87,6 +89,7 @@
                         type="text"
                         th:field="*{phone}"
                         class="form-control"
+                        autocomplete="off"
                       />
                     </div>
 
@@ -98,6 +101,7 @@
                         th:field="*{fullName}"
                         th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
                         class="form-control"
+                        autocomplete="off"
                       />
                       <div
                         class="invalid-feedback"
@@ -113,6 +117,7 @@
                         type="text"
                         th:field="*{address}"
                         class="form-control"
+                        autocomplete="off"
                       />
                     </div>
 
