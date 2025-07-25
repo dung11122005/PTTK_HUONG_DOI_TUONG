@@ -17,7 +17,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.example.exam_portal.service.CustomUserDetailsService;
+import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
+import com.example.exam_portal.service.userinfo.CustomOAuth2UserService;
 
 import jakarta.servlet.DispatcherType;
 
@@ -28,6 +30,12 @@ public class SecurityConfiguration {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UploadService uploadService;
 
     @Autowired
     private CustomLogoutSuccessHandler customLogoutSuccessHandler;
@@ -78,6 +86,12 @@ public class SecurityConfiguration {
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
                 .anyRequest().authenticated()
             )
+
+            .oauth2Login(oauth2 -> oauth2.loginPage("/login")
+                        .successHandler(customSuccessHandler())
+                        .failureUrl("/login?error")
+                        .userInfoEndpoint(user -> user
+                                .userService(new CustomOAuth2UserService(userService, uploadService))))
 
             .formLogin(form -> form
                 .loginPage("/login")

@@ -42,14 +42,16 @@ public class User {
 
     private String phone;
 
+    private String provider;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exam> exams;
 
-    @OneToMany(mappedBy = "teacher")
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExamSession> examSessions;
 
     @ManyToOne
