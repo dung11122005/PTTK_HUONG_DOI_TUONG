@@ -34,4 +34,8 @@ public class PurchaseService {
     public Page<Purchase> getAllCourseSoldPagination(Pageable page) {
         return this.purchaseRepository.findAll(page);
     }
+
+    public List<Purchase> getPurchaseClientByStudentId(Long studentId) {
+        return this.purchaseRepository.findByStudentId(studentId);
+    }
 }

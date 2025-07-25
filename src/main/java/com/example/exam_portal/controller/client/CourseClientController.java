@@ -204,4 +204,18 @@ public class CourseClientController {
     }
     
 
+    @GetMapping("/purchased-course")
+    public String getPurchasedCourseClient(Model model , 
+        @AuthenticationPrincipal UserDetails userDetails) {
+
+        User student = this.userService.getUserByEmail(userDetails.getUsername());
+        List<Purchase> purchases=this.purchaseService.getPurchaseClientByStudentId(student.getId());
+        List<Course> courses = purchases.stream()
+                                    .map(Purchase::getCourse)
+                                    .collect(Collectors.toList());
+        model.addAttribute("courses", courses);
+        return "client/course/purchasedcourse";
+    }
+    
+
 }

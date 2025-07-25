@@ -17,5 +17,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long>{
 
     Page<Purchase> findByCourseIn(List<Course> courses, Pageable pageable);
 
+    List<Purchase> findByStudentId(Long id);
 
 }
