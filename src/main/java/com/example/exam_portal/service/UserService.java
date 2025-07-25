@@ -58,4 +58,8 @@ public class UserService {
     public void deleteAUser(long id) {
         this.userRepository.deleteById(id);
     }
+
+    public boolean existsByEmail(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
 }
