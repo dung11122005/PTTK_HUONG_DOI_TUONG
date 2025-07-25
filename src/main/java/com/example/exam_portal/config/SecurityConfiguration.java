@@ -72,7 +72,7 @@ public class SecurityConfiguration {
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/**", "/api/chat/**").permitAll()
             
                 .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**"
-                ,"/admin/sold/**", "/admin/send-mail/**").hasAnyRole("TEACHER", "ADMIN")
+                ,"/admin/sold/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("TEACHER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")

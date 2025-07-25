@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.ClassStudent;
 
 
@@ -15,5 +16,7 @@ public interface  ClassStudentRepository extends JpaRepository<ClassStudent, Lon
     List<ClassStudent> findByClassroom_Id(Long id);
 
     void deleteByClassroom_IdAndStudent_Id(Long classId, Long studentId);
+
+    List<ClassStudent> findByClassroomIn(List<ClassRoom> classrooms);
 
 }

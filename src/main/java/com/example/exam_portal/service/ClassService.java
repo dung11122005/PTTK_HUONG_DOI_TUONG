@@ -3,6 +3,7 @@ package com.example.exam_portal.service;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.ClassStudent;
+import com.example.exam_portal.domain.User;
 import com.example.exam_portal.repository.ClassRepository;
 import com.example.exam_portal.repository.ClassStudentRepository;
 
@@ -53,6 +55,15 @@ public class ClassService {
     public List<ClassStudent> getClassStudentById(long id) {
         return this.classStudentRepository.findByClassroom_Id(id);
     }
+
+    public List<User> getClassStudentByListClass(List<ClassRoom> classRooms) {
+        List<ClassStudent> classStudents = this.classStudentRepository.findByClassroomIn(classRooms);
+    
+        return classStudents.stream()
+                .map(ClassStudent::getStudent) // lấy User từ ClassStudent
+                .collect(Collectors.toList());
+    }
+
 
     public List<ClassRoom> getClassByTeacherId(long id) {
         return this.classRepository.findByTeacherId(id);
