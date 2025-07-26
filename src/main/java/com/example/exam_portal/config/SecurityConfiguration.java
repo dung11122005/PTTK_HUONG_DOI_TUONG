@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.example.exam_portal.service.CustomUserDetailsService;
 import com.example.exam_portal.service.UploadService;
@@ -39,6 +40,9 @@ public class SecurityConfiguration {
 
     @Autowired
     private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,6 +74,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/api/**") // bỏ CSRF cho API
             )
@@ -78,7 +83,7 @@ public class SecurityConfiguration {
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                 .requestMatchers("/","/courses/**", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/**", "/api/chat/**", "/purchased-course/**").permitAll()
-            
+                .requestMatchers("/api/v1/user/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
                 .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**"
                 ,"/admin/sold/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("TEACHER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")

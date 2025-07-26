@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,11 +104,16 @@ public class ListTestApiController {
 
     @GetMapping("/user/{id}")
     @ApiMessage("fetch user by id")
-    public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) throws IdInvalidException{
-
+    public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id,
+    @AuthenticationPrincipal UserDetails userDetails) throws IdInvalidException{
+        User user = this.userService.getUserByEmail(userDetails.getUsername());
         User fetchUser = this.userService.getUserById(id);
         if (fetchUser == null) {
             throw new IdInvalidException("User với id = " + id + " không tồn tại");
+        }
+
+        if (user == null || (Long) user.getId()!=id) {
+            throw new IdInvalidException("Không thể truy cập tài khoản người khác");
         }
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -120,8 +127,14 @@ public class ListTestApiController {
             @RequestParam("name") String name,
             @RequestParam("phone") String phone,
             @RequestParam("address") String address,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatarFile
+            @RequestParam(value = "avatar", required = false) MultipartFile avatarFile,
+            @AuthenticationPrincipal UserDetails userDetails
     ) throws IdInvalidException {
+
+        User us = this.userService.getUserByEmail(userDetails.getUsername());
+        if (us == null || (Long) us.getId()!=id) {
+            throw new IdInvalidException("Không thể truy cập tài khoản người khác");
+        }
 
         User user = userService.getUserById(id);
         if (user == null) {
@@ -132,7 +145,7 @@ public class ListTestApiController {
         user.setFullName(name);
         user.setPhone(phone);
         user.setAddress(address);
-
+        
         // Xử lý ảnh nếu có
         if (avatarFile != null && !avatarFile.isEmpty()) {
             String savedFileName = this.uploadService.handleSaveUploadFile(avatarFile, "avatars");
