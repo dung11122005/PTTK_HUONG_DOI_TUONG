@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.domain.response.ResUserDTO;
 import com.example.exam_portal.repository.RoleRepository;
 import com.example.exam_portal.repository.UserRepository;
 
@@ -62,4 +63,21 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return this.userRepository.existsByEmail(email);
     }
+
+    public ResUserDTO convertToResUserDTO(User user) {
+        ResUserDTO res = new ResUserDTO();
+        res.setId(user.getId());
+        res.setEmail(user.getEmail());
+        res.setName(user.getFullName());
+        res.setPhone(user.getPhone());
+        res.setCreatedAt(user.getCreatedAt());
+        res.setAddress(user.getAddress());
+
+        if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+            String avatarUrl = "http://localhost:8080/uploads/images/avatars/" + user.getAvatar();
+            res.setAvatarUrl(avatarUrl);
+        }
+        return res;
+    }
+
 }

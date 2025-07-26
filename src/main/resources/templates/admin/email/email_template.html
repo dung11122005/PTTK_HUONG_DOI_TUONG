@@ -28,9 +28,20 @@
       .header {
         font-size: 24px;
         font-weight: bold;
-        color: #2c3e50;
-        border-bottom: 2px solid #3498db;
+        color: #e74c3c;
+        border-bottom: 2px solid #e74c3c;
         padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .urgent {
+        color: #e74c3c;
+        background-color: #fdecea;
+        padding: 15px;
+        border-left: 6px solid #c0392b;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 20px;
         margin-bottom: 20px;
       }
 
@@ -53,11 +64,14 @@
   <body>
     <div class="email-wrapper">
       <div class="container">
-        <div class="header">Thông báo từ giáo viên</div>
-        <div class="content" th:utext="${message}">
-          [Nội dung thông báo sẽ được hiển thị tại đây]
+        <div class="header">⚠️ Thông báo Khẩn từ Giáo viên</div>
+        <div class="urgent">
+          Lưu ý: Đây là thông báo quan trọng, vui lòng đọc kĩ
         </div>
-        <div class="footer">Trân trọng,<br />Hệ thống quản lý lớp học</div>
+        <div class="content" th:utext="${message}">
+          [Nội dung thông báo KHẨN sẽ được hiển thị tại đây]
+        </div>
+        <div class="footer">Trân trọng</div>
       </div>
     </div>
   </body>
