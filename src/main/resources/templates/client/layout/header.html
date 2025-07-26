@@ -70,7 +70,8 @@
                         <li>
                           <a
                             class="dropdown-item"
-                            href="/profile"
+                            th:href="'http://localhost:3000/profile/' + ${session.id}"
+                            target="_blank"
                             style="
                               width: 100%;
                               padding: 10px 20px;
