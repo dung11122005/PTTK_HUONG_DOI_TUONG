@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.Chapter;
@@ -33,6 +34,10 @@ public class CourseService {
 
     public Page<Course> getAllCoursePagination(Pageable page) {
         return this.courseRepository.findAll(page);
+    }
+
+    public Page<Course> getAllCoursePagination(Specification<Course> spec, Pageable pageable) {
+        return this.courseRepository.findAll(spec, pageable);
     }
 
     public List<Course> getAllCourse() {

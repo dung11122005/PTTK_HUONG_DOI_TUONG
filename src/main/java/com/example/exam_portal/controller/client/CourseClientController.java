@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,7 @@ import com.example.exam_portal.service.CourseService;
 import com.example.exam_portal.service.PaymentService;
 import com.example.exam_portal.service.PurchaseService;
 import com.example.exam_portal.service.UserService;
+import com.example.exam_portal.spec.SpecificationBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,7 +56,9 @@ public class CourseClientController {
 
     @GetMapping("/courses")
     public String getCourseHomePage(Model model, @RequestParam("page") Optional<String> pageOptional,
-    @AuthenticationPrincipal UserDetails userDetails) {
+    @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params) {
+
+        Specification<Course> spec = new SpecificationBuilder<Course>().buildFromParams(params);
 
         int page = 1;
         try {
@@ -68,7 +73,7 @@ public class CourseClientController {
         Page<Course> us;
         Pageable pageable = PageRequest.of(page - 1, 9);
         
-        us = this.courseService.getAllCoursePagination(pageable);
+        us = this.courseService.getAllCoursePagination(spec, pageable);
       
         
         List<Course> courses = us.getContent();

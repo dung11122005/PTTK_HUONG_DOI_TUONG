@@ -110,13 +110,13 @@
                 "
               >
                 <form
-                  action="/courses/search"
+                  action="/courses"
                   method="get"
                   style="display: flex; width: 100%; max-width: 600px"
                 >
                   <input
                     type="text"
-                    name="keyword"
+                    name="name"
                     placeholder="Tìm kiếm khóa học..."
                     style="
                       flex: 1;
@@ -126,6 +126,7 @@
                       border-radius: 4px 0 0 4px;
                       outline: none;
                     "
+                    autocomplete="off"
                   />
                   <button
                     type="submit"
