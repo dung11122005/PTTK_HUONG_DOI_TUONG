@@ -82,11 +82,12 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                 .requestMatchers("/","/courses/**", "/login/**", "/register", "/product/**", "/products/**",
-                 "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/**", "/api/chat/**", "/purchased-course/**").permitAll()
+                 "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**",
+                 "/api/chat/**", "/purchased-course/**").permitAll()
                 .requestMatchers("/api/v1/user/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
                 .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**"
                 ,"/admin/sold/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("TEACHER", "ADMIN")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("ADMIN")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
                 .anyRequest().authenticated()

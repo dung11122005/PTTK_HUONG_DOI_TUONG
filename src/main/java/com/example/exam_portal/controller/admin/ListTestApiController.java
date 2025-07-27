@@ -97,8 +97,12 @@ public class ListTestApiController {
     public ResponseEntity<ResultPaginationDTO> getAllLogs(
         @RequestParam Map<String, String> params,
         Pageable pageable) {
+            // Bỏ các param không liên quan đến filter
+        Map<String, String> filteredParams = params.entrySet().stream()
+        .filter(e -> !List.of("page", "size", "sort").contains(e.getKey()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        Specification<ActivityLog> spec = new SpecificationBuilder<ActivityLog>().buildFromParams(params);
+        Specification<ActivityLog> spec = new SpecificationBuilder<ActivityLog>().buildFromParams(filteredParams);
         return ResponseEntity.ok(activityLogService.fetchAllLogs(spec, pageable));
     }
 
