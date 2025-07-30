@@ -16,7 +16,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.exam_portal.domain.response.RestResponse;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.example.exam_portal.controller.admin")
 public class GlobalException {
     // handle all exception
     @ExceptionHandler(Exception.class)

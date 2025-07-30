@@ -1,5 +1,6 @@
 package com.example.exam_portal.controller.client;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,11 @@ public class HomePageController {
         return"client/homepage/show";
     }
     
+
+    @GetMapping("/access-deny")
+    public String accessDenied(Model model, Principal principal) {
+        return "client/error/403"; // Trỏ đến templates/error/403.html
+    }
 
 
     @GetMapping("/login")
