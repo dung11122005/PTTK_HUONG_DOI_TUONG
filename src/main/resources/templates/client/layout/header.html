@@ -20,6 +20,7 @@
                     <li class="active"><a href="/">Home</a></li>
                     <li><a href="/courses">Courses</a></li>
                     <li><a href="/exam">Exam</a></li>
+                    <li><a href="/practice">Practice English</a></li>
 
                     <!-- Nếu chưa login -->
                     <li
@@ -99,7 +100,40 @@
                             Khóa học đã mua
                           </a>
                         </li>
-
+                        <div sec:authorize="hasAnyRole('TEACHER')">
+                          <li>
+                            <a
+                              class="dropdown-item"
+                              href="/admin/exam"
+                              style="
+                                width: 100%;
+                                padding: 10px 20px;
+                                color: #212529;
+                                text-decoration: none;
+                                background-color: #fff;
+                              "
+                            >
+                              Trang giáo viên
+                            </a>
+                          </li>
+                        </div>
+                        <div sec:authorize="hasAnyRole('ADMIN')">
+                          <li>
+                            <a
+                              class="dropdown-item"
+                              href="/admin"
+                              style="
+                                width: 100%;
+                                padding: 10px 20px;
+                                color: #212529;
+                                text-decoration: none;
+                                background-color: #fff;
+                              "
+                            >
+                              Trang admin
+                            </a>
+                          </li>
+                        </div>
                         <li>
                           <form
                             th:action="@{/logout}"

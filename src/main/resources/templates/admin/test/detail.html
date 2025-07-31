@@ -34,18 +34,25 @@
               </li>
               <li class="breadcrumb-item active">Điểm của kì thi</li>
             </ol>
-            <ol class="breadcrumb mb-4">
-              <li class="breadcrumb-item">
-                <a
-                  th:href="@{'/admin/test/' + ${id} + '/export'}"
-                  class="btn btn-success"
-                  target="_blank"
-                  download
-                >
-                  Xuất Excel
-                </a>
-              </li>
-            </ol>
+            <div class="d-flex mb-4 gap-2">
+              <a
+                th:href="@{'/admin/test/' + ${id} + '/export'}"
+                class="btn btn-success"
+                target="_blank"
+                download
+              >
+                Xuất Excel
+              </a>
+
+              <a
+                th:href="'http://localhost:3000/score/' + ${id}"
+                class="btn btn-primary"
+                target="_blank"
+                download
+              >
+                Thống kê
+              </a>
+            </div>
 
             <div class="mt-4">
               <div class="row">
