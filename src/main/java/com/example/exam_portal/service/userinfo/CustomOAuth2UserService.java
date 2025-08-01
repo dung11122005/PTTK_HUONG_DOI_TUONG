@@ -103,12 +103,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
         String fileName = email.replaceAll("[^a-zA-Z0-9]", "_") + ".jpg";
 
         String savedFileName="";
-        try {
-            MultipartFile avatarFile = urlToMultipartFile(avatarUrl, fileName);
-            savedFileName = this.uploadService.handleSaveUploadFile(avatarFile, "avatars");
-        } catch (IOException e) {
-            e.printStackTrace(); // hoặc log lỗi tùy bạn
-        }
+        
 
 
         
@@ -119,6 +114,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
         if (email != null) {
             User user = this.userService.getUserByEmail(email);
             if (user == null) {
+                try {
+                    MultipartFile avatarFile = urlToMultipartFile(avatarUrl, fileName);
+                    savedFileName = this.uploadService.handleSaveUploadFile(avatarFile, "avatars");
+                } catch (IOException e) {
+                    e.printStackTrace(); // hoặc log lỗi tùy bạn
+                }
                 // Create new user
                 User oUser = new User();
                 oUser.setEmail(email);

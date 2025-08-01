@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -109,8 +110,15 @@ public class ListTestApiController {
     @GetMapping("/user/{id}")
     @ApiMessage("fetch user by id")
     public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id,
-    @AuthenticationPrincipal UserDetails userDetails) throws IdInvalidException{
-        User user = this.userService.getUserByEmail(userDetails.getUsername());
+    @AuthenticationPrincipal Object principal) throws IdInvalidException{
+        String email = null;
+
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername(); // login thường
+        } else if (principal instanceof OAuth2User oAuth2User) {
+            email = oAuth2User.getAttribute("email"); // login bằng Google
+        }
+        User user = this.userService.getUserByEmail(email);
         User fetchUser = this.userService.getUserById(id);
         if (fetchUser == null) {
             throw new IdInvalidException("User với id = " + id + " không tồn tại");
@@ -132,10 +140,16 @@ public class ListTestApiController {
             @RequestParam("phone") String phone,
             @RequestParam("address") String address,
             @RequestParam(value = "avatar", required = false) MultipartFile avatarFile,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal Object principal
     ) throws IdInvalidException {
 
-        User us = this.userService.getUserByEmail(userDetails.getUsername());
+        String email="";
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername(); // login thường
+        } else if (principal instanceof OAuth2User oAuth2User) {
+            email = oAuth2User.getAttribute("email"); // login bằng Google
+        }
+        User us = this.userService.getUserByEmail(email);
         if (us == null || (Long) us.getId()!=id) {
             throw new IdInvalidException("Không thể truy cập tài khoản người khác");
         }
