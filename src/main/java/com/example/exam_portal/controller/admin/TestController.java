@@ -229,4 +229,11 @@ public class TestController {
         return "redirect:/admin/exam";
     }
 
+    @GetMapping("/admin/test/result/{id}")
+    public String getDeleteExamResult(@RequestParam("testId") Long testId, @PathVariable long id) {
+        this.examResultService.hanndleDeleteExamResult(id);
+        return "redirect:/admin/test/"+testId;
+    }
+    
+
 }

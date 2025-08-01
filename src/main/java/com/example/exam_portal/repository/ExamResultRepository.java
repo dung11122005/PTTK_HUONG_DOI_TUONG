@@ -18,4 +18,6 @@ public interface ExamResultRepository extends JpaRepository<ExamResult, Long>{
     boolean existsByStudentIdAndExamId(Long studentId, Long examId);
 
     List<ExamResult> findByExamSessionId(Long Id);
+
+    void deleteById(long id);
 }

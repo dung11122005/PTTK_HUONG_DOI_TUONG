@@ -45,6 +45,11 @@ public class ExamResultService {
         return examResultRepository.existsByStudentIdAndExamId(studentId, examId);
     }
 
+    public void hanndleDeleteExamResult(Long id) {
+        this.examResultRepository.deleteById(id);
+    }
+
+
     public void writeExcelFileExamResult(List<ExamResult> results, OutputStream outputStream) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Exam Results");
