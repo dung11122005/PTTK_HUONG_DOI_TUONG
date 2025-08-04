@@ -54,8 +54,8 @@
       }
 
       .question-nav button {
-        width: 45px;
-        height: 45px;
+        width: 30px;
+        height: 30px;
         font-weight: bold;
         pointer-events: none; /* Không cho bấm */
       }
@@ -99,6 +99,22 @@
         -moz-user-drag: none;
         user-drag: none;
       }
+
+
+      .question-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr); /* 4 cột đều nhau */
+        gap: 5px; /* khoảng cách giữa các nút */
+        width: 100%;
+      }
+
+      .question-nav .question-btn {
+        height: 35px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+
     </style>
 
     <script>
@@ -200,6 +216,7 @@
                             th:name="'answers[' + ${question.id} + ']'"
                             th:value="${choice.content}"
                             class="answer-input"
+                            th:attr="data-index=${iterStat.index}"
                           />
                           <span th:text="${choice.content}"></span>
                         </label>
@@ -223,6 +240,7 @@
                             th:name="'answers[' + ${question.id} + ']'"
                             th:value="${choice.content}"
                             class="answer-input"
+                            th:attr="data-index=${iterStat.index}"
                           />
                           <span th:text="${choice.content}"></span>
                         </label>
@@ -241,6 +259,7 @@
                       th:name="'answers[' + ${question.id} + ']'"
                       style="font-size: 18px; height: 36px; padding: 5px"
                       autocomplete="off"
+                       th:attr="data-index=${iterStat.index}"
                     />
                   </div>
 
@@ -271,11 +290,11 @@
             <!-- Thanh điều hướng câu hỏi -->
             <div class="col-md-3">
               <h2>Câu hỏi đã trả lời</h2>
-              <div class="question-nav d-flex flex-wrap">
+              <div class="question-nav">
                 <div th:each="q, idx : ${questions}">
                   <button
                     type="button"
-                    class="btn btn-outline-secondary m-1"
+                    class="btn btn-outline-secondary question-btn"
                     th:id="'nav' + ${idx.index}"
                     onclick="scrollToQuestion([[${idx.index}]])"
                   >
