@@ -15,12 +15,12 @@ public class PracticeService {
     private GeminiClient geminiClient;
 
     public String generateRandomVietnameseSentence() {
-        return geminiClient.ask("Hãy tạo một đoạn tiếng Việt bất cứ chủ đề gì và những câu bạn trả ra không được lặp lại câu trước (~100–120 từ) cho học sinh dịch sang tiếng Anh. Chỉ trả về câu tiếng Việt.");
+        return this.geminiClient.ask("Hãy tạo một đoạn tiếng Việt bất cứ chủ đề gì và những câu bạn trả ra không được lặp lại câu trước (~100–120 từ) cho học sinh dịch sang tiếng Anh. Chỉ trả về câu tiếng Việt.");
     }
 
     public FeedbackResult analyzeStudentTranslation(String sourceVi, String studentEn) {
         String prompt = PromptBuilder.buildCorrectionPrompt(sourceVi, studentEn);
-        String json = geminiClient.askRaw(prompt);
+        String json = this.geminiClient.askRaw(prompt);
         return ResponseParser.parseFeedback(json);
     }
 

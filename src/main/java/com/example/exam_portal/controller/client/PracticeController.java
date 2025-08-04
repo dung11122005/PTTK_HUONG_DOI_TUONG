@@ -20,7 +20,7 @@ public class PracticeController {
 
     @GetMapping
     public String getPracticePage(Model model) {
-        String sentence = practiceService.generateRandomVietnameseSentence();
+        String sentence = this.practiceService.generateRandomVietnameseSentence();
         model.addAttribute("sourceVi", sentence);
         return "client/chatbot/practice";
     }
@@ -31,7 +31,7 @@ public class PracticeController {
             @RequestParam String studentEn,
             Model model) {
 
-        FeedbackResult result = practiceService.analyzeStudentTranslation(sourceVi, studentEn);
+        FeedbackResult result = this.practiceService.analyzeStudentTranslation(sourceVi, studentEn);
         
         model.addAttribute("sourceVi", sourceVi);
         model.addAttribute("studentEn", studentEn);
