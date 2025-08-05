@@ -78,7 +78,7 @@ public class UserService {
         res.setAddress(user.getAddress());
 
         if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-            String avatarUrl = backendUrl + user.getAvatar();
+            String avatarUrl = backendUrl + "uploads/images/avatars/" + user.getAvatar();
             res.setAvatarUrl(avatarUrl);
         }
         return res;
