@@ -1,7 +1,10 @@
 # Build stage
 FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+COPY src ./src
+COPY application.properties ./src/main/resources/
+
 RUN mvn clean package -DskipTests
 
 # Run stage
