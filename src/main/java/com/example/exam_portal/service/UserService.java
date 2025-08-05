@@ -2,6 +2,7 @@ package com.example.exam_portal.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private  final RoleRepository roleRepository;
+
+    @Value("${spring.url.be}")
+    private String backendUrl;
 
     public UserService(
             UserRepository userRepository,
@@ -74,7 +78,7 @@ public class UserService {
         res.setAddress(user.getAddress());
 
         if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-            String avatarUrl = "http://localhost:8080/uploads/images/avatars/" + user.getAvatar();
+            String avatarUrl = backendUrl + user.getAvatar();
             res.setAvatarUrl(avatarUrl);
         }
         return res;
