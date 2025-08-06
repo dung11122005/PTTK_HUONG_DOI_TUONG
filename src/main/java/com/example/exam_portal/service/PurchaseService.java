@@ -35,6 +35,14 @@ public class PurchaseService {
         return this.purchaseRepository.findAll(page);
     }
 
+    public List<Purchase> getAllCourseSoldListCourseId(List<Course> courses) {
+        return this.purchaseRepository.findByCourseIn(courses);
+    }
+
+    public List<Purchase> getAllCourseSold() {
+        return this.purchaseRepository.findAll();
+    }
+
     public List<Purchase> getPurchaseClientByStudentId(Long studentId) {
         return this.purchaseRepository.findByStudentId(studentId);
     }

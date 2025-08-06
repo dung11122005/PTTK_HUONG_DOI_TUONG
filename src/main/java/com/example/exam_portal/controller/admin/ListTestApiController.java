@@ -22,15 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.exam_portal.domain.ActivityLog;
+import com.example.exam_portal.domain.Course;
 import com.example.exam_portal.domain.ExamResult;
+import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.domain.dto.ResultPaginationDTO;
 import com.example.exam_portal.domain.response.ExamResultDTO;
 import com.example.exam_portal.domain.response.ExamResultListResponse;
 import com.example.exam_portal.domain.response.ResUserDTO;
 import com.example.exam_portal.domain.response.RestResponse;
+import com.example.exam_portal.domain.response.SoldCourseResponse;
 import com.example.exam_portal.service.ActivityLogService;
+import com.example.exam_portal.service.CourseService;
 import com.example.exam_portal.service.ExamResultService;
+import com.example.exam_portal.service.PurchaseService;
 import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
 import com.example.exam_portal.spec.SpecificationBuilder;
@@ -46,13 +51,19 @@ public class ListTestApiController {
     private final ExamResultService examResultService;
     private final UserService userService;
     private final UploadService uploadService;
+    private final CourseService courseService;
+    private final PurchaseService purchaseService;
 
     public ListTestApiController(ExamResultService examResultService, 
-    ActivityLogService activityLogService, UserService userService, UploadService uploadService){
+    ActivityLogService activityLogService, UserService userService, 
+    UploadService uploadService, CourseService courseService,
+    PurchaseService purchaseService){
         this.examResultService=examResultService;
         this.activityLogService = activityLogService;
         this.userService=userService;
         this.uploadService=uploadService;
+        this.courseService=courseService;
+        this.purchaseService=purchaseService;
     }
 
 
@@ -175,5 +186,40 @@ public class ListTestApiController {
         return ResponseEntity.ok(userService.convertToResUserDTO(user));
     }
 
+
+    @GetMapping("/soldcourse")
+    public ResponseEntity<RestResponse<List<SoldCourseResponse>>> getSoldCourse(@AuthenticationPrincipal UserDetails userDetails) throws IdInvalidException {
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+
+        if(teacher==null){
+            throw new IdInvalidException("bạn chưa đăng nhập, vui lòng đăng nhập");
+        }
+
+        if(teacher.getRole().getName().equals("STUDENT")){
+            throw new IdInvalidException("bạn không đủ quyền hạn truy cập");
+        }
+
+        List<Purchase> purchases;
+        List<Course> courses=this.courseService.getCourseByTeacherId(teacher.getId());
+        if(teacher.getRole().getName().equals("ADMIN")){
+            purchases = this.purchaseService.getAllCourseSold();
+        }else{
+            purchases = this.purchaseService.getAllCourseSoldListCourseId(courses);
+        }
+
+         // Convert to SoldCourseResponse
+        List<SoldCourseResponse> soldCourseResponses = purchases.stream()
+        .map(p -> new SoldCourseResponse(p.getCourse().getName(), p.getCourse().getPrice()))
+        .collect(Collectors.toList());
+
+
+        RestResponse<List<SoldCourseResponse>> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.OK.value());
+        res.setMessage("Lấy danh sách kết quả thành công.");
+        res.setData(soldCourseResponses);
+        res.setError(null);
+        
+        return ResponseEntity.ok(res);
+    }
 
 }
