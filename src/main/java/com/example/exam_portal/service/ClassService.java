@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.ClassRoom;
@@ -37,6 +38,10 @@ public class ClassService {
 
     public Page<ClassRoom> getAllClassRoomPagination(Pageable page) {
         return this.classRepository.findAll(page);
+    }
+
+    public Page<ClassStudent> getAllClassRoomPagination(Specification<ClassStudent> spec, Pageable pageable) {
+        return this.classStudentRepository.findAll(spec, pageable);
     }
 
     public List<ClassRoom> getAllClassRoom() {

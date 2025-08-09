@@ -74,6 +74,14 @@
             <!-- Danh sách học sinh đã trong lớp -->
             <div class="mt-5">
               <h5>Danh sách học sinh trong lớp</h5>
+              <!-- Form tìm kiếm -->
+              <form th:action="@{/admin/class/student/add/{id}(id=${currentClass.id})}" method="get" class="mb-3">
+                <div class="input-group" style="max-width: 300px;">
+                  <input type="text" name="student.fullName" class="form-control" placeholder="Tìm theo tên"
+                         th:value="${name}" autocomplete=off>
+                  <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                </div>
+              </form>
               <table class="table table-bordered table-striped">
                 <thead>
                   <tr>
@@ -102,6 +110,42 @@
                   </tr>
                 </tbody>
               </table>
+              <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                      <li class="page-item">
+                        <a
+                          class="page-link"
+                          th:classappend="${currentPage == 1} ? ' disabled'"
+                          th:href="@{'/admin/class/student/add/{id}(id=${currentClass.id})/?page=' + ${currentPage - 1}}"
+                          aria-label="Previous"
+                        >
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>
+                      </li>
+                      <li
+                        class="page-item"
+                        th:each="i : ${#numbers.sequence(1, totalPages)}"
+                      >
+                        <a
+                          class="page-link"
+                          th:classappend="${i == currentPage} ? ' active'"
+                          th:href="@{'/admin/class/student/add/{id}(id=${currentClass.id})/?page=' + ${i}}"
+                          th:text="${i}"
+                          >1</a
+                        >
+                      </li>
+                      <li class="page-item">
+                        <a
+                          class="page-link"
+                          th:classappend="${currentPage == totalPages} ? ' disabled'"
+                          th:href="@{'/admin/class/student/add/{id}(id=${currentClass.id})/?page=' + ${currentPage + 1}}"
+                          aria-label="Next"
+                        >
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
             </div>
           </div>
         </main>

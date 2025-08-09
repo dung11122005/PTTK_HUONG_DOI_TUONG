@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,7 @@ import com.example.exam_portal.domain.ClassStudent;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.UserService;
+import com.example.exam_portal.spec.SpecificationBuilder;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -119,16 +122,36 @@ public class ClassController {
 
 
     @GetMapping("/admin/class/student/add/{classId}")
-    public String showAddStudentToClassForm(Model model, @PathVariable Long classId) {
+    public String showAddStudentToClassForm(Model model, @PathVariable Long classId, 
+    @RequestParam Map<String, String> params, 
+    @RequestParam("page") Optional<String> pageOptional ) {
         ClassRoom classRoom = this.classService.getClassRoomById(classId);
         List<User> listStudents = this.userService.getUserRoleName("STUDENT"); // chỉ học sinh
+        Specification<ClassStudent> spec = new SpecificationBuilder<ClassStudent>().buildFromParams(params);
 
-        List<ClassStudent> classStudentList=this.classService.getClassStudentById(classId);
+
+        int page = 1;
+        try {
+            if (pageOptional.isPresent()) {
+                page = Integer.parseInt(pageOptional.get());
+            } else {
+                page = 1;
+            }
+        } catch (Exception e) {
+
+        }
+        Page<ClassStudent> classStudentList;
+        Pageable pageable = PageRequest.of(page - 1, 10);
+
+        classStudentList=this.classService.getAllClassRoomPagination(spec, pageable);
 
         model.addAttribute("classStudentList", classStudentList);
         model.addAttribute("currentClass", classRoom); // để lấy ID truyền vào form action
         model.addAttribute("students", listStudents);  // danh sách học sinh
         model.addAttribute("classStudent", new ClassStudent()); // object gắn với form
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", classStudentList.getTotalPages());
 
         return "admin/class/addStudent"; // tên template Thymeleaf
     }
