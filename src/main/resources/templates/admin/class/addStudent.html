@@ -77,15 +77,15 @@
               <table class="table table-bordered table-striped">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>#</th>
                     <th>Họ và tên</th>
                     <th>Email</th>
                     <th>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="cs : ${classStudentList}">
-                    <td th:text="${cs.student.id}"></td>
+                  <tr th:each="cs, stat : ${classStudentList}">
+                    <td th:text="${stat.count}"></td>
                     <td th:text="${cs.student.fullName}"></td>
                     <td th:text="${cs.student.email}"></td>
                     <td>
