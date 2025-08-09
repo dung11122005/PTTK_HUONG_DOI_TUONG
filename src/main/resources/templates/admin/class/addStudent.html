@@ -48,23 +48,21 @@
             </ol>
             <div class="mt-4">
               <div class="row">
-                <form
-                  th:action="@{/admin/class/student/add/{id}(id=${currentClass.id})}"
-                  th:object="${classStudent}"
-                  method="post"
-                >
+                <form th:action="@{/admin/class/student/add/{id}(id=${currentClass.id})}" method="post">
                   <!-- Chọn học sinh -->
                   <div class="mb-3">
-                    <label class="form-label">Học sinh:</label>
-                    <select class="form-select" th:field="*{student.id}">
-                      <option
-                        th:each="stu : ${students}"
-                        th:value="${stu.id}"
-                        th:text="${stu.fullName + ' (ID: ' + stu.id + ')'}"
-                      ></option>
-                    </select>
+                    <label class="form-label">Email học sinh:</label>
+                    <input type="email"
+                           class="form-control"
+                           name="email"
+                           placeholder="Nhập email học sinh"
+                           required 
+                           autocomplete="off"/>
+                  
+                    <!-- Hiển thị lỗi -->
+                    <div th:if="${error}" class="text-danger mt-1" th:text="${error}"></div>
                   </div>
-
+                
                   <!-- Nút -->
                   <button type="submit" class="btn btn-primary">
                     Thêm học sinh
@@ -72,6 +70,7 @@
                 </form>
               </div>
             </div>
+
             <!-- Danh sách học sinh đã trong lớp -->
             <div class="mt-5">
               <h5>Danh sách học sinh trong lớp</h5>

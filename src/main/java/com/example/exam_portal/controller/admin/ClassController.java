@@ -155,22 +155,34 @@ public class ClassController {
 
     @PostMapping("/admin/class/student/add/{classId}")
     public String addStudentToClass(@PathVariable Long classId,
-                                    @ModelAttribute("classStudent") ClassStudent classStudent) {
+                                    @RequestParam("email") String email,
+                                    Model model) {
 
         ClassRoom classRoom = this.classService.getClassRoomById(classId);
-        User student = this.userService.getUserById(classStudent.getStudent().getId());
+        model.addAttribute("currentClass", classRoom);
 
+        if (email == null || email.trim().isEmpty()) {
+            model.addAttribute("error", "Vui lòng nhập email");
+            return "admin/class/addStudent"; // Tên file HTML của form
+        }
+
+        User student = this.userService.getUserByEmail(email);
+        if (student == null) {
+            model.addAttribute("error", "Không tìm thấy học sinh với email này");
+            return "admin/class/addStudent";
+        }
+
+        ClassStudent classStudent = new ClassStudent();
         classStudent.setClassroom(classRoom);
         classStudent.setStudent(student);
 
-        // Thêm vào danh sách lớp
         classRoom.getStudents().add(classStudent);
-
-        // Lưu lớp => cascade sẽ lưu classStudent
         this.classService.handleSaveClassRoom(classRoom);
 
         return "redirect:/admin/class/student/add/" + classId;
     }
+
+
 
     @PostMapping("/admin/class/student/delete/{classId}/{studentId}")
     public String deleteStudentFromClass(@PathVariable Long classId,
