@@ -209,7 +209,7 @@ public class ListTestApiController {
 
          // Convert to SoldCourseResponse
         List<SoldCourseResponse> soldCourseResponses = purchases.stream()
-        .map(p -> new SoldCourseResponse(p.getCourse().getName(), p.getCourse().getPrice()))
+        .map(p -> new SoldCourseResponse(p.getCourse().getId() ,p.getCourse().getName(), p.getCourse().getPrice()))
         .collect(Collectors.toList());
 
 
