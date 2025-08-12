@@ -134,7 +134,9 @@ public class ClassController {
         .filter(e -> !List.of("page", "size", "sort").contains(e.getKey()))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        Specification<ClassStudent> spec = new SpecificationBuilder<ClassStudent>().buildFromParams(filteredParams);
+        Specification<ClassStudent> spec = new SpecificationBuilder<ClassStudent>()
+        .buildFromParams(filteredParams)
+        .and((root, query, cb) -> cb.equal(root.get("classroom").get("id"), classId));
 
 
         int page = 1;
