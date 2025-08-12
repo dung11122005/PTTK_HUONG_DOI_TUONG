@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -127,15 +128,19 @@ public class ClassController {
     @RequestParam("page") Optional<String> pageOptional ) {
         ClassRoom classRoom = this.classService.getClassRoomById(classId);
         List<User> listStudents = this.userService.getUserRoleName("STUDENT"); // chỉ học sinh
-        Specification<ClassStudent> spec = new SpecificationBuilder<ClassStudent>().buildFromParams(params);
+
+        // Lọc bỏ các param phân trang, sort
+        Map<String, String> filteredParams = params.entrySet().stream()
+        .filter(e -> !List.of("page", "size", "sort").contains(e.getKey()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Specification<ClassStudent> spec = new SpecificationBuilder<ClassStudent>().buildFromParams(filteredParams);
 
 
         int page = 1;
         try {
             if (pageOptional.isPresent()) {
                 page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
             }
         } catch (Exception e) {
 
