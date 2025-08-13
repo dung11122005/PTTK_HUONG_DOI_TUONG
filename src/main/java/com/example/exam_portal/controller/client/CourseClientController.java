@@ -55,10 +55,14 @@ public class CourseClientController {
     }
 
     @GetMapping("/courses")
-    public String getCourseHomePage(Model model, @RequestParam("page") Optional<String> pageOptional,
+    public String getCourseHomePage(Model model, @RequestParam(name = "page", required = false) Optional<String> pageOptional,
     @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params) {
 
-        Specification<Course> spec = new SpecificationBuilder<Course>().buildFromParams(params);
+        Map<String, String> filteredParams = params.entrySet().stream()
+        .filter(e -> !List.of("page", "size", "sort").contains(e.getKey()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Specification<Course> spec = new SpecificationBuilder<Course>().buildFromParams(filteredParams);
 
         int page = 1;
         try {
