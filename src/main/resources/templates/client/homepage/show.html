@@ -41,141 +41,26 @@
         color: white !important;
         border-color: #28a745 !important;
       }
-      #chatbot-toggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background: #007bff;
-        color: #fff;
-        border-radius: 50%;
-        font-size: 28px;
-        text-align: center;
-        line-height: 60px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        z-index: 10000;
-      }
-
-      #chatbot-window {
-        display: none;
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 320px;
-        height: 400px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        flex-direction: column;
-        overflow: hidden;
-        z-index: 9999;
-        animation: fadeInUp 0.3s ease-in-out;
-      }
-
-      @keyframes fadeInUp {
-        from {
-          transform: translateY(20px);
-          opacity: 0;
+      @media (max-width: 991px) {
+        .mobile_menu .dropdown-menu {
+          display: block !important; /* Luôn hiển thị khi mở menu mobile */
+          position: static !important; /* Bỏ absolute để nằm trong luồng */
+          float: none !important;
+          background: #fff !important; /* Đổi nền trắng để thấy chữ */
+          border: none !important;
+          box-shadow: none !important;
+          padding-left: 20px; /* thụt vào để thấy cấp con */
         }
-        to {
-          transform: translateY(0);
-          opacity: 1;
+        .mobile_menu .dropdown-item {
+          color: #000 !important; /* Đổi chữ thành đen */
+          padding: 8px 0;
         }
       }
 
-      .chatbot-header {
-        background: #007bff !important;
-        color: #fff !important;
-        padding: 10px 12px !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        border-top-left-radius: 10px !important;
-        border-top-right-radius: 10px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-      }
-
-      .chatbot-title {
-        flex-grow: 1 !important;
-        overflow: hidden !important;
-        white-space: nowrap !important;
-        text-overflow: ellipsis !important;
-        margin-right: 10px !important;
-      }
-
-      .chatbot-close-btn {
-        width: 32px !important;
-        height: 32px !important;
-        background: transparent !important;
-        border: none !important;
-        color: #fff !important;
-        font-size: 20px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-        flex-shrink: 0 !important;
-      }
-
-      #chatbot-history {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        background: #f5f5f5;
-        height: 250px;
-      }
-
-      #chatbot-input {
-        width: 100%;
-        height: 60px;
-        border: none;
-        padding: 8px;
-        border-top: 1px solid #ccc;
-        resize: none;
-      }
-
-      #chatbot-window button {
-        width: 100%;
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 10px;
-      }
-
-      .chat-message.user {
-        text-align: right;
-        margin: 6px 0;
-      }
-
-      .chat-message.user span {
-        display: inline-block;
-        background-color: #007bff;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 16px;
-        max-width: 80%;
-        word-wrap: break-word;
-      }
-
-      /* Tin nhắn chatbot */
-      .chat-message.bot {
-        text-align: left;
-        margin: 6px 0;
-      }
-
-      .chat-message.bot span {
-        display: inline-block;
-        background-color: #e0e0e0;
-        color: #000;
-        padding: 8px 12px;
-        border-radius: 16px;
-        max-width: 80%;
-        word-wrap: break-word;
+      .mobile_menu ul li a {
+        display: block;
+        padding: 20px; /* padding cố định nhỏ */
+        line-height: 1; /* làm nút thấp */
       }
     </style>
   </head>

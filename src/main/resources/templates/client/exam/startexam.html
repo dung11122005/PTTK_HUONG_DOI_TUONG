@@ -100,7 +100,6 @@
         user-drag: none;
       }
 
-
       .question-nav {
         display: grid;
         grid-template-columns: repeat(5, 1fr); /* 4 cột đều nhau */
@@ -114,7 +113,27 @@
         text-align: center;
       }
 
+      @media (max-width: 991px) {
+        .mobile_menu .dropdown-menu {
+          display: block !important; /* Luôn hiển thị khi mở menu mobile */
+          position: static !important; /* Bỏ absolute để nằm trong luồng */
+          float: none !important;
+          background: #fff !important; /* Đổi nền trắng để thấy chữ */
+          border: none !important;
+          box-shadow: none !important;
+          padding-left: 20px; /* thụt vào để thấy cấp con */
+        }
+        .mobile_menu .dropdown-item {
+          color: #000 !important; /* Đổi chữ thành đen */
+          padding: 8px 0;
+        }
+      }
 
+      .mobile_menu ul li a {
+        display: block;
+        padding: 20px; /* padding cố định nhỏ */
+        line-height: 1; /* làm nút thấp */
+      }
     </style>
 
     <script>
@@ -259,7 +278,7 @@
                       th:name="'answers[' + ${question.id} + ']'"
                       style="font-size: 18px; height: 36px; padding: 5px"
                       autocomplete="off"
-                       th:attr="data-index=${iterStat.index}"
+                      th:attr="data-index=${iterStat.index}"
                     />
                   </div>
 

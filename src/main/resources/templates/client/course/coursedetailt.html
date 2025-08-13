@@ -70,6 +70,28 @@
       color: white !important;
       border-color: #28a745 !important;
     }
+
+    @media (max-width: 991px) {
+      .mobile_menu .dropdown-menu {
+        display: block !important; /* Luôn hiển thị khi mở menu mobile */
+        position: static !important; /* Bỏ absolute để nằm trong luồng */
+        float: none !important;
+        background: #fff !important; /* Đổi nền trắng để thấy chữ */
+        border: none !important;
+        box-shadow: none !important;
+        padding-left: 20px; /* thụt vào để thấy cấp con */
+      }
+      .mobile_menu .dropdown-item {
+        color: #000 !important; /* Đổi chữ thành đen */
+        padding: 8px 0;
+      }
+    }
+
+    .mobile_menu ul li a {
+      display: block;
+      padding: 20px; /* padding cố định nhỏ */
+      line-height: 1; /* làm nút thấp */
+    }
   </style>
 
   <body>
