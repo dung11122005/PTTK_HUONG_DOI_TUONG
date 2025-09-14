@@ -70,7 +70,10 @@ public class TestController {
         Page<ExamSession> ex;
         Pageable pageable = PageRequest.of(page - 1, 10);
         
-        if(teacher.getRole().getName().equals("ADMIN")){
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+
+        if(isAdmin){
             ex = this.testService.getAllExamSessionPagination(pageable);
         }else{
             ex = this.testService.getAllExamSessionPaginationTeacherId(teacher.getId(), pageable);
@@ -134,13 +137,17 @@ public class TestController {
     public String getCreateTestPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         List<Exam> exams;
-        if(teacher.getRole().getName().equals("ADMIN")){
+
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+
+        if(isAdmin){
             exams=this.examService.getAllExam();
         }else{
             exams=this.examService.getExamByTeacherId(teacher.getId());
         }
         List<ClassRoom> classRoom;
-        if(teacher.getRole().getName().equals("ADMIN")){
+        if(isAdmin){
             classRoom=this.classService.getAllClassRoom();
         }else{
             classRoom=this.classService.getClassByTeacherId(teacher.getId());
@@ -177,13 +184,16 @@ public class TestController {
                 @PathVariable Long id) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         List<Exam> exams;
-        if(teacher.getRole().getName().equals("ADMIN")){
+
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        if(isAdmin){
             exams=this.examService.getAllExam();
         }else{
             exams=this.examService.getExamByTeacherId(teacher.getId());
         }
         List<ClassRoom> classRoom;
-        if(teacher.getRole().getName().equals("ADMIN")){
+        if(isAdmin){
             classRoom=this.classService.getAllClassRoom();
         }else{
             classRoom=this.classService.getClassByTeacherId(teacher.getId());

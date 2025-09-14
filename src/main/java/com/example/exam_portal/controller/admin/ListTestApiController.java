@@ -195,17 +195,24 @@ public class ListTestApiController {
             throw new IdInvalidException("bạn chưa đăng nhập, vui lòng đăng nhập");
         }
 
-        if(teacher.getRole().getName().equals("STUDENT")){
+        boolean isStudent = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("STUDENT"));
+        if (isStudent) {
             throw new IdInvalidException("bạn không đủ quyền hạn truy cập");
         }
-
+        
+        boolean isAdmin = teacher.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        
         List<Purchase> purchases;
-        List<Course> courses=this.courseService.getCourseByTeacherId(teacher.getId());
-        if(teacher.getRole().getName().equals("ADMIN")){
+        List<Course> courses = this.courseService.getCourseByTeacherId(teacher.getId());
+        
+        if (isAdmin) {
             purchases = this.purchaseService.getAllCourseSold();
-        }else{
+        } else {
             purchases = this.purchaseService.getAllCourseSoldListCourseId(courses);
         }
+
 
          // Convert to SoldCourseResponse
         List<SoldCourseResponse> soldCourseResponses = purchases.stream()

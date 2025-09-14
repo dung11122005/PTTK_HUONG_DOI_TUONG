@@ -1,7 +1,9 @@
 package com.example.exam_portal.controller.admin;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.UploadService;
@@ -79,35 +82,44 @@ public class UserController {
             @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
             @RequestParam("anhFile") MultipartFile file,
+            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,  // nhận nhiều role
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request) {
-
-        // List<FieldError> errors = newUserBindingResult.getFieldErrors();
-        // for (FieldError error : errors) {
-        // System.out.println(">>>>> >>>>>" + error.getField() + " - " +
-        // error.getDefaultMessage());
-        // }
-        
 
         if (newUserBindingResult.hasErrors()) {
             return "admin/user/create";
         }
 
+        // Upload avatar
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatars");
         String hashPassword = this.passwordEncoder.encode(hoidanit.getPassword());
 
         hoidanit.setAvatar(avatar);
         hoidanit.setPassword(hashPassword);
-        hoidanit.setRole(this.userService.getRoleByName(hoidanit.getRole().getName()));
 
-        //ActivitiLog
+        // Lấy danh sách role từ DB theo roleIds
+        if (roleIds != null && !roleIds.isEmpty()) {
+            Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(roleIds));
+            hoidanit.setRoles(roles);
+        }
+
+        // ActivityLog
         String ip = request.getRemoteAddr();
-        activityLogService.handleSaveActivityLog(userDetails.getUsername(), "Tạo user", "POST", "/admin/user/create", ip, 200);
-        // Save
-        
+        activityLogService.handleSaveActivityLog(
+                userDetails.getUsername(),
+                "Tạo user",
+                "POST",
+                "/admin/user/create",
+                ip,
+                200
+        );
+
+        // Save user
         this.userService.handleSaveUser(hoidanit);
+        
         return "redirect:/admin/user";
     }
+
 
     @RequestMapping("/admin/user/{id}")
     public String getUserDetailPage(Model model, @PathVariable long id) {

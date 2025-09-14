@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -118,20 +120,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
                     MultipartFile avatarFile = urlToMultipartFile(avatarUrl, fileName);
                     savedFileName = this.uploadService.handleSaveUploadFile(avatarFile, "avatars");
                 } catch (IOException e) {
-                    e.printStackTrace(); // hoặc log lỗi tùy bạn
+                    e.printStackTrace(); // TODO: log lỗi
+                    savedFileName = "default-google.png"; // fallback
                 }
-                // Create new user
+            
+                // Tạo user mới
                 User oUser = new User();
                 oUser.setEmail(email);
-                oUser.setAvatar("default-google.png");
                 oUser.setFullName(fullName);
                 oUser.setProvider("GOOGLE");
-                oUser.setPassword("123456");
-                oUser.setRole(userRole);
-                oUser.setAvatar(savedFileName);
+            
+                // nếu có avatar upload thì dùng, không thì default
+                oUser.setAvatar(savedFileName != null ? savedFileName : "default-google.png");
+            
+            
+                // Gán role mặc định (VD: STUDENT)
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole); // userRole bạn lấy từ DB ra
+                oUser.setRoles(roles);
+            
                 this.userService.handleSaveUser(oUser);
             }
         }
+
 
         return new DefaultOAuth2User(
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userRole.getName())),

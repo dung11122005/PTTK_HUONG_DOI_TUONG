@@ -59,7 +59,9 @@ public class ExamController {
         }
         Page<Exam> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        if(teacher.getRole().getName().equals("ADMIN")){
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        if(isAdmin){
             us = this.examService.getAllExamPagination(pageable);
         }else{
             us = this.examService.getAllExamPaginationTeacherId(teacher.getId(), pageable);

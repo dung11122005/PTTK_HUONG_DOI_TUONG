@@ -59,11 +59,15 @@ public class ClassController {
 
         Page<ClassRoom> cl;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        if(teacher.getRole().getName().equals("ADMIN")){
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+
+        if (isAdmin) {
             cl = this.classService.getAllClassRoomPagination(pageable);
-        }else{
+        } else {
             cl = this.classService.getAllClassRoomPaginationByIdTeacher(teacher.getId(), pageable);
         }
+
         
         List<ClassRoom> classRooms = cl.getContent();
         model.addAttribute("classRooms", classRooms);

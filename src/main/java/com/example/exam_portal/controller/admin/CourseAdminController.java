@@ -60,7 +60,9 @@ public class CourseAdminController {
         }
         Page<Course> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        if(teacher.getRole().getName().equals("ADMIN")){
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        if(isAdmin){
             us = this.courseService.getAllCoursePagination(pageable);
         }else{
             us = this.courseService.getAllCoursePaginationTeacherId(teacher.getId(), pageable);
@@ -271,7 +273,9 @@ public class CourseAdminController {
         Page<Purchase> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
         List<Course> courses=this.courseService.getCourseByTeacherId(teacher.getId());
-        if(teacher.getRole().getName().equals("ADMIN")){
+        boolean isAdmin = teacher.getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        if(isAdmin){
             us = this.purchaseService.getAllCourseSoldPagination(pageable);
         }else{
             us = this.purchaseService.getAllCourseSoldPaginationListCourseId(courses, pageable);

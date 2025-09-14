@@ -68,6 +68,14 @@ public class UserService {
         return this.userRepository.existsByEmail(email);
     }
 
+    public List<Role> getRolesByIds(List<Long> ids) {
+        return this.roleRepository.findAllByIdIn(ids);
+    }
+
+    public List<Role> getRolesByNames(List<String> names) {
+        return this.roleRepository.findAllByNameIn(names);
+    }
+
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
         res.setId(user.getId());

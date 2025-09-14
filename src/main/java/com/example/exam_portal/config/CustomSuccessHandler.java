@@ -3,6 +3,8 @@ package com.example.exam_portal.config;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,7 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.UserService;
@@ -94,7 +97,14 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
             session.setAttribute("phone", user.getPhone());
             session.setAttribute("id", user.getId());
             session.setAttribute("email", user.getEmail());
-            session.setAttribute("role", user.getRole().getName());
+                
+            // Lấy tất cả role name
+            Set<String> roleNames = user.getRoles().stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toSet());
+                
+            session.setAttribute("roles", roleNames); // Lưu dưới dạng Set
         }
+
     }
 }

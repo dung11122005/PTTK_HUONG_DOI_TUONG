@@ -1,6 +1,8 @@
 package com.example.exam_portal.controller.client;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.exam_portal.domain.Course;
+import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.domain.dto.RegisterDTO;
 import com.example.exam_portal.service.CourseService;
@@ -88,7 +91,12 @@ public class HomePageController {
         user.setPhone(registerDto.getPhone());
         user.setAvatar("default-avatar.jpg");
 
-        user.setRole(this.userService.getRoleByName("STUDENT"));
+        // Lấy role STUDENT từ DB
+        Role studentRole = this.userService.getRoleByName("STUDENT");
+            
+        // Set roles (dùng HashSet vì ManyToMany)
+        user.setRoles(new HashSet<>(Collections.singletonList(studentRole)));
+
 
         this.userService.handleSaveUser(user);
         return "redirect:/login?success";
