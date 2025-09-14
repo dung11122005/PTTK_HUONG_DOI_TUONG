@@ -90,7 +90,7 @@ public class ExamController {
         exam.setDescription(form.getDescription());
         exam.setTimeLimit(form.getTimeLimit());
         exam.setIsPublic(form.getIsPublic());
-        exam.setUser(teacher);
+        // exam.setUser(teacher);
 
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";
@@ -115,7 +115,7 @@ public class ExamController {
         exam.setDescription(form.getDescription());
         exam.setTimeLimit(form.getTimeLimit());
         exam.setIsPublic(form.getIsPublic());
-        exam.setUser(teacher);
+        // exam.setUser(teacher);
 
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";

@@ -57,7 +57,7 @@ public class ExamResultService {
         // Dòng 0: tên giáo viên (lấy từ dòng đầu tiên của danh sách)
         if (!results.isEmpty()) {
             Exam exam = results.get(0).getExam();
-            String teacherName = exam.getUser().getFullName();
+            // String teacherName = exam.getUser().getFullName();
             String examName = exam.getName();
 
             // Dòng 0: Tên bài kiểm tra
@@ -68,7 +68,7 @@ public class ExamResultService {
             // Dòng 1: Tên giáo viên
             Row teacherRow = sheet.createRow(1);
             teacherRow.createCell(0).setCellValue("Giáo viên:");
-            teacherRow.createCell(1).setCellValue(teacherName);
+            // teacherRow.createCell(1).setCellValue(teacherName);
         }
 
         // Tiêu đề bắt đầu từ dòng 3

@@ -84,13 +84,13 @@ public class ClassController {
     }
 
 
-    @PostMapping("/admin/class/create")
-    public String postCreateClass(@ModelAttribute("newClass") ClassRoom classroom, @AuthenticationPrincipal UserDetails userDetails) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-        classroom.setTeacher(teacher);
-        this.classService.handleSaveClassRoom(classroom);
-        return "redirect:/admin/class"; // hoặc trang hiển thị danh sách lớp
-    }
+    // @PostMapping("/admin/class/create")
+    // public String postCreateClass(@ModelAttribute("newClass") ClassRoom classroom, @AuthenticationPrincipal UserDetails userDetails) {
+    //     User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+    //     classroom.setTeacher(teacher);
+    //     this.classService.handleSaveClassRoom(classroom);
+    //     return "redirect:/admin/class"; // hoặc trang hiển thị danh sách lớp
+    // }
 
     @GetMapping("/admin/class/update/{id}")
     public String getUpdateClassPage(Model model, @PathVariable Long id) {
@@ -100,18 +100,18 @@ public class ClassController {
     }
 
 
-    @PostMapping("/admin/class/update/{id}")
-    public String postUpdateClass(@ModelAttribute("newClass") ClassRoom classroom,
-                                  @PathVariable Long id,
-                                  @AuthenticationPrincipal UserDetails userDetails) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+    // @PostMapping("/admin/class/update/{id}")
+    // public String postUpdateClass(@ModelAttribute("newClass") ClassRoom classroom,
+    //                               @PathVariable Long id,
+    //                               @AuthenticationPrincipal UserDetails userDetails) {
+    //     User teacher = this.userService.getUserByEmail(userDetails.getUsername());
 
-        classroom.setId(id);
-        classroom.setTeacher(teacher);
+    //     classroom.setId(id);
+    //     classroom.setTeacher(teacher);
 
-        this.classService.handleSaveClassRoom(classroom);
-        return "redirect:/admin/class";
-    }
+    //     this.classService.handleSaveClassRoom(classroom);
+    //     return "redirect:/admin/class";
+    // }
 
     @GetMapping("/admin/class/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {

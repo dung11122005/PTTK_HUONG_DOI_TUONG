@@ -1,6 +1,7 @@
 package com.example.exam_portal.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -23,28 +24,29 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ClassRoom {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "class_code", nullable = false, unique = true)
-    private String classCode;
+    private String classCode; // "10A1"
 
     @Column(nullable = false)
-    private String name;
+    private String name; // "10A1"
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id", nullable = false)
-    private User teacher;
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
+
+    @ManyToOne
+    @JoinColumn(name = "grade_id")
+    private Grade grade;
 
     @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClassStudent> students;
+    private List<ClassStudent> students = new ArrayList<>();
 
+    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeachingAssignment> assignments = new ArrayList<>();
 
     private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @PrePersist protected void onCreate(){ createdAt = LocalDateTime.now(); }
 }

@@ -172,7 +172,7 @@ public class TestController {
         // Gán lại vào examSession
         newExamSession.setExam(exam);
         newExamSession.setClassroom(classroom);
-        newExamSession.setTeacher(teacher);
+        // newExamSession.setTeacher(teacher);
 
         this.testService.handleSaveExamSession(newExamSession);
 
@@ -220,7 +220,7 @@ public class TestController {
         // Gán lại vào examSession
         newExamSession.setExam(exam);
         newExamSession.setClassroom(classroom);
-        newExamSession.setTeacher(teacher);
+        // newExamSession.setTeacher(teacher);
 
         this.testService.handleSaveExamSession(newExamSession);
 

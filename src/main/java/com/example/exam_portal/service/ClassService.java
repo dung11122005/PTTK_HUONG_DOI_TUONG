@@ -94,7 +94,7 @@ public class ClassService {
         // Dòng 0: tên giáo viên (lấy từ dòng đầu tiên của danh sách)
         if (!classStudents.isEmpty()) {
             ClassRoom classes = classStudents.get(0).getClassroom();
-            String teacherName = classes.getTeacher().getFullName();
+            // String teacherName = classes.getTeacher().getFullName();
             String className = classes.getName();
 
             // Dòng 0: Tên lớp
@@ -105,7 +105,7 @@ public class ClassService {
             // Dòng 1: Tên giáo viên
             Row teacherRow = sheet.createRow(1);
             teacherRow.createCell(0).setCellValue("Giáo viên:");
-            teacherRow.createCell(1).setCellValue(teacherName);
+            // teacherRow.createCell(1).setCellValue(teacherName);
         }
 
         // Tiêu đề bắt đầu từ dòng 3

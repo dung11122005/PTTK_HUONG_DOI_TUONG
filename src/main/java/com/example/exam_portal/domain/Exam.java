@@ -29,13 +29,18 @@ public class Exam {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // Đề thi thuộc môn nào
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
+
+    // Người tạo đề thi (giáo viên bộ môn)
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 
     @Column(name = "time_limit", nullable = false)
     private Integer timeLimit; // phút
-
 
     @Column(name = "is_public")
     private Boolean isPublic;
