@@ -60,7 +60,13 @@
                         <td th:text="${stat.count}">1</td>
                         <td th:text="${user.email}">user@example.com</td>
                         <td th:text="${user.fullName}">Nguyễn Văn A</td>
-                        <td th:text="${user.role.name}">ADMIN</td>
+                        <td>
+                          <span
+                            th:each="r : ${user.roles}"
+                            th:text="${r.name}"
+                            class="badge bg-info mx-1"
+                          ></span>
+                        </td>
                         <td>
                           <a
                             th:href="@{'/admin/user/' + ${user.id}}"

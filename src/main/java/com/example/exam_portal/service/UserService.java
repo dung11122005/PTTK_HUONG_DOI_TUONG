@@ -40,7 +40,7 @@ public class UserService {
     }
 
     public List<User> getUserRoleName(String name) {
-        return this.userRepository.findByRole_Name(name);
+        return this.userRepository.findByRoles_Name(name);
     }
 
     public User handleSaveUser(User user) {

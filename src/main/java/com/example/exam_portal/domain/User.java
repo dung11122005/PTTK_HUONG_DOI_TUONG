@@ -57,11 +57,17 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exam> exams;
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExamSession> examSessions;
+
+    // Quan hệ: phòng đào tạo (user) tạo ra nhiều ExamSession
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExamSession> createdExamSessions;
+
+    // Quan hệ: giáo viên được gán vào nhiều ExamSession
+    @ManyToMany(mappedBy = "assignedTeachers")
+    private Set<ExamSession> assignedExamSessions = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "class_id")

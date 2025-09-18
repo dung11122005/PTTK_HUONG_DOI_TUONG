@@ -10,15 +10,12 @@ import com.example.exam_portal.domain.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
-    User save(User hoidanit);
 
     void deleteById(long id);
 
-    List<User> findByRole_Name(String roleName);
+    List<User> findByRoles_Name(String roleName);
 
     List<User> findOneByEmail(String email);
-
-    List<User> findAll();
 
     User findById(long id);
 

@@ -19,7 +19,7 @@ public class ExamService {
     }
 
     public Page<Exam> getAllExamPaginationTeacherId(Long id, Pageable page) {
-        return this.examRepository.findByUserId(id, page);
+        return this.examRepository.findByCreatedBy_Id(id, page);
     }
 
     public Page<Exam> getAllExamPagination(Pageable page) {
@@ -40,7 +40,7 @@ public class ExamService {
     }
 
     public List<Exam> getExamByTeacherId(long id) {
-        return this.examRepository.findByUserId(id);
+        return this.examRepository.findByCreatedBy_Id(id);
     }
 
     public void deleteAExam(long id) {

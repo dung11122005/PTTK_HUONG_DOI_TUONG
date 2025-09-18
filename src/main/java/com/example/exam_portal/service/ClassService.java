@@ -33,7 +33,7 @@ public class ClassService {
     }
 
     public Page<ClassRoom> getAllClassRoomPaginationByIdTeacher(Long id, Pageable page) {
-        return this.classRepository.findByTeacherId(id, page);
+        return this.classRepository.findByAssignments_Teacher_Id(id, page);
     }
 
     public Page<ClassRoom> getAllClassRoomPagination(Pageable page) {
@@ -71,7 +71,7 @@ public class ClassService {
 
 
     public List<ClassRoom> getClassByTeacherId(long id) {
-        return this.classRepository.findByTeacherId(id);
+        return this.classRepository.findByAssignments_Teacher_Id(id);
     }
 
     public List<ClassStudent> getClassRoomByClassIdAndStudentId(Long classId, Long studentId) {
