@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.repository.RoleRepository;
 import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
@@ -38,15 +39,17 @@ public class UserController {
     private  final UploadService uploadService;
     private final PasswordEncoder passwordEncoder;
     private final ActivityLogService activityLogService;
+    private final RoleRepository roleRepository;
 
     public UserController(UserService userService, 
         UploadService uploadService,
         PasswordEncoder passwordEncoder,
-        ActivityLogService activityLogService){
+        ActivityLogService activityLogService, RoleRepository roleRepository){
         this.userService=userService;
         this.uploadService=uploadService;
         this.passwordEncoder=passwordEncoder;
         this.activityLogService=activityLogService;
+        this.roleRepository=roleRepository;
     }
 
 
@@ -74,6 +77,7 @@ public class UserController {
     @GetMapping("/admin/user/create")
     public String getCreateUserPage(Model model) {
         model.addAttribute("newUser", new User());
+        model.addAttribute("allRoles", this.roleRepository.findAll());
         return "admin/user/create";
     }
 
@@ -82,27 +86,29 @@ public class UserController {
             @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
             @RequestParam("anhFile") MultipartFile file,
-            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,  // nhận nhiều role
+            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request) {
-
+            
         if (newUserBindingResult.hasErrors()) {
+            // load lại allRoles để hiển thị lại form khi có lỗi
+            model.addAttribute("allRoles", this.userService.getAllRoles());
             return "admin/user/create";
         }
-
+    
         // Upload avatar
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatars");
         String hashPassword = this.passwordEncoder.encode(hoidanit.getPassword());
-
+    
         hoidanit.setAvatar(avatar);
         hoidanit.setPassword(hashPassword);
-
+    
         // Lấy danh sách role từ DB theo roleIds
         if (roleIds != null && !roleIds.isEmpty()) {
             Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(roleIds));
             hoidanit.setRoles(roles);
         }
-
+    
         // ActivityLog
         String ip = request.getRemoteAddr();
         activityLogService.handleSaveActivityLog(
@@ -113,12 +119,13 @@ public class UserController {
                 ip,
                 200
         );
-
+    
         // Save user
         this.userService.handleSaveUser(hoidanit);
-        
+    
         return "redirect:/admin/user";
     }
+
 
 
     @RequestMapping("/admin/user/{id}")

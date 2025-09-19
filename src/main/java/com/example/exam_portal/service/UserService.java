@@ -52,6 +52,10 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
+    public List<Role> getAllRoles() {
+        return this.roleRepository.findAll();
+    }
+
     public Page<User> getAllUserPagination(Pageable page) {
         return this.userRepository.findAll(page);
     }

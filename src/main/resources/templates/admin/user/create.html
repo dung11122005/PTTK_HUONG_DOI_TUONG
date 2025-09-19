@@ -122,13 +122,24 @@
                     </div>
 
                     <!-- Role -->
+                    <!-- Roles -->
                     <div class="mb-3 col-12 col-md-6">
-                      <label class="form-label">Role:</label>
-                      <select class="form-select" th:field="*{role.name}">
-                        <option value="STUDENT">STUDENT</option>
-                        <option value="TEACHER">TEACHER</option>
-                        <option value="ADMIN">ADMIN</option>
+                      <label class="form-label">Roles:</label>
+                      <select
+                        class="form-select"
+                        name="roleIds"
+                        multiple="multiple"
+                      >
+                        <option
+                          th:each="r : ${allRoles}"
+                          th:value="${r.id}"
+                          th:text="${r.name}"
+                        ></option>
                       </select>
+                      <small class="form-text text-muted"
+                        >Giữ Ctrl (Windows/Linux) hoặc Command (Mac) để chọn
+                        nhiều vai trò.</small
+                      >
                     </div>
 
                     <!-- Avatar -->
