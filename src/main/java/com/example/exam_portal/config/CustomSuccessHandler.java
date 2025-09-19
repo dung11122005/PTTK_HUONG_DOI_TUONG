@@ -67,19 +67,23 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
 
 
     private String determineTargetUrl(Authentication authentication) {
-        Map<String, String> roleTargetUrlMap = new HashMap<>();
-        roleTargetUrlMap.put("ROLE_STUDENT", "/");
-        roleTargetUrlMap.put("ROLE_ADMIN", "/admin");
-        roleTargetUrlMap.put("ROLE_TEACHER", "/admin/exam");
+    Map<String, String> roleTargetUrlMap = new HashMap<>();
+    roleTargetUrlMap.put("ROLE_STUDENT", "/");
+    roleTargetUrlMap.put("ROLE_ADMIN", "/admin/user");          // Quản trị viên hệ thống
+    roleTargetUrlMap.put("ROLE_PRINCIPAL", "/admin");           // Hiệu trưởng → Dashboard
+    roleTargetUrlMap.put("ROLE_ACADEMIC_AFFAIRS", "/admin/class"); // Phòng đào tạo → Quản lý lớp
+    roleTargetUrlMap.put("ROLE_SUBJECT_TEACHER", "/admin/exam");   // Giáo viên bộ môn → Quản lý kỳ thi
+    roleTargetUrlMap.put("ROLE_HOMEROOM_TEACHER", "/admin/class"); // Giáo viên chủ nhiệm → Quản lý lớp
 
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            String role = authority.getAuthority();
-            if (roleTargetUrlMap.containsKey(role)) {
-                return roleTargetUrlMap.get(role);
-            }
+    for (GrantedAuthority authority : authentication.getAuthorities()) {
+        String role = authority.getAuthority();
+        if (roleTargetUrlMap.containsKey(role)) {
+            return roleTargetUrlMap.get(role);
         }
-        throw new IllegalStateException("User role not recognized");
     }
+    throw new IllegalStateException("User role not recognized: " + authentication.getAuthorities());
+}
+
 
     private void setUserSessionAttributes(HttpSession session, Authentication authentication) {
         if (session == null) return;

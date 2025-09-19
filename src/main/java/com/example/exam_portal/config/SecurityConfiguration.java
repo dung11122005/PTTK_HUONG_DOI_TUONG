@@ -79,15 +79,24 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers("/api/**") // bỏ CSRF cho API
             )
 
+            // ADMIN
+            // PRINCIPAL
+            // ACADEMIC_AFFAIRS
+            // SUBJECT_TEACHER
+            // STUDENT
+            // HOMEROOM_TEACHER
+
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                 .requestMatchers("/","/courses/**", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**",
                  "/api/chat/**", "/purchased-course/**").permitAll()
-                .requestMatchers("/api/v1/user/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
-                .requestMatchers("/admin/exam/**", "/admin/class/**", "/admin/test/**", "/admin/course/**"
-                ,"/admin/sold/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("TEACHER", "ADMIN")
-                .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("ADMIN")
+                .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN", "PRINCIPAL", "ACADEMIC_AFFAIRS", "SUBJECT_TEACHER", "STUDENT", "HOMEROOM_TEACHER")
+                .requestMatchers("/admin/user/**").hasAnyRole("ADMIN","PRINCIPAL")
+                .requestMatchers("/admin/exam/**", "/admin/course/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("SUBJECT_TEACHER", "PRINCIPAL")
+                .requestMatchers("/admin/class/**", "/admin/test/**").hasAnyRole("ACADEMIC_AFFAIRS","PRINCIPAL")
+                .requestMatchers("/admin/class/**", "/admin/test/**").hasAnyRole("SUBJECT_TEACHER","PRINCIPAL")
+                .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("PRINCIPAL")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
                 .anyRequest().authenticated()

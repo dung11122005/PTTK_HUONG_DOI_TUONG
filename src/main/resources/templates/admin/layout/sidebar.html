@@ -4,74 +4,82 @@
       <div class="sb-sidenav-menu">
         <div class="nav">
           <div class="sb-sidenav-menu-heading">Core</div>
-          <div sec:authorize="hasRole('ADMIN')">
+
+          <!-- Dashboard chỉ PRINCIPAL mới xem được -->
+          <div sec:authorize="hasRole('PRINCIPAL')">
             <a class="nav-link" href="/admin">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
               Dashboard
             </a>
+          </div>
+
+          <!-- User: ADMIN, PRINCIPAL -->
+          <div sec:authorize="hasAnyRole('ADMIN','PRINCIPAL')">
             <a class="nav-link" href="/admin/user">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-user"></i>
               </div>
               User
             </a>
           </div>
 
-          <!-- Hiển thị khi có ROLE_TEACHER hoặc ROLE_ADMIN -->
-          <div sec:authorize="hasAnyRole('ADMIN','TEACHER')">
+          <!-- Exam, Course, Send Mail, Email: SUBJECT_TEACHER, PRINCIPAL -->
+          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
             <a class="nav-link" href="/admin/exam">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-file-alt"></i>
               </div>
               Exam
             </a>
-            <a class="nav-link" href="/admin/class">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              Class
-            </a>
-            <a class="nav-link" href="/admin/test">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              Test
-            </a>
             <a class="nav-link" href="/admin/course">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-book"></i>
               </div>
               Course
             </a>
-            <a class="nav-link" href="/admin/sold">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              Course Sold
-            </a>
             <a class="nav-link" href="/admin/send-mail">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-envelope"></i>
               </div>
               Send Email
             </a>
             <a class="nav-link" href="/admin/email">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-inbox"></i>
               </div>
-              receive email
+              Receive Email
             </a>
           </div>
-          <div sec:authorize="hasAnyRole('ADMIN')">
+
+          <!-- Class, Test: ACADEMIC_AFFAIRS, SUBJECT_TEACHER, PRINCIPAL -->
+          <div
+            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS','SUBJECT_TEACHER','PRINCIPAL')"
+          >
+            <a class="nav-link" href="/admin/class">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              Class
+            </a>
+            <a class="nav-link" href="/admin/test">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+              Test
+            </a>
+          </div>
+
+          <!-- Activity Log: PRINCIPAL -->
+          <div sec:authorize="hasRole('PRINCIPAL')">
             <a
               class="nav-link"
               target="_blank"
               href="http://localhost:3000/auditlogs"
             >
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-clipboard-list"></i>
               </div>
               Activity Log
             </a>

@@ -139,32 +139,56 @@ public class UserController {
     public String getUpdateUserPage(Model model, @PathVariable long id) {
         User currentUser = this.userService.getUserById(id);
         model.addAttribute("newUser", currentUser);
+        model.addAttribute("allRoles", this.roleRepository.findAll());
         return "admin/user/update";
     }
 
     @PostMapping("/admin/user/update")
-    public String postUpdateUser(@ModelAttribute("newUser") @Valid User hoidanit,
+    public String postUpdateUser(
+            @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
             @RequestParam("anhFile") MultipartFile file,
+            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request) {
+
         User currentUser = this.userService.getUserById(hoidanit.getId());
         if (currentUser != null) {
-            // update new image
+            // update avatar
             if (!file.isEmpty()) {
                 String img = this.uploadService.handleSaveUploadFile(file, "avatars");
                 currentUser.setAvatar(img);
             }
+
+            currentUser.setEmail(hoidanit.getEmail());
             currentUser.setFullName(hoidanit.getFullName());
             currentUser.setAddress(hoidanit.getAddress());
             currentUser.setPhone(hoidanit.getPhone());
-            
+
+            // cập nhật roles
+            if (roleIds != null && !roleIds.isEmpty()) {
+                Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(roleIds));
+                currentUser.setRoles(roles);
+            } else {
+                currentUser.setRoles(new HashSet<>()); // clear hết nếu không chọn gì
+            }
+
+            // Activity log
             String ip = request.getRemoteAddr();
-            this.activityLogService.handleSaveActivityLog(userDetails.getUsername(), "Sửa user", "POST", "/admin/user/update/" + hoidanit.getId(), ip, 200);
+            this.activityLogService.handleSaveActivityLog(
+                    userDetails.getUsername(),
+                    "Sửa user",
+                    "POST",
+                    "/admin/user/update/" + hoidanit.getId(),
+                    ip,
+                    200
+            );
+
             this.userService.handleSaveUser(currentUser);
         }
         return "redirect:/admin/user";
     }
+
 
     @GetMapping("/admin/user/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {
