@@ -54,9 +54,7 @@
           </div>
 
           <!-- Class, Test: ACADEMIC_AFFAIRS, SUBJECT_TEACHER, PRINCIPAL -->
-          <div
-            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS','SUBJECT_TEACHER','PRINCIPAL')"
-          >
+          <div sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')">
             <a class="nav-link" href="/admin/class">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-users"></i>
@@ -69,10 +67,46 @@
               </div>
               Test
             </a>
+            <a class="nav-link" href="/admin/school-year">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              Niên khóa
+            </a>
+            <a class="nav-link" href="/admin/grade">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-layer-group"></i>
+              </div>
+              Khối
+            </a>
+            <a class="nav-link" href="/admin/subject">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-book"></i>
+              </div>
+              Môn học
+            </a>
+          </div>
+
+          <div sec:authorize="hasAnyRole('HOMEROOM_TEACHER','PRINCIPAL')">
+            <a class="nav-link" href="/admin/class">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              Class
+            </a>
+          </div>
+
+          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
+            <a class="nav-link" href="/admin/test">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+              Test
+            </a>
           </div>
 
           <!-- Activity Log: PRINCIPAL -->
-          <div sec:authorize="hasRole('PRINCIPAL')">
+          <div sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')">
             <a
               class="nav-link"
               target="_blank"

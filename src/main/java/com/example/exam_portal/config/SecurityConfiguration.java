@@ -94,8 +94,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN", "PRINCIPAL", "ACADEMIC_AFFAIRS", "SUBJECT_TEACHER", "STUDENT", "HOMEROOM_TEACHER")
                 .requestMatchers("/admin/user/**").hasAnyRole("ADMIN","PRINCIPAL")
                 .requestMatchers("/admin/exam/**", "/admin/course/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("SUBJECT_TEACHER", "PRINCIPAL")
-                .requestMatchers("/admin/class/**", "/admin/test/**").hasAnyRole("ACADEMIC_AFFAIRS","PRINCIPAL")
-                .requestMatchers("/admin/class/**", "/admin/test/**").hasAnyRole("SUBJECT_TEACHER","PRINCIPAL")
+                .requestMatchers("/admin/class/**", "/admin/test/**").hasAnyRole("ACADEMIC_AFFAIRS","SUBJECT_TEACHER", "PRINCIPAL")
+                // .requestMatchers( "/admin/test/**").hasAnyRole("SUBJECT_TEACHER","PRINCIPAL")
+                .requestMatchers("/admin/class/**").hasAnyRole("HOMEROOM_TEACHER","PRINCIPAL")
                 .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("PRINCIPAL")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
