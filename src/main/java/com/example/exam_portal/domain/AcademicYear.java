@@ -2,6 +2,8 @@ package com.example.exam_portal.domain;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,10 +23,13 @@ public class AcademicYear {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name; // "2024-2025"
+    private String name;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    private boolean active; // chỉ 1 niên khóa active
+    private boolean active = true;
 }
