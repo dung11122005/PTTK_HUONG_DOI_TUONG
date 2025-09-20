@@ -113,12 +113,14 @@ public class ExamController {
         // gán người tạo
         exam.setCreatedBy(teacher);
 
+        // gán loại đề thi
+        exam.setExamType(form.getExamType());
+
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";
     }
 
-    
-    
+ 
 
     @GetMapping("/admin/exam/update/{id}")
     public String getUpdateExamPage(Model model, @PathVariable Long id) {
@@ -134,28 +136,32 @@ public class ExamController {
                                  @ModelAttribute("newExam") Exam form,
                                  @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-
+                                
         Exam exam = this.examService.getExamById(id);
         exam.setName(form.getName());
         exam.setDescription(form.getDescription());
         exam.setTimeLimit(form.getTimeLimit());
         exam.setIsPublic(form.getIsPublic());
-
+                                
         // cập nhật subject
         Optional<Subject> subject = subjectService.getSubjectById(form.getSubject().getId());
         exam.setSubject(subject.get());
-
+                                
         // cập nhật grade
         Optional<Grade> grade = gradeService.getGradeById(form.getGrade().getId());
         exam.setGrade(grade.get());
-
+                                
+        // cập nhật loại đề thi
+        exam.setExamType(form.getExamType());
+                                
         // vẫn giữ nguyên createdBy (hoặc nếu muốn thì gán lại)
         exam.setCreatedBy(teacher);
-
+                                
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";
     }
-
+    
+    
 
     @GetMapping("/admin/exam/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {

@@ -2,9 +2,13 @@ package com.example.exam_portal.domain;
 
 import java.util.List;
 
+import com.example.exam_portal.domain.enums.ExamType;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,6 +41,10 @@ public class Exam {
     @ManyToOne
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exam_type", nullable = false)
+    private ExamType examType;
 
     // Người tạo đề thi (giáo viên bộ môn)
     @ManyToOne

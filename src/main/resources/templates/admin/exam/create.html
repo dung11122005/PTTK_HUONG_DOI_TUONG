@@ -68,6 +68,20 @@
                       ></textarea>
                     </div>
 
+                    <!-- Loại đề thi -->
+                    <div class="mb-3">
+                      <label class="form-label">Loại đề thi:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{examType}"
+                        required
+                      >
+                        <option th:value="REGULAR">Thường xuyên</option>
+                        <option th:value="MID_TERM">Giữa kì</option>
+                        <option th:value="FINAL_TERM">Cuối kì</option>
+                      </select>
+                    </div>
+
                     <!-- Chọn khối/lớp -->
                     <div class="mb-3">
                       <label class="form-label">Khối:</label>
