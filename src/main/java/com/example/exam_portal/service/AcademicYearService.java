@@ -1,5 +1,6 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -24,6 +25,9 @@ public class AcademicYearService {
         return year;
     }
 
+    public List<AcademicYear> getAllAcademicYear() {
+        return this.academicYearRepository.findAllByOrderByStartDateDesc();
+    }
 
     public Optional<AcademicYear> getAcademicYearById(long id) {
         return this.academicYearRepository.findById(id);

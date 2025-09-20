@@ -40,6 +40,10 @@ public class ClassService {
         return this.classRepository.findAll(page);
     }
 
+    public Page<ClassRoom> getAllClassRoomPaginationteId(Long id, Pageable page) {
+        return this.classRepository.findByHomeroomTeacherId(id, page);
+    }
+
     public Page<ClassStudent> getAllClassRoomPagination(Specification<ClassStudent> spec, Pageable pageable) {
         return this.classStudentRepository.findAll(spec, pageable);
     }

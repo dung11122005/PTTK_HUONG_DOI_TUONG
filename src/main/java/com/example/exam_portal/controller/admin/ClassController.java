@@ -22,10 +22,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.exam_portal.domain.AcademicYear;
 import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.ClassStudent;
+import com.example.exam_portal.domain.Grade;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.service.AcademicYearService;
 import com.example.exam_portal.service.ClassService;
+import com.example.exam_portal.service.GradeService;
 import com.example.exam_portal.service.UserService;
 import com.example.exam_portal.spec.SpecificationBuilder;
 
@@ -36,82 +40,130 @@ public class ClassController {
     
     private final ClassService classService;
     private final UserService userService;
+    private final AcademicYearService academicYearService;
+    private final GradeService gradeService;
 
-    public ClassController(ClassService classService, UserService userService){
+    public ClassController(ClassService classService, UserService userService, 
+    AcademicYearService academicYearService, GradeService gradeService){
         this.classService=classService;
         this.userService=userService;
+        this.academicYearService=academicYearService;
+        this.gradeService=gradeService;
     }
 
     @GetMapping("/admin/class")
-    public String getClassPage(Model model, @RequestParam("page") Optional<String> pageOptional, 
-    @AuthenticationPrincipal UserDetails userDetails) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+    public String getClassPage(
+            Model model,
+            @RequestParam("page") Optional<String> pageOptional,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        User user = this.userService.getUserByEmail(userDetails.getUsername());
         int page = 1;
+
         try {
             if (pageOptional.isPresent()) {
                 page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
             }
         } catch (Exception e) {
-
+            page = 1;
         }
 
-        Page<ClassRoom> cl;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        Page<ClassRoom> cl;
 
-        if (isAdmin) {
+        boolean isAcademicAffairs = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
+        boolean isHomeroomTeacher = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
+
+        if (isAcademicAffairs) {
             cl = this.classService.getAllClassRoomPagination(pageable);
+        } else if (isHomeroomTeacher) {
+            cl = this.classService.getAllClassRoomPaginationteId(user.getId(), pageable);
         } else {
-            cl = this.classService.getAllClassRoomPaginationByIdTeacher(teacher.getId(), pageable);
+            // Nếu là role khác, có thể trả về rỗng
+            cl = Page.empty(pageable);
         }
 
-        
         List<ClassRoom> classRooms = cl.getContent();
         model.addAttribute("classRooms", classRooms);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cl.getTotalPages());
+
         return "admin/class/show";
     }
 
 
+
     @GetMapping("/admin/class/create")
     public String getCreateClassPage(Model model) {
-        model.addAttribute("newClass", new ClassRoom()); // Dùng chính đối tượng đã gán teacher
+        model.addAttribute("newClass", new ClassRoom());
+
+        // Lấy danh sách niên khóa và khối lớp
+        List<AcademicYear> academicYears = this.academicYearService.getAllAcademicYear();
+        List<Grade> grades = this.gradeService.getAllGrade();
+
+        model.addAttribute("academicYears", academicYears);
+        model.addAttribute("grades", grades);
+
         return "admin/class/create";
     }
 
 
-    // @PostMapping("/admin/class/create")
-    // public String postCreateClass(@ModelAttribute("newClass") ClassRoom classroom, @AuthenticationPrincipal UserDetails userDetails) {
-    //     User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-    //     classroom.setTeacher(teacher);
-    //     this.classService.handleSaveClassRoom(classroom);
-    //     return "redirect:/admin/class"; // hoặc trang hiển thị danh sách lớp
-    // }
+
+    @PostMapping("/admin/class/create")
+    public String postCreateClass(
+            @ModelAttribute("newClass") ClassRoom classroom,
+            @RequestParam("teacherEmail") String teacherEmail) {
+
+        User teacher = userService.getUserByEmail(teacherEmail);
+
+        if (teacher == null) {
+            // TODO: có thể add error vào model rồi return lại trang create
+            throw new RuntimeException("Không tìm thấy giáo viên với email: " + teacherEmail);
+        }
+
+        classroom.setHomeroomTeacher(teacher);
+        classService.handleSaveClassRoom(classroom);
+
+        return "redirect:/admin/class";
+    }
+
 
     @GetMapping("/admin/class/update/{id}")
     public String getUpdateClassPage(Model model, @PathVariable Long id) {
-        ClassRoom classRoom=this.classService.getClassRoomById(id);
-        model.addAttribute("newClass", classRoom); // Dùng chính đối tượng đã gán teacher
+        ClassRoom classRoom = this.classService.getClassRoomById(id);
+        model.addAttribute("newClass", classRoom);
+
+        // Danh sách niên khóa
+        model.addAttribute("academicYears", this.academicYearService.getAllAcademicYear());
+
+        // Danh sách khối
+        model.addAttribute("grades", this.gradeService.getAllGrade());
+
         return "admin/class/update";
     }
 
 
-    // @PostMapping("/admin/class/update/{id}")
-    // public String postUpdateClass(@ModelAttribute("newClass") ClassRoom classroom,
-    //                               @PathVariable Long id,
-    //                               @AuthenticationPrincipal UserDetails userDetails) {
-    //     User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+    @PostMapping("/admin/class/update/{id}")
+    public String postUpdateClass(
+            @ModelAttribute("newClass") ClassRoom classroom,
+            @PathVariable Long id,
+            @RequestParam("homeroomTeacherEmail") String teacherEmail) {
 
-    //     classroom.setId(id);
-    //     classroom.setTeacher(teacher);
+        // Lấy giáo viên theo email
+        User teacher = this.userService.getUserByEmail(teacherEmail);
+        if (teacher == null) {
+            throw new RuntimeException("Không tìm thấy giáo viên với email: " + teacherEmail);
+        }
 
-    //     this.classService.handleSaveClassRoom(classroom);
-    //     return "redirect:/admin/class";
-    // }
+        classroom.setId(id);
+        classroom.setHomeroomTeacher(teacher);
+
+        this.classService.handleSaveClassRoom(classroom);
+        return "redirect:/admin/class";
+    }
+
 
     @GetMapping("/admin/class/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {

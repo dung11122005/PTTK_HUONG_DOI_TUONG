@@ -38,6 +38,10 @@ public class ClassRoom {
     private AcademicYear academicYear;
 
     @ManyToOne
+    @JoinColumn(name = "homeroom_teacher_id", nullable = false)
+    private User homeroomTeacher;
+
+    @ManyToOne
     @JoinColumn(name = "grade_id")
     private Grade grade;
 

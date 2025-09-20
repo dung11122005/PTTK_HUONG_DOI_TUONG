@@ -50,6 +50,8 @@
                         <th>#</th>
                         <th>Mã lớp</th>
                         <th>Tên lớp</th>
+                        <th>Khối</th>
+                        <th>Niên khóa</th>
                         <th>Giảng viên</th>
                         <th>Hành động</th>
                       </tr>
@@ -59,7 +61,19 @@
                         <td th:text="${stat.count}">1</td>
                         <td th:text="${classRoom.classCode}">CP001</td>
                         <td th:text="${classRoom.name}">Nhập môn phần mềm</td>
-                        <td th:text="${classRoom.teacher.fullName}">
+                        <td
+                          th:text="${classRoom.grade != null ? classRoom.grade.name : 'Chưa có'}"
+                        >
+                          10
+                        </td>
+                        <td
+                          th:text="${classRoom.academicYear != null ? classRoom.academicYear.name : 'Chưa có'}"
+                        >
+                          2025-2026
+                        </td>
+                        <td
+                          th:text="${classRoom.homeroomTeacher != null ? classRoom.homeroomTeacher.fullName : 'Chưa có'}"
+                        >
                           Lương Trần Ngọc Khiết
                         </td>
                         <td>
@@ -76,9 +90,8 @@
                           <a
                             th:href="@{'/admin/class/delete/' + ${classRoom.id}}"
                             class="btn btn-danger btn-sm"
+                            >Xóa</a
                           >
-                            Xóa
-                          </a>
                         </td>
                       </tr>
                     </tbody>
@@ -126,6 +139,7 @@
             </div>
           </div>
         </main>
+
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>

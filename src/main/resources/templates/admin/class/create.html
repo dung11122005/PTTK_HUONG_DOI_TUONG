@@ -54,6 +54,7 @@
                         th:field="*{classCode}"
                         placeholder="Ví dụ: LOP10A1"
                         required
+                        autocomplete="off"
                       />
                     </div>
 
@@ -70,13 +71,52 @@
                       />
                     </div>
 
-                    <!-- Ngày tạo (readonly) -->
-                    <div class="mb-3" style="display: none">
-                      <label class="form-label">Ngày tạo:</label>
+                    <!-- Niên khóa -->
+                    <div class="mb-3">
+                      <label class="form-label">Niên khóa:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{academicYear}"
+                        required
+                      >
+                        <option value="" disabled selected>
+                          -- Chọn niên khóa --
+                        </option>
+                        <option
+                          th:each="year : ${academicYears}"
+                          th:value="${year.id}"
+                          th:text="${year.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Khối lớp -->
+                    <div class="mb-3">
+                      <label class="form-label">Khối lớp:</label>
+                      <select class="form-select" th:field="*{grade}" required>
+                        <option value="" disabled selected>
+                          -- Chọn khối lớp --
+                        </option>
+                        <option
+                          th:each="g : ${grades}"
+                          th:value="${g.id}"
+                          th:text="${g.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Giáo viên chủ nhiệm (nhập email) -->
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >Email giáo viên chủ nhiệm:</label
+                      >
                       <input
-                        type="text"
+                        type="email"
                         class="form-control"
-                        th:value="${newClass.createdAt != null ? #temporals.format(newClass.createdAt, 'dd/MM/yyyy HH:mm') : ''}"
+                        name="teacherEmail"
+                        placeholder="Ví dụ: giaovien@example.com"
+                        required
+                        autocomplete="off"
                       />
                     </div>
 

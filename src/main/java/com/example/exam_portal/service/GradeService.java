@@ -1,5 +1,6 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +18,10 @@ public class GradeService {
 
     public GradeService(GradeRepository gradeRepository){
         this.gradeRepository=gradeRepository;
+    }
+
+    public List<Grade> getAllGrade() {
+        return this.gradeRepository.findAll();
     }
 
     public Grade handleSaveGrade(Grade Grade) {
