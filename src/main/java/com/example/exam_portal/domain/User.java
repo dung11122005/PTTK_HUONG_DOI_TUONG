@@ -65,9 +65,6 @@ public class User {
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExamSession> createdExamSessions;
 
-    // Quan hệ: giáo viên được gán vào nhiều ExamSession
-    @ManyToMany(mappedBy = "assignedTeachers")
-    private Set<ExamSession> assignedExamSessions = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "class_id")

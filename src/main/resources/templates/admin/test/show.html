@@ -50,7 +50,7 @@
                         <th>#</th>
                         <th>Tên đề thi</th>
                         <th>Lớp thi</th>
-                        <th>Giảng viên</th>
+                        <th>Người tạo</th>
                         <th>Bắt đầu</th>
                         <th>Kết thúc</th>
                         <th>Trạng thái</th>
@@ -66,8 +66,10 @@
                         <td th:text="${examSession.classroom?.name} ?: '---'">
                           Lớp
                         </td>
-                        <td th:text="${examSession.teacher?.fullName} ?: '---'">
-                          GV
+                        <td
+                          th:text="${examSession.createdBy?.fullName} ?: '---'"
+                        >
+                          Người tạo
                         </td>
                         <td
                           th:text="${examSession.startTime != null} ? ${#temporals.format(examSession.startTime, 'dd/MM/yyyy HH:mm')} : '---'"
@@ -135,7 +137,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/exam-sessions?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/test?page=' + ${currentPage + 1}}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>

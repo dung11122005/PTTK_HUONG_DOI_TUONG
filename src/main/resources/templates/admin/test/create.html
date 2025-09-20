@@ -42,7 +42,6 @@
                     th:action="@{/admin/test/create}"
                     th:object="${newExamSession}"
                     method="post"
-                    class="row"
                   >
                     <!-- Chọn đề thi -->
                     <div class="mb-3">
@@ -53,15 +52,20 @@
                         required
                       >
                         <option value="">-- Chọn đề thi --</option>
-                        <option
-                          th:each="exam : ${exams}"
-                          th:value="${exam.id}"
-                          th:text="${exam.name}"
-                        ></option>
+                        <th:block th:each="subject : ${subjects}">
+                          <optgroup th:label="${subject.name}">
+                            <option
+                              th:each="exam : ${exams}"
+                              th:if="${exam.subject.id} == ${subject.id}"
+                              th:value="${exam.id}"
+                              th:text="${exam.name}"
+                            ></option>
+                          </optgroup>
+                        </th:block>
                       </select>
                     </div>
 
-                    <!-- Chọn lớp thi -->
+                    <!-- Chọn lớp -->
                     <div class="mb-3">
                       <label class="form-label">Lớp thi:</label>
                       <select
@@ -69,7 +73,7 @@
                         th:field="*{classroom.id}"
                         required
                       >
-                        <option value="">-- Chọn lớp thi --</option>
+                        <option value="">-- Chọn lớp --</option>
                         <option
                           th:each="classRoom : ${classRooms}"
                           th:value="${classRoom.id}"
@@ -110,8 +114,7 @@
                       <label class="form-check-label">Khóa ca thi ngay</label>
                     </div>
 
-                    <!-- Nút submit -->
-                    <div class="mb-4">
+                    <div class="mb-3">
                       <button type="submit" class="btn btn-primary">
                         Tạo ca thi
                       </button>

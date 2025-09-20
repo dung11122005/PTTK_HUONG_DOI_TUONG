@@ -1,5 +1,6 @@
 package com.example.exam_portal.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +17,10 @@ public class SubjectService {
 
     public SubjectService(SubjectRepository subjectRepository){
         this.subjectRepository=subjectRepository;
+    }
+
+    public List<Subject> getAllSubject() {
+        return this.subjectRepository.findAll();
     }
 
     public Subject handleSaveSubject(Subject subject) {

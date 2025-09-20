@@ -19,7 +19,7 @@ public class TestService {
     }
 
     public Page<ExamSession> getAllExamSessionPaginationTeacherId(Long id, Pageable page) {
-        return this.testRepositoty.findByAssignedTeachers_Id(id, page);
+        return this.testRepositoty.findByCreatedBy_Id(id, page);
     }
 
     public Page<ExamSession> getAllExamSessionPagination(Pageable page) {

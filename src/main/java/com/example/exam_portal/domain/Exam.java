@@ -34,6 +34,10 @@ public class Exam {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    @ManyToOne
+    @JoinColumn(name = "grade_id", nullable = false)
+    private Grade grade;
+
     // Người tạo đề thi (giáo viên bộ môn)
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)

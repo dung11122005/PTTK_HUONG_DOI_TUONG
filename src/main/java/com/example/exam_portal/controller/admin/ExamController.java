@@ -21,26 +21,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.exam_portal.domain.Choice;
 import com.example.exam_portal.domain.Exam;
+import com.example.exam_portal.domain.Grade;
 import com.example.exam_portal.domain.Question;
+import com.example.exam_portal.domain.Subject;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.domain.enums.QuestionType;
 import com.example.exam_portal.service.ExamService;
+import com.example.exam_portal.service.GradeService;
 import com.example.exam_portal.service.QuestionService;
+import com.example.exam_portal.service.SubjectService;
 import com.example.exam_portal.service.UserService;
 
 
 @Controller
 public class ExamController {
-    
 
     private final ExamService examService;
     private  final UserService userService;
     private final QuestionService questionService;
+    private final SubjectService subjectService;
+    private final GradeService gradeService;
 
-    public ExamController(ExamService examService, UserService userService, QuestionService questionService){
+
+    public ExamController(ExamService examService, UserService userService, 
+    QuestionService questionService, SubjectService subjectService, GradeService gradeService){
         this.examService=examService;
         this.userService=userService;
         this.questionService=questionService;
+        this.subjectService=subjectService;
+        this.gradeService=gradeService;
     }
 
     @GetMapping("/admin/exam")
@@ -60,7 +69,7 @@ public class ExamController {
         Page<Exam> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
         boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         if(isAdmin){
             us = this.examService.getAllExamPagination(pageable);
         }else{
@@ -77,12 +86,14 @@ public class ExamController {
     @GetMapping("/admin/exam/create")
     public String getCreateExamPage(Model model) {
         model.addAttribute("newExam", new Exam());
+        model.addAttribute("subjects", this.subjectService.getAllSubject());
+        model.addAttribute("grades", this.gradeService.getAllGrade()); // thêm khối
         return "admin/exam/create";
     }
 
     @PostMapping("/admin/exam/create")
     public String postCreateExam(@ModelAttribute("newExam") Exam form,
-                             @AuthenticationPrincipal UserDetails userDetails) {
+                                 @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
 
         Exam exam = new Exam();
@@ -90,36 +101,61 @@ public class ExamController {
         exam.setDescription(form.getDescription());
         exam.setTimeLimit(form.getTimeLimit());
         exam.setIsPublic(form.getIsPublic());
-        // exam.setUser(teacher);
+
+        // gán môn học
+        Optional<Subject> subject = this.subjectService.getSubjectById(form.getSubject().getId());
+        exam.setSubject(subject.get());
+
+        // gán khối
+        Optional<Grade> grade = this.gradeService.getGradeById(form.getGrade().getId());
+        exam.setGrade(grade.get());
+
+        // gán người tạo
+        exam.setCreatedBy(teacher);
 
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";
     }
 
+    
+    
 
     @GetMapping("/admin/exam/update/{id}")
     public String getUpdateExamPage(Model model, @PathVariable Long id) {
-        Exam exam=this.examService.getExamById(id);
+        Exam exam = this.examService.getExamById(id);
         model.addAttribute("newExam", exam);
+        model.addAttribute("subjects", this.subjectService.getAllSubject());
+        model.addAttribute("grades", this.gradeService.getAllGrade());
         return "admin/exam/update";
     }
 
-
     @PostMapping("/admin/exam/update/{id}")
-    public String postUpdateExam(@PathVariable Long id, Model model, @ModelAttribute("newExam") Exam form,
-                             @AuthenticationPrincipal UserDetails userDetails) {
+    public String postUpdateExam(@PathVariable Long id,
+                                 @ModelAttribute("newExam") Exam form,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
 
-        Exam exam=this.examService.getExamById(id);
+        Exam exam = this.examService.getExamById(id);
         exam.setName(form.getName());
         exam.setDescription(form.getDescription());
         exam.setTimeLimit(form.getTimeLimit());
         exam.setIsPublic(form.getIsPublic());
-        // exam.setUser(teacher);
+
+        // cập nhật subject
+        Optional<Subject> subject = subjectService.getSubjectById(form.getSubject().getId());
+        exam.setSubject(subject.get());
+
+        // cập nhật grade
+        Optional<Grade> grade = gradeService.getGradeById(form.getGrade().getId());
+        exam.setGrade(grade.get());
+
+        // vẫn giữ nguyên createdBy (hoặc nếu muốn thì gán lại)
+        exam.setCreatedBy(teacher);
 
         this.examService.handleSaveExam(exam);
         return "redirect:/admin/exam";
     }
+
 
     @GetMapping("/admin/exam/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {

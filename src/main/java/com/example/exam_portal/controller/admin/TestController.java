@@ -23,10 +23,12 @@ import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.Exam;
 import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.ExamSession;
+import com.example.exam_portal.domain.Subject;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.service.ExamService;
+import com.example.exam_portal.service.SubjectService;
 import com.example.exam_portal.service.TestService;
 import com.example.exam_portal.service.UserService;
 
@@ -40,16 +42,18 @@ public class TestController {
     private final ExamService examService;
     private final ClassService classService;
     private final ExamResultService examResultService;
+    private final SubjectService subjectService;
 
 
     public TestController(TestService testService, UserService userService, 
         ExamService examService, ClassService classService,
-        ExamResultService examResultService){
+        ExamResultService examResultService, SubjectService subjectService){
         this.testService=testService;
         this.userService=userService;
         this.examService=examService;
         this.classService=classService;
         this.examResultService=examResultService;
+        this.subjectService=subjectService;
     }
 
 
@@ -71,7 +75,7 @@ public class TestController {
         Pageable pageable = PageRequest.of(page - 1, 10);
         
         boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
 
         if(isAdmin){
             ex = this.testService.getAllExamSessionPagination(pageable);
@@ -135,97 +139,94 @@ public class TestController {
 
     @GetMapping("/admin/test/create")
     public String getCreateTestPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-        List<Exam> exams;
+        User currentUser = this.userService.getUserByEmail(userDetails.getUsername());
 
-        boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        // Load tất cả đề thi, để nhóm theo môn
+        List<Exam> exams = this.examService.getAllExam();
 
-        if(isAdmin){
-            exams=this.examService.getAllExam();
-        }else{
-            exams=this.examService.getExamByTeacherId(teacher.getId());
-        }
-        List<ClassRoom> classRoom;
-        if(isAdmin){
-            classRoom=this.classService.getAllClassRoom();
-        }else{
-            classRoom=this.classService.getClassByTeacherId(teacher.getId());
-        }
+        // Load tất cả lớp học
+        List<ClassRoom> classRooms = this.classService.getAllClassRoom();
 
-        
+        // Lấy danh sách môn học để nhóm đề thi
+        List<Subject> subjects = this.subjectService.getAllSubject(); // Hoặc lấy từ exams nếu muốn
+
         model.addAttribute("newExamSession", new ExamSession());
         model.addAttribute("exams", exams);
-        model.addAttribute("classRooms", classRoom);
+        model.addAttribute("classRooms", classRooms);
+        model.addAttribute("subjects", subjects);
+
         return "admin/test/create";
     }
 
     @PostMapping("/admin/test/create")
     public String postCreateTestPage(@ModelAttribute("newExamSession") ExamSession newExamSession,
                                      @AuthenticationPrincipal UserDetails userDetails) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+        User creator = this.userService.getUserByEmail(userDetails.getUsername());
 
-        // Lấy lại exam và classRoom từ ID
         Exam exam = this.examService.getExamById(newExamSession.getExam().getId());
         ClassRoom classroom = this.classService.getClassRoomById(newExamSession.getClassroom().getId());
 
-        // Gán lại vào examSession
         newExamSession.setExam(exam);
         newExamSession.setClassroom(classroom);
-        // newExamSession.setTeacher(teacher);
+        newExamSession.setCreatedBy(creator);
 
         this.testService.handleSaveExamSession(newExamSession);
 
-        return "redirect:/admin/test"; // nhớ redirect tránh reload form
+        return "redirect:/admin/test";
     }
+
+
 
     @GetMapping("/admin/test/update/{id}")
     public String getUpdateTestPage(Model model, @AuthenticationPrincipal UserDetails userDetails,
-                @PathVariable Long id) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-        List<Exam> exams;
-
-        boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
-        if(isAdmin){
-            exams=this.examService.getAllExam();
-        }else{
-            exams=this.examService.getExamByTeacherId(teacher.getId());
-        }
-        List<ClassRoom> classRoom;
-        if(isAdmin){
-            classRoom=this.classService.getAllClassRoom();
-        }else{
-            classRoom=this.classService.getClassByTeacherId(teacher.getId());
-        }
-        ExamSession newExamSession=this.testService.getExamSessionById(id);
-        
-        model.addAttribute("newExamSession", newExamSession);
+                                    @PathVariable Long id) {
+                                    
+        User currentUser = this.userService.getUserByEmail(userDetails.getUsername());
+                                    
+        // Lấy tất cả đề thi để nhóm theo môn
+        List<Exam> exams = this.examService.getAllExam();
+                                    
+        // Lấy tất cả lớp
+        List<ClassRoom> classRooms = this.classService.getAllClassRoom();
+                                    
+        // Lấy ExamSession hiện tại
+        ExamSession examSession = this.testService.getExamSessionById(id);
+                                    
+        // Lấy danh sách môn học từ exams
+        List<Subject> subjects = exams.stream()
+                                      .map(Exam::getSubject)
+                                      .distinct()
+                                      .toList();
+                                    
+        model.addAttribute("newExamSession", examSession);
         model.addAttribute("exams", exams);
-        model.addAttribute("classRooms", classRoom);
+        model.addAttribute("classRooms", classRooms);
+        model.addAttribute("subjects", subjects);
+                                    
         return "admin/test/update";
     }
-
+    
     @PostMapping("/admin/test/update/{id}")
     public String postUpdateTestPage(@ModelAttribute("newExamSession") ExamSession newExamSession,
                                      @AuthenticationPrincipal UserDetails userDetails,
                                      @PathVariable Long id) {
-        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-
+                                    
+        User creator = this.userService.getUserByEmail(userDetails.getUsername());
+                                    
         newExamSession.setId(id);
-        // Lấy lại exam và classRoom từ ID
+                                    
         Exam exam = this.examService.getExamById(newExamSession.getExam().getId());
         ClassRoom classroom = this.classService.getClassRoomById(newExamSession.getClassroom().getId());
-
-        // Gán lại vào examSession
+                                    
         newExamSession.setExam(exam);
         newExamSession.setClassroom(classroom);
-        // newExamSession.setTeacher(teacher);
-
+        newExamSession.setCreatedBy(creator);
+                                    
         this.testService.handleSaveExamSession(newExamSession);
-
-        return "redirect:/admin/test"; // nhớ redirect tránh reload form
+                                    
+        return "redirect:/admin/test";
     }
+    
 
     @GetMapping("/admin/test/delete/{id}")
     public String getDeleteUserPage(Model model, @PathVariable long id) {

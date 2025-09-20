@@ -1,8 +1,6 @@
 package com.example.exam_portal.domain;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -49,11 +45,11 @@ public class ExamSession {
     private Boolean isLocked = false;
 
     // Giáo viên bộ môn được phân công chấm/nhập điểm
-    @ManyToMany
-    @JoinTable(
-        name = "exam_session_teachers",
-        joinColumns = @JoinColumn(name = "exam_session_id"),
-        inverseJoinColumns = @JoinColumn(name = "teacher_id")
-    )
-    private Set<User> assignedTeachers = new HashSet<>();
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "exam_session_teachers",
+    //     joinColumns = @JoinColumn(name = "exam_session_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "teacher_id")
+    // )
+    // private Set<User> assignedTeachers = new HashSet<>();
 }

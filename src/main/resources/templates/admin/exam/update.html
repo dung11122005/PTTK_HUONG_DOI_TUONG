@@ -67,6 +67,38 @@
                       ></textarea>
                     </div>
 
+                    <!-- Môn học -->
+                    <div class="mb-3">
+                      <label class="form-label">Môn học:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{subject.id}"
+                        required
+                      >
+                        <option
+                          th:each="s : ${subjects}"
+                          th:value="${s.id}"
+                          th:text="${s.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Khối -->
+                    <div class="mb-3">
+                      <label class="form-label">Khối:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{grade.id}"
+                        required
+                      >
+                        <option
+                          th:each="g : ${grades}"
+                          th:value="${g.id}"
+                          th:text="${g.name}"
+                        ></option>
+                      </select>
+                    </div>
+
                     <!-- Giới hạn thời gian -->
                     <div class="mb-3">
                       <label class="form-label"

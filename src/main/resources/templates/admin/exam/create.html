@@ -54,6 +54,7 @@
                         th:field="*{name}"
                         placeholder="Ví dụ: Đề kiểm tra Toán 15 phút"
                         required
+                        autocomplete="off"
                       />
                     </div>
 
@@ -67,6 +68,38 @@
                       ></textarea>
                     </div>
 
+                    <!-- Chọn khối/lớp -->
+                    <div class="mb-3">
+                      <label class="form-label">Khối:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{grade.id}"
+                        required
+                      >
+                        <option
+                          th:each="g : ${grades}"
+                          th:value="${g.id}"
+                          th:text="${g.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Chọn môn học -->
+                    <div class="mb-3">
+                      <label class="form-label">Môn học:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{subject.id}"
+                        required
+                      >
+                        <option
+                          th:each="sub : ${subjects}"
+                          th:value="${sub.id}"
+                          th:text="${sub.name}"
+                        ></option>
+                      </select>
+                    </div>
+
                     <!-- Giới hạn thời gian -->
                     <div class="mb-3">
                       <label class="form-label"
@@ -78,6 +111,7 @@
                         min="1"
                         th:field="*{timeLimit}"
                         required
+                        autocomplete="off"
                       />
                     </div>
 

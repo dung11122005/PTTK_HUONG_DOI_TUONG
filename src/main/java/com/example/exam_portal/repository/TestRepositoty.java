@@ -16,7 +16,13 @@ public interface TestRepositoty extends JpaRepository<ExamSession, Long> {
 
     ExamSession findByClassroomIdAndExamId(Long classId, Long examId);
 
-    Page<ExamSession> findByAssignedTeachers_Id(Long teacherId, Pageable pageable);
+    // Page<ExamSession> findByAssignedTeachers_Id(Long teacherId, Pageable pageable);
+
+    Page<ExamSession> findByCreatedBy_Id(Long userId, Pageable pageable);
+
+    Page<ExamSession> findByClassroom_Id(Long classId, Pageable pageable);
+
+    Page<ExamSession> findByExam_Id(Long examId, Pageable pageable);
 
     List<ExamSession> findByClassroom_IdIn(List<Long> classIds);
 
