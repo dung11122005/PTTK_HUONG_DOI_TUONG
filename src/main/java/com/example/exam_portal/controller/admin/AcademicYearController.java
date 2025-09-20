@@ -43,7 +43,7 @@ public class AcademicYearController {
 
         }
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<AcademicYear> academicYear = this.academicYearService.getAllAcademicYearPagination(pageable);
+        Page<AcademicYear> academicYear = this.academicYearService.getAllAcademicYearPaginationDate(pageable);
         List<AcademicYear> academicYears = academicYear.getContent();
         model.addAttribute("academicYear", academicYears);
         model.addAttribute("currentPage", page);

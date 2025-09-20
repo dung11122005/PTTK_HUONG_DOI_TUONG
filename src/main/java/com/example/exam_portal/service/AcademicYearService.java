@@ -37,4 +37,8 @@ public class AcademicYearService {
         return this.academicYearRepository.findAll(page);
     }
 
+    public Page<AcademicYear> getAllAcademicYearPaginationDate(Pageable page) {
+        return this.academicYearRepository.findAllByOrderByStartDateDesc(page);
+    }
+
 }
