@@ -27,66 +27,53 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Tạo lớp học</h1>
+            <h1 class="mt-4">Cập nhật khối lớp</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
-                <a th:href="@{/admin/class}">Class</a>
+                <a th:href="@{/admin/grade}">Grade</a>
               </li>
-              <li class="breadcrumb-item active">Tạo lớp học</li>
+              <li class="breadcrumb-item active">Cập nhật khối lớp</li>
             </ol>
 
             <div class="mt-4">
               <div class="row">
                 <div class="col-md-8 col-12 mx-auto">
                   <form
-                    th:action="@{/admin/class/create}"
-                    th:object="${newClass}"
+                    th:action="@{/admin/grade/update/{id}(id=${newGrade.id})}"
+                    th:object="${newGrade}"
                     method="post"
-                    enctype="multipart/form-data"
                     class="row"
                   >
-                    <!-- Mã lớp học -->
+                    <!-- Tên khối -->
                     <div class="mb-3">
-                      <label class="form-label">Mã lớp học:</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        th:field="*{classCode}"
-                        placeholder="Ví dụ: LOP10A1"
-                        required
-                      />
-                    </div>
-
-                    <!-- Tên lớp học -->
-                    <div class="mb-3">
-                      <label class="form-label">Tên lớp học:</label>
+                      <label class="form-label">Tên khối:</label>
                       <input
                         type="text"
                         class="form-control"
                         th:field="*{name}"
-                        placeholder="Ví dụ: Lớp 10A1 - Toán nâng cao"
+                        placeholder="Ví dụ: 10, 11, 12"
                         required
-                        autocomplete="off"
                       />
                     </div>
 
-                    <!-- Ngày tạo (readonly) -->
-                    <div class="mb-3" style="display: none">
-                      <label class="form-label">Ngày tạo:</label>
+                    <!-- Thứ tự hiển thị -->
+                    <div class="mb-3">
+                      <label class="form-label">Thứ tự:</label>
                       <input
-                        type="text"
+                        type="number"
                         class="form-control"
-                        th:value="${newClass.createdAt != null ? #temporals.format(newClass.createdAt, 'dd/MM/yyyy HH:mm') : ''}"
+                        th:field="*{orderIndex}"
+                        placeholder="Ví dụ: 1"
                       />
                     </div>
 
                     <!-- Nút submit -->
                     <div class="mb-4">
-                      <button type="submit" class="btn btn-primary">
-                        Tạo lớp
+                      <button type="submit" class="btn btn-warning">
+                        Cập nhật
                       </button>
                       <a
-                        th:href="@{/admin/class}"
+                        th:href="@{/admin/grade}"
                         class="btn btn-secondary ms-2"
                         >Hủy</a
                       >
