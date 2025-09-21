@@ -96,6 +96,22 @@
         padding: 20px; /* padding cố định nhỏ */
         line-height: 1; /* làm nút thấp */
       }
+
+      .course-thumbnail {
+        width: 100%;
+        height: 200px; /* chiều cao cố định, bạn có thể đổi tùy ý */
+        object-fit: cover; /* cắt ảnh cho vừa khung, không méo */
+        border-radius: 8px; /* bo góc (nếu cần) */
+      }
+
+      .properties__caption h3 a {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* giới hạn tối đa 2 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 48px; /* giữ chiều cao ổn định */
+      }
     </style>
   </head>
 
@@ -123,7 +139,6 @@
         <div class="container">
           <div class="row justify-content-center mb-4">
             <div class="row justify-content-center mb-4">
-              <!-- ✅ Thanh tìm kiếm đơn giản, đẹp, không lỗi hiển thị -->
               <div
                 style="
                   display: flex;
@@ -169,59 +184,105 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-lg-4" th:each="course : ${courses}">
-              <div class="properties properties2 mb-30">
-                <div class="properties__card">
-                  <div class="properties__img overlay1">
-                    <a th:href="@{'/course/detail/' + ${course.id}}"
-                      ><img
-                        th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}"
-                        alt="Course Image"
-                    /></a>
+          <div class="container mt-4">
+            <!-- Bộ lọc -->
+            <div class="row mb-4">
+              <!-- Lọc theo môn -->
+              <div class="col-12 mb-2">
+                <label class="fw-bold d-block">Môn học:</label>
+                <div class="row">
+                  <div class="col-3 mb-2" th:each="subject : ${subjects}">
+                    <input
+                      type="checkbox"
+                      class="filter-checkbox"
+                      name="subject"
+                      th:value="${subject.id}"
+                      th:checked="${subjectIds != null and subjectIds.contains(subject.id)}"
+                    />
+                    <span th:text="${subject.name}">Toán</span>
                   </div>
-                  <div class="properties__caption">
-                    <p th:text="${course.teacher.fullName}">Tên giảng viên</p>
-                    <h3>
+                </div>
+              </div>
+
+              <!-- Lọc theo khối -->
+              <div class="col-12 mb-2">
+                <label class="fw-bold d-block">Khối:</label>
+                <div class="row">
+                  <div class="col-3 mb-2" th:each="grade : ${grades}">
+                    <input
+                      type="checkbox"
+                      class="filter-checkbox"
+                      name="grade"
+                      th:value="${grade.id}"
+                      th:checked="${gradeIds != null and gradeIds.contains(grade.id)}"
+                    />
+                    <span th:text="${grade.name}">Khối 10</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Danh sách khóa học -->
+            <div class="row">
+              <div class="col-lg-4 mb-4" th:each="course : ${courses}">
+                <div class="properties properties2 h-100">
+                  <div class="properties__card">
+                    <div class="properties__img overlay1">
+                      <a th:href="@{'/course/detail/' + ${course.id}}">
+                        <img
+                          th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}"
+                          alt="Course Image"
+                          class="course-thumbnail w-100"
+                        />
+                      </a>
+                    </div>
+                    <div class="properties__caption p-3">
+                      <p th:text="${course.teacher.fullName}">Tên giảng viên</p>
+                      <h3>
+                        <a
+                          th:href="@{'/course/detail/' + ${course.id}}"
+                          th:text="${course.name}"
+                          >Tên Khóa học</a
+                        >
+                      </h3>
+                      <p th:text="${course.shortDescription}">Mô tả ngắn</p>
+
+                      <div
+                        class="properties__footer d-flex justify-content-between align-items-center mt-2"
+                      >
+                        <div
+                          style="font-size: 16px; font-weight: 600; color: #000"
+                        >
+                          <span th:text="${course.subject.name}">Môn học</span>
+                          -
+                          <span th:text="${course.grade.name}">Khối</span>
+                        </div>
+                        <div class="price">
+                          <span
+                            th:if="${course.isFree}"
+                            th:text="'Free'"
+                          ></span>
+                          <span
+                            th:unless="${course.isFree}"
+                            th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                          ></span>
+                        </div>
+                      </div>
+
                       <a
                         th:href="@{'/course/detail/' + ${course.id}}"
-                        th:text="${course.name}"
-                        >Tên Khóa học</a
+                        th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'"
+                        class="btn mt-3"
                       >
-                    </h3>
-                    <p th:text="${course.shortDescription}">mô tả ngắn</p>
-                    <div
-                      class="properties__footer d-flex justify-content-between align-items-center"
-                    >
-                      <div class="restaurant-name">
-                        <div class="rating">
-                          <i class="fas fa-star"></i>
-                          <i class="fas fa-star"></i>
-                          <i class="fas fa-star"></i>
-                          <i class="fas fa-star"></i>
-                          <i class="fas fa-star-half"></i>
-                        </div>
-                        <p><span>(4.5)</span> based on 120</p>
-                      </div>
-                      <div class="price">
-                        <span th:if="${course.isFree}" th:text="'Free'"></span>
-                        <span
-                          th:unless="${course.isFree}"
-                          th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
-                        ></span>
-                      </div>
+                        Find out more
+                      </a>
                     </div>
-                    <a
-                      th:href="@{'/course/detail/' + ${course.id}}"
-                      th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'"
-                    >
-                      Find out more
-                    </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
           <div>
             <div class="row justify-content-center">
               <div class="col-12">
@@ -286,6 +347,31 @@
     <div id="back-top">
       <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
     </div>
+    <script>
+      document.querySelectorAll(".filter-checkbox").forEach((cb) => {
+        cb.addEventListener("change", () => {
+          const params = new URLSearchParams(window.location.search);
+
+          // reset khi load lại
+          params.delete("subject");
+          params.delete("grade");
+
+          // gom tất cả subject đang chọn
+          document
+            .querySelectorAll('input[name="subject"]:checked')
+            .forEach((el) => params.append("subject", el.value));
+
+          // gom tất cả grade đang chọn
+          document
+            .querySelectorAll('input[name="grade"]:checked')
+            .forEach((el) => params.append("grade", el.value));
+
+          // reload với link mới
+          window.location.href =
+            window.location.pathname + "?" + params.toString();
+        });
+      });
+    </script>
 
     <!-- JS here -->
     <script src="/js/vendor/modernizr-3.5.0.min.js"></script>

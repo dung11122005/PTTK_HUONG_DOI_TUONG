@@ -28,8 +28,10 @@ import com.example.exam_portal.domain.PaymentRequest;
 import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.CourseService;
+import com.example.exam_portal.service.GradeService;
 import com.example.exam_portal.service.PaymentService;
 import com.example.exam_portal.service.PurchaseService;
+import com.example.exam_portal.service.SubjectService;
 import com.example.exam_portal.service.UserService;
 import com.example.exam_portal.spec.SpecificationBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,48 +47,63 @@ public class CourseClientController {
     private final UserService userService;
     private final PurchaseService purchaseService;
     private final PaymentService paymentService;
+    private final SubjectService subjectService;
+    private final GradeService gradeService;
 
     public CourseClientController(CourseService courseService, UserService userService, 
-    PurchaseService purchaseService, PaymentService paymentService){
+    PurchaseService purchaseService, PaymentService paymentService,
+    SubjectService subjectService, GradeService gradeService){
         this.courseService=courseService;
         this.userService=userService;
         this.purchaseService=purchaseService;
         this.paymentService=paymentService;
+        this.subjectService=subjectService;
+        this.gradeService=gradeService;
     }
 
     @GetMapping("/courses")
-    public String getCourseHomePage(Model model, @RequestParam(name = "page", required = false) Optional<String> pageOptional,
-    @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params) {
-
-        Map<String, String> filteredParams = params.entrySet().stream()
-        .filter(e -> !List.of("page", "size", "sort").contains(e.getKey()))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        Specification<Course> spec = new SpecificationBuilder<Course>().buildFromParams(filteredParams);
-
-        int page = 1;
-        try {
-            if (pageOptional.isPresent()) {
-                page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
-            }
-        } catch (Exception e) {
-
-        }
-        Page<Course> us;
+    public String getCourseHomePage(Model model,
+                                    @RequestParam(name = "page", required = false) Optional<String> pageOptional,
+                                    @RequestParam(name = "subject", required = false) List<Long> subjectIds,
+                                    @RequestParam(name = "grade", required = false) List<Long> gradeIds,
+                                    @RequestParam Map<String, String> params) {
+                                    
+        int page = pageOptional.map(Integer::parseInt).orElse(1);
         Pageable pageable = PageRequest.of(page - 1, 9);
-        
-        us = this.courseService.getAllCoursePagination(spec, pageable);
-      
-        
-        List<Course> courses = us.getContent();
-        model.addAttribute("courses", courses);
+                                    
+        Specification<Course> spec = Specification.where(null);
+                                    
+        if (subjectIds != null && !subjectIds.isEmpty()) {
+            spec = spec.and((root, query, cb) -> root.get("subject").get("id").in(subjectIds));
+        }
+    
+        if (gradeIds != null && !gradeIds.isEmpty()) {
+            spec = spec.and((root, query, cb) -> root.get("grade").get("id").in(gradeIds));
+        }
+    
+        Page<Course> us = this.courseService.getAllCoursePagination(spec, pageable);
+    
+        model.addAttribute("courses", us.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", us.getTotalPages());
-
+    
+        // Truyền filter ra view
+        model.addAttribute("subjects", subjectService.getAllSubject());
+        model.addAttribute("grades", gradeService.getAllGrade());
+    
+        // Quan trọng: truyền lại danh sách đã chọn
+        model.addAttribute("subjectIds", subjectIds != null ? subjectIds : List.of());
+        model.addAttribute("gradeIds", gradeIds != null ? gradeIds : List.of());
+    
+        // params nếu muốn giữ lại query string
+        model.addAttribute("params", params);
+    
         return "client/course/course";
     }
+
+
+
+
     
     @GetMapping("/course/detail/{id}")
     public String getCourseDetailtPage(Model model, @PathVariable long id, @AuthenticationPrincipal UserDetails userDetails) {

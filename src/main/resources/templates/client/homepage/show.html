@@ -62,6 +62,22 @@
         padding: 20px; /* padding cố định nhỏ */
         line-height: 1; /* làm nút thấp */
       }
+
+      .course-thumbnail {
+        width: 100%;
+        height: 200px; /* chiều cao cố định, bạn có thể đổi tùy ý */
+        object-fit: cover; /* cắt ảnh cho vừa khung, không méo */
+        border-radius: 8px; /* bo góc (nếu cần) */
+      }
+
+      .properties__caption h3 a {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* giới hạn tối đa 2 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 48px; /* giữ chiều cao ổn định */
+      }
     </style>
   </head>
 
@@ -104,6 +120,7 @@
                     <img
                       th:src="@{/uploads/images/avatarcourses/{img}(img=${course.thumbnail})}"
                       alt="Course Image"
+                      class="course-thumbnail"
                     />
                   </a>
                 </div>
@@ -113,24 +130,25 @@
                     <a
                       th:href="@{'/course/detail/' + ${course.id}}"
                       th:text="${course.name}"
-                      >Tên khóa học</a
+                      >Tên Khóa học</a
                     >
                   </h3>
-                  <p th:text="${course.shortDescription}">Mô tả ngắn</p>
-
+                  <p th:text="${course.shortDescription}">mô tả ngắn</p>
                   <div
                     class="properties__footer d-flex justify-content-between align-items-center"
                   >
-                    <div class="restaurant-name">
-                      <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half"></i>
-                      </div>
-                      <p><span>(4.5)</span> based on 120</p>
+                    <div
+                      style="
+                        font-size: 20px;
+                        font-weight: 600;
+                        color: #000000ff;
+                      "
+                    >
+                      <span th:text="${course.subject.name}">Môn học</span>
+                      -
+                      <span th:text="${course.grade.name}">Khối</span>
                     </div>
+
                     <div class="price">
                       <span th:if="${course.isFree}" th:text="'Free'"></span>
                       <span
@@ -208,72 +226,6 @@
     <footer>
       <div th:replace="client/layout/footer"></div>
     </footer>
-
-    <!-- Chatbot toggle button -->
-    <div id="chatbot-toggle" onclick="toggleChatbot()">💬</div>
-
-    <!-- Chatbot window -->
-    <div id="chatbot-window">
-      <div class="chatbot-header">
-        <div class="chatbot-title">🤖 Trợ lý học tập</div>
-        <button class="chatbot-close-btn" onclick="toggleChatbot()">×</button>
-      </div>
-      <div id="chatbot-history"></div>
-      <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
-      <button onclick="sendChat(event)">Gửi</button>
-    </div>
-    <script>
-      async function sendChat(event) {
-        event.preventDefault(); // Ngăn submit form
-        const input = document.getElementById("chatbot-input");
-        const history = document.getElementById("chatbot-history");
-
-        const userText = input.value.trim();
-        if (!userText) return;
-
-        // Giao diện người dùng
-        const userMsg = document.createElement("div");
-        userMsg.className = "chat-message user";
-        userMsg.innerHTML = `<span>${userText} 🧑</span>`;
-        history.appendChild(userMsg);
-
-        // Giao diện phản hồi chatbot
-        const botMsg = document.createElement("div");
-        botMsg.className = "chat-message bot";
-        botMsg.innerHTML = `<span>🤖 Đang trả lời...</span>`;
-        history.appendChild(botMsg);
-
-        input.value = "";
-        history.scrollTop = history.scrollHeight;
-
-        // Gửi đến backend sử dụng OpenAI
-        try {
-          const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message: userText }),
-          });
-
-          const data = await response.json();
-          botMsg.innerHTML = `<span>🤖 ${data.reply}</span>`;
-        } catch (error) {
-          botMsg.innerHTML = `<span>🤖 Có lỗi xảy ra khi gọi API.</span>`;
-        }
-
-        history.scrollTop = history.scrollHeight;
-      }
-    </script>
-    <script>
-      function toggleChatbot() {
-        const chatWindow = document.getElementById("chatbot-window");
-        chatWindow.style.display =
-          chatWindow.style.display === "none" || chatWindow.style.display === ""
-            ? "flex"
-            : "none";
-      }
-    </script>
 
     <!-- JS here -->
     <script src="/js/vendor/modernizr-3.5.0.min.js"></script>
