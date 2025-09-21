@@ -65,18 +65,6 @@
                       ></div>
                     </div>
 
-                    <!-- Price -->
-                    <div class="mb-3 col-12 col-md-6">
-                      <label class="form-label">Giá:</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        th:field="*{price}"
-                        class="form-control"
-                        required
-                      />
-                    </div>
-
                     <!-- Short Description -->
                     <div class="mb-3 col-12 col-md-6">
                       <label class="form-label">Miêu tả ngắn:</label>
@@ -89,12 +77,31 @@
                       />
                     </div>
 
-                    <!-- Is Free -->
+                    <!-- Subject -->
                     <div class="mb-3 col-12 col-md-6">
-                      <label class="form-label">Miễn phí?</label>
-                      <select class="form-select" th:field="*{isFree}">
-                        <option th:value="true">Có</option>
-                        <option th:value="false">Không</option>
+                      <label class="form-label">Môn học:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{subject}"
+                        required
+                      >
+                        <option
+                          th:each="s : ${subjects}"
+                          th:value="${s.id}"
+                          th:text="${s.name}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Grade -->
+                    <div class="mb-3 col-12 col-md-6">
+                      <label class="form-label">Khối:</label>
+                      <select class="form-select" th:field="*{grade}" required>
+                        <option
+                          th:each="g : ${grades}"
+                          th:value="${g.id}"
+                          th:text="${g.name}"
+                        ></option>
                       </select>
                     </div>
 

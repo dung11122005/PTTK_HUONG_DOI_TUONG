@@ -53,8 +53,8 @@
                         <th>#</th>
                         <th>Tên khóa học</th>
                         <th>Mô tả</th>
-                        <th>Giá</th>
-                        <th>Miễn phí?</th>
+                        <th>Môn học</th>
+                        <th>Khối</th>
                         <th>Giáo viên</th>
                         <th>Hành động</th>
                       </tr>
@@ -66,9 +66,15 @@
                         <td th:text="${course.shortDescription}">
                           Chi tiết về Spring
                         </td>
-                        <td th:text="${course.price} + ' VNĐ'">100000</td>
-                        <td th:text="${course.isFree ? 'Có' : 'Không'}">
-                          Không
+                        <td
+                          th:text="${course.subject != null ? course.subject.name : 'Chưa có'}"
+                        >
+                          Toán
+                        </td>
+                        <td
+                          th:text="${course.grade != null ? course.grade.name : 'Chưa có'}"
+                        >
+                          12
                         </td>
                         <td th:text="${course.teacher.fullName}">
                           Nguyễn Văn A

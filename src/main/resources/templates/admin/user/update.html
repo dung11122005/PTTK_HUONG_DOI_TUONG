@@ -110,6 +110,7 @@
                         th:field="*{fullName}"
                         th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
                         class="form-control"
+                        autocomplete="off"
                       />
                       <div
                         class="invalid-feedback"

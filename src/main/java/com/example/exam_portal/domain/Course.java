@@ -42,6 +42,14 @@ public class Course {
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;  
+
+    @ManyToOne
+    @JoinColumn(name = "grade_id", nullable = false)
+    private Grade grade;       
+
     @Column(columnDefinition = "TEXT")
     private String thumbnail;
 

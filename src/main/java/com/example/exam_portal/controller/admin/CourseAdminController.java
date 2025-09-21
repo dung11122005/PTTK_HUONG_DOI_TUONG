@@ -24,7 +24,9 @@ import com.example.exam_portal.domain.CourseLesson;
 import com.example.exam_portal.domain.Purchase;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.CourseService;
+import com.example.exam_portal.service.GradeService;
 import com.example.exam_portal.service.PurchaseService;
+import com.example.exam_portal.service.SubjectService;
 import com.example.exam_portal.service.UploadService;
 import com.example.exam_portal.service.UserService;
 
@@ -35,13 +37,19 @@ public class CourseAdminController {
     private final UserService userService;
     private final UploadService uploadService;
     private final PurchaseService purchaseService;
+    private final SubjectService subjectService;
+    private final GradeService gradeService;
+
 
     public CourseAdminController(CourseService courseService, 
-    UserService userService, UploadService uploadService, PurchaseService purchaseService){
+    UserService userService, UploadService uploadService, PurchaseService purchaseService,
+    SubjectService subjectService, GradeService gradeService){
         this.courseService=courseService;
         this.userService=userService;
         this.uploadService=uploadService;
         this.purchaseService=purchaseService;
+        this.subjectService=subjectService;
+        this.gradeService=gradeService;
     }
 
     @GetMapping("/admin/course")
@@ -61,7 +69,7 @@ public class CourseAdminController {
         Page<Course> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
         boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+        .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         if(isAdmin){
             us = this.courseService.getAllCoursePagination(pageable);
         }else{
@@ -79,14 +87,16 @@ public class CourseAdminController {
     @GetMapping("/admin/course/create")
     public String getCreateCoursePage(Model model) {
         model.addAttribute("newCourse", new Course());
+        model.addAttribute("subjects", this.subjectService.getAllSubject());
+        model.addAttribute("grades", this.gradeService.getAllGrade());
         return "admin/course/create";
     }
 
     @PostMapping("/admin/course/create")
     public String postCreateCourse(@ModelAttribute("newCourse") Course course,
-                             @AuthenticationPrincipal UserDetails userDetails,
-                             BindingResult newCourseBindingResult,
-            @RequestParam("thumbnailFile") MultipartFile file) {
+                                   @AuthenticationPrincipal UserDetails userDetails,
+                                   BindingResult newCourseBindingResult,
+                                   @RequestParam("thumbnailFile") MultipartFile file) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
 
         if (newCourseBindingResult.hasErrors()) {
@@ -94,11 +104,13 @@ public class CourseAdminController {
         }
 
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatarcourses");
-        
 
         course.setThumbnail(avatar);
-        // GÁN GIÁO VIÊN TẠO KHÓA HỌC
         course.setTeacher(teacher);
+
+        // mặc định free
+        course.setPrice(0F);
+        course.setIsFree(true);
 
         // Save
         this.courseService.handleSaveCourse(course);
@@ -106,15 +118,20 @@ public class CourseAdminController {
         return "redirect:/admin/course";
     }
 
+
     @GetMapping("/admin/course/update/{id}")
-    public String getUpdateUserPage(Model model, @PathVariable long id) {
+    public String getUpdateCoursePage(Model model, @PathVariable long id) {
         Course course = this.courseService.getCourseById(id);
         model.addAttribute("newCourse", course);
+        model.addAttribute("subjects", this.subjectService.getAllSubject());
+        model.addAttribute("grades", this.gradeService.getAllGrade());
         return "admin/course/update";
     }
 
     @PostMapping("/admin/course/update/{id}")
     public String postUpdateCourse(@ModelAttribute("newCourse") Course course,
+                                   @RequestParam("subjectId") Long subjectId,
+                                   @RequestParam("gradeId") Long gradeId,
                                    @AuthenticationPrincipal UserDetails userDetails,
                                    BindingResult newCourseBindingResult,
                                    @RequestParam("thumbnailFile") MultipartFile file,
@@ -125,16 +142,30 @@ public class CourseAdminController {
             return "admin/course/update";
         }
 
-        // Lấy course cũ từ DB
         Course existingCourse = this.courseService.getCourseById(id);
         if (existingCourse == null) {
-            return "redirect:/admin/course"; // hoặc trả về lỗi phù hợp
+            return "redirect:/admin/course";
         }
 
+        // Gán lại thông tin
         course.setId(id);
         course.setTeacher(teacher);
+        course.setSubject(
+            subjectService.getSubjectById(subjectId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học id=" + subjectId))
+        );
+            
+        course.setGrade(
+            gradeService.getGradeById(gradeId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khối id=" + gradeId))
+        );
+            
 
-        // Nếu có ảnh mới thì lưu ảnh mới, ngược lại giữ ảnh cũ
+        // Mặc định free
+        course.setPrice(0F);
+        course.setIsFree(true);
+
+        // Nếu có ảnh mới thì lưu, không thì giữ ảnh cũ
         if (!file.isEmpty()) {
             String avatar = this.uploadService.handleSaveUploadFile(file, "avatarcourses");
             course.setThumbnail(avatar);
@@ -142,11 +173,11 @@ public class CourseAdminController {
             course.setThumbnail(existingCourse.getThumbnail());
         }
 
-        // Save
         this.courseService.handleSaveCourse(course);
 
         return "redirect:/admin/course";
     }
+
 
 
 
