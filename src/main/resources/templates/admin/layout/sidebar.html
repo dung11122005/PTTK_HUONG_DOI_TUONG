@@ -39,18 +39,6 @@
               </div>
               Course
             </a>
-            <a class="nav-link" href="/admin/send-mail">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-envelope"></i>
-              </div>
-              Send Email
-            </a>
-            <a class="nav-link" href="/admin/email">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-inbox"></i>
-              </div>
-              Receive Email
-            </a>
           </div>
 
           <!-- Class, Test: ACADEMIC_AFFAIRS, SUBJECT_TEACHER, PRINCIPAL -->
@@ -87,21 +75,33 @@
             </a>
           </div>
 
-          <div sec:authorize="hasAnyRole('HOMEROOM_TEACHER','PRINCIPAL')">
+          <div sec:authorize="hasAnyRole('HOMEROOM_TEACHER')">
             <a class="nav-link" href="/admin/class">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-users"></i>
               </div>
               Class
             </a>
-          </div>
 
-          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
             <a class="nav-link" href="/admin/test">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-clipboard-check"></i>
               </div>
               Test
+            </a>
+          </div>
+          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
+            <a class="nav-link" href="/admin/send-mail">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              Send Email
+            </a>
+            <a class="nav-link" href="/admin/email">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-inbox"></i>
+              </div>
+              Receive Email
             </a>
           </div>
 

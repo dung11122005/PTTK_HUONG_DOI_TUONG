@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.example.exam_portal.domain.ExamSession;
 
 @Repository
-public interface TestRepositoty extends JpaRepository<ExamSession, Long> {
+public interface TestRepository extends JpaRepository<ExamSession, Long> {
     ExamSession findById(long id);
 
     ExamSession findByClassroomIdAndExamId(Long classId, Long examId);
@@ -27,5 +27,8 @@ public interface TestRepositoty extends JpaRepository<ExamSession, Long> {
     List<ExamSession> findByClassroom_IdIn(List<Long> classIds);
 
     void deleteByClassroomIdAndExamId(Long classId, Long examId);
+
+    // Lấy tất cả ExamSession theo danh sách classIds, có phân trang
+    Page<ExamSession> findByClassroom_IdIn(List<Long> classIds, Pageable pageable);
 
 }

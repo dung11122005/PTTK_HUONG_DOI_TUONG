@@ -100,7 +100,9 @@
                             Khóa học đã mua
                           </a>
                         </li>
-                        <div sec:authorize="hasAnyRole('TEACHER')">
+                        <div
+                          sec:authorize="hasAnyRole('SUBJECT_TEACHER', 'HOMEROOM_TEACHER')"
+                        >
                           <li>
                             <a
                               class="dropdown-item"
@@ -121,7 +123,7 @@
                           <li>
                             <a
                               class="dropdown-item"
-                              href="/admin"
+                              href="/admin/user"
                               style="
                                 width: 100%;
                                 padding: 10px 20px;
@@ -131,6 +133,40 @@
                               "
                             >
                               Trang admin
+                            </a>
+                          </li>
+                        </div>
+                        <div sec:authorize="hasAnyRole('PRINCIPAL')">
+                          <li>
+                            <a
+                              class="dropdown-item"
+                              href="/admin"
+                              style="
+                                width: 100%;
+                                padding: 10px 20px;
+                                color: #212529;
+                                text-decoration: none;
+                                background-color: #fff;
+                              "
+                            >
+                              Trang hiệu trưởng
+                            </a>
+                          </li>
+                        </div>
+                        <div sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS')">
+                          <li>
+                            <a
+                              class="dropdown-item"
+                              href="/admin/class"
+                              style="
+                                width: 100%;
+                                padding: 10px 20px;
+                                color: #212529;
+                                text-decoration: none;
+                                background-color: #fff;
+                              "
+                            >
+                              Trang phòng đào tạo
                             </a>
                           </li>
                         </div>

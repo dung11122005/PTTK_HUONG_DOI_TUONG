@@ -68,37 +68,42 @@ public class TestController {
 
 
     @GetMapping("/admin/test")
-    public String getTestPage(Model model, @RequestParam("page") Optional<String> pageOptional,
-    @AuthenticationPrincipal UserDetails userDetails) {
+    public String getTestPage(Model model,
+                              @RequestParam("page") Optional<String> pageOptional,
+                              @AuthenticationPrincipal UserDetails userDetails) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
-        int page = 1;
-        try {
-            if (pageOptional.isPresent()) {
-                page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
-            }
-        } catch (Exception e) {
-
-        }
-        Page<ExamSession> ex;
+        int page = pageOptional.map(Integer::parseInt).orElse(1);
         Pageable pageable = PageRequest.of(page - 1, 10);
-        
-        boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
 
-        if(isAdmin){
+        boolean isPrincipal = teacher.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
+        boolean isAcademic = teacher.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
+
+        Page<ExamSession> ex;
+
+        if (isPrincipal || isAcademic) {
+            // Hiển thị tất cả ca thi
             ex = this.testService.getAllExamSessionPagination(pageable);
-        }else{
-            ex = this.testService.getAllExamSessionPaginationTeacherId(teacher.getId(), pageable);
+        } else {
+            // Lấy các lớp mà giáo viên là chủ nhiệm
+            List<ClassRoom> homeroomClasses = this.classService.getClassesByHomeroomTeacherId(teacher.getId());
+            List<Long> classIds = homeroomClasses.stream().map(ClassRoom::getId).toList();
+
+            if (classIds.isEmpty()) {
+                // Không có lớp chủ nhiệm nào
+                ex = Page.empty(pageable);
+            } else {
+                ex = this.testService.getAllExamSessionByClassIds(classIds, pageable);
+            }
         }
 
-        List<ExamSession> examSessions =  ex.getContent();
-        model.addAttribute("examSessions", examSessions);
+        model.addAttribute("examSessions", ex.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ex.getTotalPages());
         return "admin/test/show";
     }
+
 
     @GetMapping("/admin/test/{id}")
     public String getResultTestPage(Model model, @RequestParam("page") Optional<String> pageOptional,

@@ -78,6 +78,7 @@
                       name="points"
                       step="0.5"
                       required
+                      autocomplete="off"
                     />
                   </div>
 
@@ -95,6 +96,7 @@
                           class="form-control"
                           name="choicesContent"
                           placeholder="Đáp án"
+                          autocomplete="off"
                         />
                       </div>
                       <div class="col-4">
@@ -104,6 +106,7 @@
                             class="form-check-input"
                             name="isCorrect"
                             th:value="${i}"
+                            autocomplete="off"
                           />
 
                           <label class="form-check-label">Đúng</label>
@@ -118,6 +121,7 @@
                       type="text"
                       class="form-control"
                       name="correctAnswer"
+                      autocomplete="off"
                     />
                   </div>
 
@@ -195,6 +199,7 @@
                           step="0.5"
                           th:value="${q.points}"
                           required
+                          autocomplete="off"
                         />
                       </div>
 
@@ -208,6 +213,7 @@
                               class="form-control"
                               name="choicesContent"
                               th:value="${c.content}"
+                              autocomplete="off"
                             />
                           </div>
                           <div class="col-4">
@@ -218,6 +224,7 @@
                                 name="isCorrect"
                                 th:checked="${c.isCorrect}"
                                 th:value="${i.index}"
+                                autocomplete="off"
                               />
                               <label class="form-check-label">Đúng</label>
                             </div>
@@ -233,6 +240,7 @@
                           class="form-control"
                           name="correctAnswer"
                           th:value="${q.correctAnswer}"
+                          autocomplete="off"
                         />
                       </div>
 

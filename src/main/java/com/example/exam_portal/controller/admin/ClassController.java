@@ -71,12 +71,14 @@ public class ClassController {
         Pageable pageable = PageRequest.of(page - 1, 10);
         Page<ClassRoom> cl;
 
+        boolean isPrincipal = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         boolean isAcademicAffairs = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
         boolean isHomeroomTeacher = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
 
-        if (isAcademicAffairs) {
+        if (isPrincipal || isAcademicAffairs) {
             cl = this.classService.getAllClassRoomPagination(pageable);
         } else if (isHomeroomTeacher) {
             cl = this.classService.getAllClassRoomPaginationteId(user.getId(), pageable);

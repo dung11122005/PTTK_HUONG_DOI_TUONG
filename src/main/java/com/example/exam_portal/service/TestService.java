@@ -7,15 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.ExamSession;
-import com.example.exam_portal.repository.TestRepositoty;
+import com.example.exam_portal.repository.TestRepository;
 
 @Service
 public class TestService {
     
-    private final TestRepositoty testRepositoty;
+    private final TestRepository testRepositoty;
 
-    public TestService(TestRepositoty testRepositoty){
+    public TestService(TestRepository testRepositoty){
         this.testRepositoty=testRepositoty;
+    }
+
+    public Page<ExamSession> getAllExamSessionByClassIds(List<Long> classIds, Pageable pageable) {
+        return this.testRepositoty.findByClassroom_IdIn(classIds, pageable);
     }
 
     public Page<ExamSession> getAllExamSessionPaginationTeacherId(Long id, Pageable page) {

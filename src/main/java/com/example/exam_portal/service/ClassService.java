@@ -44,6 +44,10 @@ public class ClassService {
         return this.classRepository.findByHomeroomTeacherId(id, page);
     }
 
+    public List<ClassRoom> getClassesByHomeroomTeacherId(Long id) {
+        return this.classRepository.findByHomeroomTeacherId(id);
+    }
+
     public Page<ClassStudent> getAllClassRoomPagination(Specification<ClassStudent> spec, Pageable pageable) {
         return this.classStudentRepository.findAll(spec, pageable);
     }

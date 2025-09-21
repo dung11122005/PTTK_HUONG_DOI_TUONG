@@ -39,7 +39,11 @@
                     class="d-flex justify-content-between align-items-center"
                   >
                     <h3>Danh sách lớp</h3>
-                    <a th:href="@{/admin/class/create}" class="btn btn-primary">
+                    <a
+                      th:href="@{/admin/class/create}"
+                      class="btn btn-primary"
+                      sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                    >
                       + Tạo lớp
                     </a>
                   </div>
@@ -82,14 +86,17 @@
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
+
                           <a
                             th:href="@{'/admin/class/update/' + ${classRoom.id}}"
                             class="btn btn-warning btn-sm mx-1"
+                            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
                             >Sửa</a
                           >
                           <a
                             th:href="@{'/admin/class/delete/' + ${classRoom.id}}"
                             class="btn btn-danger btn-sm"
+                            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
                             >Xóa</a
                           >
                         </td>
