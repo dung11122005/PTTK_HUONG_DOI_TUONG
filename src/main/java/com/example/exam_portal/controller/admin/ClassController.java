@@ -26,10 +26,15 @@ import com.example.exam_portal.domain.AcademicYear;
 import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.ClassStudent;
 import com.example.exam_portal.domain.Grade;
+import com.example.exam_portal.domain.Subject;
+import com.example.exam_portal.domain.TeachingAssignment;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.domain.enums.TeachingRole;
 import com.example.exam_portal.service.AcademicYearService;
 import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.GradeService;
+import com.example.exam_portal.service.SubjectService;
+import com.example.exam_portal.service.TeachingAssignmentService;
 import com.example.exam_portal.service.UserService;
 import com.example.exam_portal.spec.SpecificationBuilder;
 
@@ -42,13 +47,18 @@ public class ClassController {
     private final UserService userService;
     private final AcademicYearService academicYearService;
     private final GradeService gradeService;
+    private final SubjectService subjectService;
+    private final TeachingAssignmentService teachingAssignmentService;
 
     public ClassController(ClassService classService, UserService userService, 
-    AcademicYearService academicYearService, GradeService gradeService){
+    AcademicYearService academicYearService, GradeService gradeService, SubjectService subjectService,
+    TeachingAssignmentService teachingAssignmentService){
         this.classService=classService;
         this.userService=userService;
         this.academicYearService=academicYearService;
         this.gradeService=gradeService;
+        this.subjectService=subjectService;
+        this.teachingAssignmentService=teachingAssignmentService;
     }
 
     @GetMapping("/admin/class")
@@ -101,32 +111,55 @@ public class ClassController {
     public String getCreateClassPage(Model model) {
         model.addAttribute("newClass", new ClassRoom());
 
-        // Lấy danh sách niên khóa và khối lớp
-        List<AcademicYear> academicYears = this.academicYearService.getAllAcademicYear();
-        List<Grade> grades = this.gradeService.getAllGrade();
+        List<AcademicYear> academicYears = academicYearService.getAllAcademicYear();
+        List<Grade> grades = gradeService.getAllGrade();
+        List<Subject> subjects = this.subjectService.getAllSubject();
 
         model.addAttribute("academicYears", academicYears);
         model.addAttribute("grades", grades);
+        model.addAttribute("subjects", subjects);
 
         return "admin/class/create";
     }
 
 
 
+
     @PostMapping("/admin/class/create")
     public String postCreateClass(
             @ModelAttribute("newClass") ClassRoom classroom,
-            @RequestParam("teacherEmail") String teacherEmail) {
+            @RequestParam("teacherEmail") String homeroomEmail,
+            @RequestParam Map<String, String> requestParams) {
 
-        User teacher = userService.getUserByEmail(teacherEmail);
-
-        if (teacher == null) {
-            // TODO: có thể add error vào model rồi return lại trang create
-            throw new RuntimeException("Không tìm thấy giáo viên với email: " + teacherEmail);
+        // Tìm giáo viên chủ nhiệm
+        User homeroom = userService.getUserByEmail(homeroomEmail);
+        if (homeroom == null) {
+            throw new RuntimeException("Không tìm thấy giáo viên chủ nhiệm với email: " + homeroomEmail);
         }
+        classroom.setHomeroomTeacher(homeroom);
 
-        classroom.setHomeroomTeacher(teacher);
+        // Lưu lớp trước (để có classroom_id)
         classService.handleSaveClassRoom(classroom);
+
+        // Duyệt qua các subjectTeachers[i]
+        int i = 0;
+        while (true) {
+            String email = requestParams.get("subjectTeachers[" + i + "].teacherEmail");
+            String subjectIdStr = requestParams.get("subjectTeachers[" + i + "].subjectId");
+            if (email == null || subjectIdStr == null) break;
+
+            User teacher = this.userService.getUserByEmail(email);
+            Optional<Subject> subject = this.subjectService.getSubjectById(Long.parseLong(subjectIdStr));
+
+            TeachingAssignment assignment = new TeachingAssignment();
+            assignment.setTeacher(teacher);
+            assignment.setClassroom(classroom);
+            assignment.setSubject(subject.get());
+            assignment.setRole(TeachingRole.SUBJECT_TEACHER);
+
+            this.teachingAssignmentService.handleSaveTeachingAssignment(assignment);
+            i++;
+        }
 
         return "redirect:/admin/class";
     }
@@ -134,37 +167,66 @@ public class ClassController {
 
     @GetMapping("/admin/class/update/{id}")
     public String getUpdateClassPage(Model model, @PathVariable Long id) {
-        ClassRoom classRoom = this.classService.getClassRoomById(id);
+        ClassRoom classRoom = classService.getClassRoomById(id);
         model.addAttribute("newClass", classRoom);
 
-        // Danh sách niên khóa
-        model.addAttribute("academicYears", this.academicYearService.getAllAcademicYear());
+        model.addAttribute("academicYears", academicYearService.getAllAcademicYear());
+        model.addAttribute("grades", gradeService.getAllGrade());
 
-        // Danh sách khối
-        model.addAttribute("grades", this.gradeService.getAllGrade());
+        // danh sách subject để hiển thị
+        model.addAttribute("subjects", subjectService.getAllSubject());
+
+        // danh sách TeachingAssignment hiện tại
+        model.addAttribute("teachingAssignments", teachingAssignmentService.getByClassRoomId(id));
 
         return "admin/class/update";
     }
+
 
 
     @PostMapping("/admin/class/update/{id}")
     public String postUpdateClass(
             @ModelAttribute("newClass") ClassRoom classroom,
             @PathVariable Long id,
-            @RequestParam("homeroomTeacherEmail") String teacherEmail) {
+            @RequestParam("homeroomTeacherEmail") String homeroomEmail,
+            @RequestParam Map<String, String> requestParams) {
 
-        // Lấy giáo viên theo email
-        User teacher = this.userService.getUserByEmail(teacherEmail);
-        if (teacher == null) {
-            throw new RuntimeException("Không tìm thấy giáo viên với email: " + teacherEmail);
+        // Gán GVCN
+        User homeroom = userService.getUserByEmail(homeroomEmail);
+        if (homeroom == null) {
+            throw new RuntimeException("Không tìm thấy giáo viên chủ nhiệm với email: " + homeroomEmail);
+        }
+        classroom.setId(id);
+        classroom.setHomeroomTeacher(homeroom);
+
+        classService.handleSaveClassRoom(classroom);
+
+        // Xóa phân công cũ
+        teachingAssignmentService.deleteByClassRoomId(id);
+
+        // Thêm phân công mới từ form
+        int i = 0;
+        while (true) {
+            String email = requestParams.get("subjectTeachers[" + i + "].teacherEmail");
+            String subjectIdStr = requestParams.get("subjectTeachers[" + i + "].subjectId");
+            if (email == null || subjectIdStr == null) break;
+
+            User teacher = userService.getUserByEmail(email);
+            Optional<Subject> subject = subjectService.getSubjectById(Long.parseLong(subjectIdStr));
+
+            TeachingAssignment assignment = new TeachingAssignment();
+            assignment.setTeacher(teacher);
+            assignment.setClassroom(classroom);
+            assignment.setSubject(subject.get());
+            assignment.setRole(TeachingRole.SUBJECT_TEACHER);
+
+            teachingAssignmentService.handleSaveTeachingAssignment(assignment);
+            i++;
         }
 
-        classroom.setId(id);
-        classroom.setHomeroomTeacher(teacher);
-
-        this.classService.handleSaveClassRoom(classroom);
         return "redirect:/admin/class";
     }
+
 
 
     @GetMapping("/admin/class/delete/{id}")

@@ -44,12 +44,4 @@ public class ExamSession {
     @Column(name = "is_locked")
     private Boolean isLocked = false;
 
-    // Giáo viên bộ môn được phân công chấm/nhập điểm
-    // @ManyToMany
-    // @JoinTable(
-    //     name = "exam_session_teachers",
-    //     joinColumns = @JoinColumn(name = "exam_session_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "teacher_id")
-    // )
-    // private Set<User> assignedTeachers = new HashSet<>();
 }

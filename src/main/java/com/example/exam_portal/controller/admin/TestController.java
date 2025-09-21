@@ -74,35 +74,34 @@ public class TestController {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         int page = pageOptional.map(Integer::parseInt).orElse(1);
         Pageable pageable = PageRequest.of(page - 1, 10);
-
+                            
         boolean isPrincipal = teacher.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         boolean isAcademic = teacher.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
-
+                            
         Page<ExamSession> ex;
-
+                            
         if (isPrincipal || isAcademic) {
-            // Hiển thị tất cả ca thi
             ex = this.testService.getAllExamSessionPagination(pageable);
         } else {
-            // Lấy các lớp mà giáo viên là chủ nhiệm
+            // GVCN
             List<ClassRoom> homeroomClasses = this.classService.getClassesByHomeroomTeacherId(teacher.getId());
-            List<Long> classIds = homeroomClasses.stream().map(ClassRoom::getId).toList();
-
-            if (classIds.isEmpty()) {
-                // Không có lớp chủ nhiệm nào
-                ex = Page.empty(pageable);
-            } else {
+            if (!homeroomClasses.isEmpty()) {
+                List<Long> classIds = homeroomClasses.stream().map(ClassRoom::getId).toList();
                 ex = this.testService.getAllExamSessionByClassIds(classIds, pageable);
+            } else {
+                // GVBM
+                ex = this.testService.getAllExamSessionByTeacherSubject(teacher.getId(), pageable);
             }
         }
-
+    
         model.addAttribute("examSessions", ex.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ex.getTotalPages());
         return "admin/test/show";
     }
+    
 
 
     @GetMapping("/admin/test/{id}")

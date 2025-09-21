@@ -81,9 +81,7 @@
                           th:value="${year.id}"
                           th:text="${year.name}"
                           th:selected="${year.id == newClass.academicYear?.id}"
-                        >
-                          2025-2026
-                        </option>
+                        ></option>
                       </select>
                     </div>
 
@@ -96,9 +94,7 @@
                           th:value="${grade.id}"
                           th:text="${grade.name}"
                           th:selected="${grade.id == newClass.grade?.id}"
-                        >
-                          10
-                        </option>
+                        ></option>
                       </select>
                     </div>
 
@@ -115,6 +111,64 @@
                         placeholder="Nhập email giáo viên"
                         required
                       />
+                    </div>
+
+                    <!-- Giáo viên bộ môn -->
+                    <div class="mb-3">
+                      <label class="form-label">Giáo viên bộ môn:</label>
+                      <div id="teacher-assignments">
+                        <div
+                          class="row mb-2"
+                          th:each="assign, iterStat : ${teachingAssignments}"
+                        >
+                          <div class="col">
+                            <input
+                              type="email"
+                              class="form-control"
+                              th:name="subjectTeachers[__${iterStat.index}__].teacherEmail"
+                              th:value="${assign.teacher.email}"
+                              placeholder="Email giáo viên"
+                              required
+                            />
+                          </div>
+                          <div class="col">
+                            <select
+                              class="form-select"
+                              th:name="subjectTeachers[__${iterStat.index}__].subjectId"
+                              required
+                            >
+                              <option value="" disabled>-- Chọn môn --</option>
+                              <option
+                                th:each="s : ${subjects}"
+                                th:value="${s.id}"
+                                th:text="${s.name}"
+                                th:selected="${assign.subject != null and s.id == assign.subject.id}"
+                              ></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- template option -->
+                      <template id="subject-options">
+                        <option value="" disabled selected>
+                          -- Chọn môn --
+                        </option>
+                        <option
+                          th:each="s : ${subjects}"
+                          th:value="${s.id}"
+                          th:text="${s.name}"
+                        ></option>
+                      </template>
+
+                      <!-- nút thêm hàng mới -->
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary mt-2"
+                        onclick="addTeacherRow()"
+                      >
+                        + Thêm giáo viên
+                      </button>
                     </div>
 
                     <!-- Nút submit -->
@@ -138,6 +192,34 @@
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>
+
+    <script th:inline="javascript">
+      let teacherIndex = /*[[${#lists.size(teachingAssignments)}]]*/ 0;
+      function addTeacherRow() {
+        const container = document.getElementById("teacher-assignments");
+        const row = document.createElement("div");
+        row.classList.add("row", "mb-2");
+
+        // lấy option từ template
+        const options = document.getElementById("subject-options").innerHTML;
+
+        row.innerHTML = `
+      <div class="col">
+        <input type="email" class="form-control"
+               name="subjectTeachers[${teacherIndex}].teacherEmail"
+               placeholder="Email giáo viên" required />
+      </div>
+      <div class="col">
+        <select class="form-select"
+                name="subjectTeachers[${teacherIndex}].subjectId"
+                required>
+          ${options}
+        </select>
+      </div>`;
+        container.appendChild(row);
+        teacherIndex++;
+      }
+    </script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

@@ -119,6 +119,46 @@
                         autocomplete="off"
                       />
                     </div>
+                    <!-- Giáo viên bộ môn -->
+                    <div class="mb-3">
+                      <label class="form-label">Giáo viên bộ môn:</label>
+                      <div id="teacher-assignments">
+                        <div class="row mb-2">
+                          <div class="col">
+                            <input
+                              type="email"
+                              class="form-control"
+                              name="subjectTeachers[0].teacherEmail"
+                              placeholder="Email giáo viên"
+                              required
+                            />
+                          </div>
+                          <div class="col">
+                            <select
+                              class="form-select"
+                              name="subjectTeachers[0].subjectId"
+                              required
+                            >
+                              <option value="" disabled selected>
+                                -- Chọn môn --
+                              </option>
+                              <option
+                                th:each="s : ${subjects}"
+                                th:value="${s.id}"
+                                th:text="${s.name}"
+                              ></option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="addTeacherRow()"
+                      >
+                        + Thêm giáo viên
+                      </button>
+                    </div>
 
                     <!-- Nút submit -->
                     <div class="mb-4">
@@ -141,6 +181,31 @@
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>
+
+    <script>
+      let teacherIndex = 1;
+      function addTeacherRow() {
+        const container = document.getElementById("teacher-assignments");
+        const row = document.createElement("div");
+        row.classList.add("row", "mb-2");
+        row.innerHTML = `
+      <div class="col">
+        <input type="email" class="form-control" name="subjectTeachers[${teacherIndex}].teacherEmail"
+               placeholder="Email giáo viên" required />
+      </div>
+      <div class="col">
+        <select class="form-select" name="subjectTeachers[${teacherIndex}].subjectId" required>
+          <option value="" disabled selected>-- Chọn môn --</option>
+          ${
+            document.querySelector("[name='subjectTeachers[0].subjectId']")
+              .innerHTML
+          }
+        </select>
+      </div>`;
+        container.appendChild(row);
+        teacherIndex++;
+      }
+    </script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
