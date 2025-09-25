@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +22,10 @@ import com.example.exam_portal.domain.Exam;
 import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.ExamSession;
 import com.example.exam_portal.domain.Question;
+import com.example.exam_portal.domain.Student;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ExamResultService;
+import com.example.exam_portal.service.StudentService;
 import com.example.exam_portal.service.TestService;
 import com.example.exam_portal.service.UserService;
 import com.google.gson.Gson;
@@ -34,42 +36,43 @@ public class TestClientController {
     private final TestService testService;
     private final UserService userService;
     private final ExamResultService examResultService;
+    private final StudentService studentService;
 
-    public TestClientController(TestService testService, UserService userService, ExamResultService examResultService){
+    public TestClientController(TestService testService, UserService userService, ExamResultService examResultService,
+    StudentService studentService){
         this.testService=testService;
         this.userService=userService;
         this.examResultService=examResultService;
+        this.studentService=studentService;
     }
 
     @GetMapping("/exam")
-    public String getExamClient(Model model,  @AuthenticationPrincipal UserDetails userDetails) {
-        User student = this.userService.getUserByEmail(userDetails.getUsername());
-
-        // Lấy danh sách lớp của học sinh
-        List<Long> classIds = student.getClassStudents()
-            .stream()
-            .map(cs -> cs.getClassroom().getId())
-            .collect(Collectors.toList());
-
-        if (classIds.isEmpty()) {
+    public String getExamClient(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        // Lấy User
+        User user = this.userService.getUserByEmail(userDetails.getUsername());
+    
+        // Tìm Student từ User.id
+        Optional<Student> student = this.studentService.getStudentById(user.getId());
+    
+        if (student.get().getClassRoom() == null) {
             model.addAttribute("message", "Bạn chưa được thêm vào lớp nào.");
             return "client/exam/examclient";
         }
-
-
-        // Lấy các kỳ thi thuộc những lớp đó
-        List<ExamSession> allExamSessions = this.testService.getAllExamSessionListClassId(classIds);
-            
-        // Lọc ra những ca thi chưa bị khóa
+    
+        Long classId = student.get().getClassRoom().getId();
+    
+        // Lấy các kỳ thi thuộc lớp đó
+        List<ExamSession> allExamSessions = this.testService.getAllExamSessionListClassId(List.of(classId));
+    
+        // Lọc ra ca thi chưa bị khóa
         List<ExamSession> examSessions = allExamSessions.stream()
-            .filter(es -> Boolean.FALSE.equals(es.getIsLocked()))
-            .collect(Collectors.toList());
-
-
+                .filter(es -> Boolean.FALSE.equals(es.getIsLocked()))
+                .toList();
+    
         model.addAttribute("examSessions", examSessions);
-         // Thymeleaf template
-            return "client/exam/examclient";
+        return "client/exam/examclient";
     }
+    
     
     @GetMapping("/exam/confirm/{id}")
     public String getConfirmExamClient(Model model, @PathVariable long id,  @AuthenticationPrincipal UserDetails userDetails) {
@@ -89,26 +92,31 @@ public class TestClientController {
                                      @PathVariable long id,
                                      @AuthenticationPrincipal UserDetails userDetails,
                                      RedirectAttributes redirectAttributes) {
-        User student = this.userService.getUserByEmail(userDetails.getUsername());
+        // Lấy user
+        User user = this.userService.getUserByEmail(userDetails.getUsername());
+
+        // Lấy student từ userId
+        Optional<Student> student = this.studentService.getStudentById(user.getId());
+
         ExamSession examSession = this.testService.getExamSessionById(id);
-                                    
-        // Kiểm tra quyền truy cập
-        boolean isStudentInClass = student.getClassStudents().stream()
-            .anyMatch(cs -> cs.getClassroom().getId().equals(examSession.getClassroom().getId()));
+
+        // Kiểm tra quyền truy cập (học sinh có thuộc lớp của kỳ thi không)
+        boolean isStudentInClass = student.get().getClassRoom() != null
+                && student.get().getClassRoom().getId().equals(examSession.getClassroom().getId());
+
         if (!isStudentInClass) {
             return "redirect:/exam?error=unauthorized";
         }
-    
+
         // Kiểm tra đã làm bài chưa
         Exam exam = examSession.getExam();
-        boolean hasSubmitted = examResultService
-            .hasStudentSubmittedExam(student.getId(), exam.getId());
+        boolean hasSubmitted = examResultService.hasStudentSubmittedExam(student.get().getId(), exam.getId());
         if (hasSubmitted) {
             redirectAttributes.addFlashAttribute("error", "Bạn đã hoàn thành kỳ thi này.");
             return "redirect:/exam";
         }
-       
-        // ✅ Kiểm tra thời gian hiện tại có nằm trong khung giờ làm bài
+
+        // Kiểm tra thời gian thi
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(examSession.getStartTime()) || now.isAfter(examSession.getEndTime())) {
             redirectAttributes.addFlashAttribute("error", "Chưa đến hoặc đã quá thời gian làm bài.");
@@ -116,12 +124,13 @@ public class TestClientController {
         }
 
         List<Question> questions = exam.getQuestions();
-    
+
         model.addAttribute("examSession", examSession);
         model.addAttribute("questions", questions);
-    
+
         return "client/exam/startexam"; // HTML quiz
     }
+
 
     @PostMapping("/exam/submit")
     public String submitExam(@RequestParam Map<String, String> params,
