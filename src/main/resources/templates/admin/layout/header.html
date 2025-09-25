@@ -3,9 +3,14 @@
     <!-- Navbar Brand-->
     <a
       class="navbar-brand ps-3"
-      th:href="${session.role == 'ADMIN' ? '/admin' : '/admin/exam'}"
+      th:href="${session.role == 'ADMIN' ? '/admin/user' 
+           : (session.role == 'PRINCIPAL' ? '/admin/dashboard' 
+           : (session.role == 'SUBJECT_DEPARTMENT' ? '/admin/exam' 
+           : (session.role == 'SUBJECT_TEACHER' ? '/teacher/exam' 
+           : (session.role == 'HOMEROOM_TEACHER' ? '/teacher/class' 
+           : '/'))))}"
     >
-      Start Bootstrap
+      Manager
     </a>
 
     <!-- Sidebar Toggle-->

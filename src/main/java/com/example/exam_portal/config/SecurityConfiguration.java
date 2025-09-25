@@ -81,7 +81,7 @@ public class SecurityConfiguration {
 
             // ADMIN
             // PRINCIPAL
-            // ACADEMIC_AFFAIRS
+            // SUBJECT_DEPARTMENT
             // SUBJECT_TEACHER
             // STUDENT
             // HOMEROOM_TEACHER
@@ -91,12 +91,14 @@ public class SecurityConfiguration {
                 .requestMatchers("/","/courses/**", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**",
                  "/api/chat/**", "/purchased-course/**").permitAll()
-                .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN", "PRINCIPAL", "ACADEMIC_AFFAIRS", "SUBJECT_TEACHER", "STUDENT", "HOMEROOM_TEACHER")
+                .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN", "PRINCIPAL", "SUBJECT_DEPARTMENT", "SUBJECT_TEACHER", "STUDENT", "HOMEROOM_TEACHER")
                 .requestMatchers("/admin/user/**").hasAnyRole("ADMIN","PRINCIPAL")
-                .requestMatchers("/admin/exam/**", "/admin/course/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("SUBJECT_TEACHER", "PRINCIPAL")
-                .requestMatchers("/admin/class/**", "/admin/test/**", "/admin/school-year/**", "/admin/grade/**", "/admin/subject/**").hasAnyRole("ACADEMIC_AFFAIRS","SUBJECT_TEACHER", "PRINCIPAL")
+                .requestMatchers("/admin/exam/**").hasAnyRole("VICE_PRINCIPAL","SUBJECT_DEPARTMENT","PRINCIPAL", "SUBJECT_TEACHER")
+                .requestMatchers("/admin/course/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("SUBJECT_TEACHER", "PRINCIPAL")
+                .requestMatchers("/admin/test/**").hasAnyRole("VICE_PRINCIPAL", "PRINCIPAL")
                 // .requestMatchers( "/admin/test/**").hasAnyRole("SUBJECT_TEACHER","PRINCIPAL")
-                .requestMatchers("/admin/class/**").hasAnyRole("HOMEROOM_TEACHER","PRINCIPAL")
+                .requestMatchers("/admin/class/**").hasAnyRole("VICE_PRINCIPAL", "HOMEROOM_TEACHER", "PRINCIPAL")
+                .requestMatchers("/admin/school-year/**", "/admin/grade/**", "/admin/subject/**").hasAnyRole("VICE_PRINCIPAL", "PRINCIPAL")
                 .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("PRINCIPAL")
 
                 // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")

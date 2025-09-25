@@ -42,7 +42,7 @@
                     <a
                       th:href="@{/admin/test/create}"
                       class="btn btn-primary"
-                      sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                      sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                     >
                       + Tạo ca thi
                     </a>
@@ -98,13 +98,13 @@
                             >Xem</a
                           >
                           <a
-                            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                            sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                             th:href="@{'/admin/test/update/' + ${examSession.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
-                            sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                            sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                             th:href="@{'/admin/test/delete/' + ${examSession.id}}"
                             class="btn btn-danger btn-sm"
                             >Xóa</a

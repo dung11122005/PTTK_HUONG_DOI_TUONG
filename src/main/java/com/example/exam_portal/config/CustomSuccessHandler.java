@@ -71,7 +71,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
     roleTargetUrlMap.put("ROLE_STUDENT", "/");
     roleTargetUrlMap.put("ROLE_ADMIN", "/admin/user");          // Quản trị viên hệ thống
     roleTargetUrlMap.put("ROLE_PRINCIPAL", "/admin");           // Hiệu trưởng → Dashboard
-    roleTargetUrlMap.put("ROLE_ACADEMIC_AFFAIRS", "/admin/class"); // Phòng đào tạo → Quản lý lớp
+    roleTargetUrlMap.put("ROLE_VICE_PRINCIPAL", "/admin/test");           // Hiệu phó → test
+    roleTargetUrlMap.put("ROLE_SUBJECT_DEPARTMENT", "/admin/exam"); // Tổ bộ môn
     roleTargetUrlMap.put("ROLE_SUBJECT_TEACHER", "/admin/exam");   // Giáo viên bộ môn → Quản lý kỳ thi
     roleTargetUrlMap.put("ROLE_HOMEROOM_TEACHER", "/admin/class"); // Giáo viên chủ nhiệm → Quản lý lớp
 

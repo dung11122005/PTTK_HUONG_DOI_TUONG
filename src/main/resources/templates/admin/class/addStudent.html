@@ -46,7 +46,7 @@
                 </a>
               </li>
             </ol>
-            <div class="mt-4" sec:authorize="hasRole('ACADEMIC_AFFAIRS')">
+            <div class="mt-4" sec:authorize="hasRole('VICE_PRINCIPAL')">
               <div class="row">
                 <form
                   th:action="@{/admin/class/student/add/{id}(id=${currentClass.id})}"
@@ -110,7 +110,7 @@
                     <th>Họ và tên</th>
                     <th>Email</th>
                     <th
-                      sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                      sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                     >
                       Hành động
                     </th>
@@ -122,7 +122,7 @@
                     <td th:text="${cs.student.fullName}"></td>
                     <td th:text="${cs.student.email}"></td>
                     <td
-                      sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')"
+                      sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                     >
                       <form
                         th:action="@{/admin/class/student/delete/{classId}/{studentId}(classId=${currentClass.id}, studentId=${cs.student.id})}"

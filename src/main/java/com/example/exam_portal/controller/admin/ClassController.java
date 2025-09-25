@@ -84,7 +84,7 @@ public class ClassController {
         boolean isPrincipal = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         boolean isAcademicAffairs = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VICE_PRINCIPAL"));
         boolean isHomeroomTeacher = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
 

@@ -47,8 +47,17 @@
             </a>
           </div>
 
-          <!-- Class, Test: ACADEMIC_AFFAIRS, SUBJECT_TEACHER, PRINCIPAL -->
-          <div sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS', 'PRINCIPAL')">
+          <div sec:authorize="hasAnyRole('SUBJECT_DEPARTMENT')">
+            <a class="nav-link" href="/admin/exam">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              Exam
+            </a>
+          </div>
+
+          <!-- Class, Test: SUBJECT_DEPARTMENT, SUBJECT_TEACHER, PRINCIPAL -->
+          <div sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')">
             <a class="nav-link" href="/admin/class">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-users"></i>

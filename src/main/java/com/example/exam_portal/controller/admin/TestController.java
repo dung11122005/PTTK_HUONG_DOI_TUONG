@@ -78,7 +78,7 @@ public class TestController {
         boolean isPrincipal = teacher.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
         boolean isAcademic = teacher.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS"));
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VICE_PRINCIPAL"));
                             
         Page<ExamSession> ex;
                             
