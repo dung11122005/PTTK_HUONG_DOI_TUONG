@@ -47,7 +47,7 @@ public class GradeController {
     }
 
     @GetMapping("/admin/grade/create")
-    public String getCreateAcademicYearPage(Model model) {
+    public String getCreateGrade(Model model) {
         model.addAttribute("newGrade", new Grade());
         return "admin/grade/create";
     }

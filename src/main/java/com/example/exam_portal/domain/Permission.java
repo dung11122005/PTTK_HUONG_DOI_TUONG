@@ -30,8 +30,8 @@ public class Permission {
     @NotBlank(message = "name không được để trống")
     private String name;
 
-    @NotBlank(message = "apiPath không được để trống")
-    private String apiPath;
+    @NotBlank(message = "endpoint không được để trống")
+    private String endpoint;
 
     @NotBlank(message = "method không được để trống")
     private String method;
@@ -44,9 +44,9 @@ public class Permission {
     private String createdBy;
     private String updatedBy;
 
-    public Permission(String name, String apiPath, String method, String module) {
+    public Permission(String name, String endpoint, String method, String module) {
         this.name = name;
-        this.apiPath = apiPath;
+        this.endpoint = endpoint;
         this.method = method;
         this.module = module;
     }
