@@ -1,7 +1,9 @@
 package com.example.exam_portal.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,5 +43,12 @@ public class PermissionService {
 
     public Page<Permission> getAllPermissionPagination(Pageable page) {
         return this.permissionRepository.findAll(page);
+    }
+
+    public Set<Permission> getAllPermissionByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new HashSet<>();
+        }
+        return new HashSet<>(permissionRepository.findByIdIn(ids));
     }
 }

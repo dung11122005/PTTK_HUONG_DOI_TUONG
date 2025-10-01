@@ -151,31 +151,6 @@ public class TestController {
         this.examResultService.writeExcelFileExamResult(examResults, response.getOutputStream());
     }
 
-    // @GetMapping("/admin/test/create")
-    // public String getCreateTestPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-    //     User currentUser = this.userService.getUserByEmail(userDetails.getUsername());
-
-    //     // Load tất cả đề thi, để nhóm theo môn
-    //     List<Exam> exams = this.examService.getAllExam();
-
-    //     // Load tất cả lớp học
-    //     List<ClassRoom> classRooms = this.classService.getAllClassRoom();
-
-    //     // Lấy danh sách môn học để nhóm đề thi
-    //     List<Subject> subjects = this.subjectService.getAllSubject(); // Hoặc lấy từ exams nếu muốn
-
-    //     model.addAttribute("newExamSession", new ExamSession());
-    //     model.addAttribute("exams", exams);
-    //     model.addAttribute("classRooms", classRooms);
-    //     model.addAttribute("subjects", subjects);
-
-    //     return "admin/test/create";
-    // }
-
-    // AdminTestController.java
-
-
-
 
     @GetMapping("/admin/test/create")
     public String getCreateTestPage(Model model) throws JsonProcessingException {

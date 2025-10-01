@@ -19,6 +19,15 @@
       src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
       crossorigin="anonymous"
     ></script>
+
+    <style>
+      .col-limit {
+        max-width: 700px;
+        word-wrap: break-word; /* xuống dòng nếu quá dài */
+        word-break: break-word; /* đảm bảo xuống dòng cho các từ dài */
+        white-space: normal; /* cho phép xuống dòng */
+      }
+    </style>
   </head>
   <div th:replace="admin/layout/header"></div>
   <body class="sb-nav-fixed sb-sidenav-toggled">
@@ -27,9 +36,9 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Exam</h1>
+            <h1 class="mt-4">Role</h1>
             <ol class="breadcrumb mb-4">
-              <li class="breadcrumb-item active">Exam</li>
+              <li class="breadcrumb-item active">Role</li>
             </ol>
 
             <div class="mt-5">
@@ -38,47 +47,42 @@
                   <div
                     class="d-flex justify-content-between align-items-center"
                   >
-                    <h3>Danh sách đề thi</h3>
-                    <a th:href="@{/admin/exam/create}" class="btn btn-primary">
-                      + Tạo đề thi
+                    <h3>Danh sách Role</h3>
+                    <a th:href="@{/admin/role/create}" class="btn btn-primary">
+                      + Tạo Role
                     </a>
                   </div>
                   <hr />
+
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Tên đề</th>
+                        <th>Tên Role</th>
                         <th>Mô tả</th>
-                        <th>Thời gian (phút)</th>
+                        <th>Số lượng Permission</th>
                         <th>Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr th:each="exam, stat : ${exams}">
+                      <tr th:each="r, stat : ${roles}">
                         <td th:text="${stat.count}">1</td>
-                        <td th:text="${exam.name}">Đề Toán Giữa kỳ</td>
-                        <td th:text="${exam.description}">
-                          Kiểm tra chương 1–3
+                        <td th:text="${r.name}">ADMIN</td>
+                        <td class="col-limit" th:text="${r.description}">
+                          Quản trị hệ thống
                         </td>
-                        <td th:text="${exam.timeLimit}">45</td>
+                        <td th:text="${r.permissions.size()}">5</td>
                         <td>
                           <a
-                            th:href="@{'/admin/exam/' + ${exam.id}}"
-                            class="btn btn-success btn-sm"
-                            >Xem</a
-                          >
-                          <a
-                            th:href="@{'/admin/exam/update/' + ${exam.id}}"
+                            th:href="@{'/admin/role/update/' + ${r.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
-                            th:href="@{'/admin/exam/delete/' + ${exam.id}}"
+                            th:href="@{'/admin/role/delete/' + ${r.id}}"
                             class="btn btn-danger btn-sm"
+                            >Xóa</a
                           >
-                            Xóa
-                          </a>
                         </td>
                       </tr>
                     </tbody>
@@ -91,7 +95,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/exam?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/role?page=' + ${currentPage - 1}}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
@@ -104,7 +108,7 @@
                         <a
                           class="page-link"
                           th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/exam?page=' + ${i}}"
+                          th:href="@{'/admin/role?page=' + ${i}}"
                           th:text="${i}"
                           >1</a
                         >
@@ -113,7 +117,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/exams?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/role?page=' + ${currentPage + 1}}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>
@@ -126,6 +130,7 @@
             </div>
           </div>
         </main>
+
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>

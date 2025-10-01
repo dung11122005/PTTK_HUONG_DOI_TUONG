@@ -1,10 +1,20 @@
 <div>
   <div id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
       <div class="sb-sidenav-menu">
         <div class="nav">
-          <div class="sb-sidenav-menu-heading">Core</div>
-
+          <div th:each="i : ${#numbers.sequence(1,10)}">
+            <a
+              class="nav-link active"
+              th:classappend="${i == 1} ? ' active' : ''"
+              href="@{'/admin/page/' + ${i}}"
+            >
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              Dashboard [[${i}]]
+            </a>
+          </div>
           <!-- Dashboard chỉ PRINCIPAL mới xem được -->
           <div sec:authorize="hasRole('PRINCIPAL')">
             <a class="nav-link" href="/admin">
