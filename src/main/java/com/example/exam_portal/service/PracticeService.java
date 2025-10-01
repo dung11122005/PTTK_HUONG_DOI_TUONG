@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.client.GeminiClient;
-import com.example.exam_portal.domain.FeedbackResult;
-import com.example.exam_portal.domain.PromptBuilder;
+import com.example.exam_portal.domain.response.FeedbackResult;
+import com.example.exam_portal.domain.response.PromptBuilder;
 import com.example.exam_portal.util.ResponseParser;
 
 

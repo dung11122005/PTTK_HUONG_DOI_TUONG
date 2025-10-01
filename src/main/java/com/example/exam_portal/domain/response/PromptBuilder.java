@@ -1,4 +1,4 @@
-package com.example.exam_portal.domain;
+package com.example.exam_portal.domain.response;
 
 public class PromptBuilder {
     public static String buildCorrectionPrompt(String vi, String en) {

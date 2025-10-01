@@ -1,4 +1,4 @@
-package com.example.exam_portal.domain;
+package com.example.exam_portal.domain.response;
 
 import lombok.Getter;
 import lombok.Setter;

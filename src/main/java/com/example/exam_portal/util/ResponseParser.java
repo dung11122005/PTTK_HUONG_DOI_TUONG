@@ -3,7 +3,7 @@ package com.example.exam_portal.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.exam_portal.domain.FeedbackResult;
+import com.example.exam_portal.domain.response.FeedbackResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

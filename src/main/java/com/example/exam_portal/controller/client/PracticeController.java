@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.exam_portal.domain.FeedbackResult;
+import com.example.exam_portal.domain.response.FeedbackResult;
 import com.example.exam_portal.service.PracticeService;
 
 
