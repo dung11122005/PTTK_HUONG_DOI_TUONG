@@ -1,6 +1,7 @@
 package com.example.exam_portal.util.error;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -80,14 +81,13 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler(value = {
-            PermissionException.class,
-    })
-    public ResponseEntity<RestResponse<Object>> handlePermissionException(Exception ex) {
-        RestResponse<Object> res = new RestResponse<Object>();
-        res.setStatusCode(HttpStatus.FORBIDDEN.value());
-        res.setError("Forbidden");
-        res.setMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    @ExceptionHandler(PermissionException.class)
+    public ResponseEntity<Map<String, String>> handlePermissionException(PermissionException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // 403
+                .body(Map.of(
+                        "error", "FORBIDDEN",
+                        "message", ex.getMessage()
+                ));
     }
 }

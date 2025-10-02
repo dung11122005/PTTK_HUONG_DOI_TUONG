@@ -1,17 +1,7 @@
 <div>
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-success">
     <!-- Navbar Brand-->
-    <a
-      class="navbar-brand ps-3"
-      th:href="${session.role == 'ADMIN' ? '/admin/user' 
-           : (session.role == 'PRINCIPAL' ? '/admin/dashboard' 
-           : (session.role == 'SUBJECT_DEPARTMENT' ? '/admin/exam' 
-           : (session.role == 'SUBJECT_TEACHER' ? '/teacher/exam' 
-           : (session.role == 'HOMEROOM_TEACHER' ? '/teacher/class' 
-           : '/'))))}"
-    >
-      Manager
-    </a>
+    <h1 class="navbar-brand ps-3">Manager</h1>
 
     <!-- Sidebar Toggle-->
     <button

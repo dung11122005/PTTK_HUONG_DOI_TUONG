@@ -3,20 +3,7 @@
     <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
       <div class="sb-sidenav-menu">
         <div class="nav">
-          <div th:each="i : ${#numbers.sequence(1,10)}">
-            <a
-              class="nav-link active"
-              th:classappend="${i == 1} ? ' active' : ''"
-              href="@{'/admin/page/' + ${i}}"
-            >
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              Dashboard [[${i}]]
-            </a>
-          </div>
-          <!-- Dashboard chỉ PRINCIPAL mới xem được -->
-          <div sec:authorize="hasRole('PRINCIPAL')">
+          <div th:if="${permissions.contains('GET /admin')}">
             <a class="nav-link" href="/admin">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-tachometer-alt"></i>
@@ -25,89 +12,80 @@
             </a>
           </div>
 
-          <!-- User: ADMIN, PRINCIPAL -->
-          <div sec:authorize="hasAnyRole('ADMIN','PRINCIPAL')">
+          <div th:if="${permissions.contains('GET /admin/user')}">
             <a class="nav-link" href="/admin/user">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-user"></i>
-              </div>
+              <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
               User
             </a>
           </div>
 
-          <!-- Exam, Course, Send Mail, Email: SUBJECT_TEACHER, PRINCIPAL -->
-          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
-            <a class="nav-link" href="/admin/exam">
+          <div th:if="${permissions.contains('GET /admin/role')}">
+            <a class="nav-link" href="/admin/role">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-file-alt"></i>
+                <i class="fas fa-user-shield"></i>
               </div>
-              Exam
-            </a>
-            <a class="nav-link" href="/admin/course">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-book"></i>
-              </div>
-              Course
-            </a>
-            <a class="nav-link" href="/admin/test">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-clipboard-check"></i>
-              </div>
-              Test
+              Role
             </a>
           </div>
 
-          <div sec:authorize="hasAnyRole('SUBJECT_DEPARTMENT')">
-            <a class="nav-link" href="/admin/exam">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-file-alt"></i>
-              </div>
-              Exam
+          <div th:if="${permissions.contains('GET /admin/permission')}">
+            <a class="nav-link" href="/admin/permission">
+              <div class="sb-nav-link-icon"><i class="fas fa-key"></i></div>
+              Permission
             </a>
           </div>
 
-          <!-- Class, Test: SUBJECT_DEPARTMENT, SUBJECT_TEACHER, PRINCIPAL -->
-          <div sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')">
-            <a class="nav-link" href="/admin/class">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-users"></i>
-              </div>
-              Class
-            </a>
-            <a class="nav-link" href="/admin/test">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-clipboard-check"></i>
-              </div>
-              Test
-            </a>
+          <div th:if="${permissions.contains('GET /admin/school-year')}">
             <a class="nav-link" href="/admin/school-year">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-calendar-alt"></i>
               </div>
               Niên khóa
             </a>
+          </div>
+
+          <div th:if="${permissions.contains('GET /admin/subject')}">
+            <a class="nav-link" href="/admin/subject">
+              <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
+              Môn học
+            </a>
+          </div>
+
+          <div th:if="${permissions.contains('GET /admin/class')}">
+            <a class="nav-link" href="/admin/class">
+              <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+              Class
+            </a>
+          </div>
+
+          <div th:if="${permissions.contains('GET /admin/grade')}">
             <a class="nav-link" href="/admin/grade">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-layer-group"></i>
               </div>
               Khối
             </a>
-            <a class="nav-link" href="/admin/subject">
+          </div>
+
+          <div th:if="${permissions.contains('GET /admin/course')}">
+            <a class="nav-link" href="/admin/course">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-book"></i>
+                <i class="fas fa-book-open"></i>
               </div>
-              Môn học
+              Course
             </a>
           </div>
 
-          <div sec:authorize="hasAnyRole('HOMEROOM_TEACHER')">
-            <a class="nav-link" href="/admin/class">
+          <div th:if="${permissions.contains('GET /admin/exam')}">
+            <a class="nav-link" href="/admin/exam">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-file-alt"></i>
               </div>
-              Class
+              Exam
             </a>
+          </div>
 
+          <div th:if="${permissions.contains('GET /admin/test')}">
             <a class="nav-link" href="/admin/test">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-clipboard-check"></i>
@@ -115,23 +93,24 @@
               Test
             </a>
           </div>
-          <div sec:authorize="hasAnyRole('SUBJECT_TEACHER','PRINCIPAL')">
+
+          <div th:if="${permissions.contains('GET /admin/send-mail')}">
             <a class="nav-link" href="/admin/send-mail">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-envelope"></i>
               </div>
               Send Email
             </a>
+          </div>
+
+          <div th:if="${permissions.contains('GET /admin/email')}">
             <a class="nav-link" href="/admin/email">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-inbox"></i>
-              </div>
+              <div class="sb-nav-link-icon"><i class="fas fa-inbox"></i></div>
               Receive Email
             </a>
           </div>
 
-          <!-- Activity Log: PRINCIPAL -->
-          <div sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')">
+          <div th:if="${permissions.contains('GET /admin/auditlog')}">
             <a
               class="nav-link"
               target="_blank"

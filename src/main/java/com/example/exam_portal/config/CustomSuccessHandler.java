@@ -1,19 +1,17 @@
 package com.example.exam_portal.config;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import com.example.exam_portal.domain.Permission;
 import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.service.ActivityLogService;
@@ -67,23 +65,25 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
 
 
     private String determineTargetUrl(Authentication authentication) {
-    Map<String, String> roleTargetUrlMap = new HashMap<>();
-    roleTargetUrlMap.put("ROLE_STUDENT", "/");
-    roleTargetUrlMap.put("ROLE_ADMIN", "/admin/user");          // Quản trị viên hệ thống
-    roleTargetUrlMap.put("ROLE_PRINCIPAL", "/admin");           // Hiệu trưởng → Dashboard
-    roleTargetUrlMap.put("ROLE_VICE_PRINCIPAL", "/admin/test");           // Hiệu phó → test
-    roleTargetUrlMap.put("ROLE_SUBJECT_DEPARTMENT", "/admin/exam"); // Tổ bộ môn
-    roleTargetUrlMap.put("ROLE_SUBJECT_TEACHER", "/admin/exam");   // Giáo viên bộ môn → Quản lý kỳ thi
-    roleTargetUrlMap.put("ROLE_HOMEROOM_TEACHER", "/admin/class"); // Giáo viên chủ nhiệm → Quản lý lớp
+        // Map<String, String> roleTargetUrlMap = new HashMap<>();
+        // roleTargetUrlMap.put("ROLE_STUDENT", "/");
+        // roleTargetUrlMap.put("ROLE_ADMIN", "/admin/user");          // Quản trị viên hệ thống
+        // roleTargetUrlMap.put("ROLE_PRINCIPAL", "/admin");           // Hiệu trưởng → Dashboard
+        // roleTargetUrlMap.put("ROLE_VICE_PRINCIPAL", "/admin/test");           // Hiệu phó → test
+        // roleTargetUrlMap.put("ROLE_SUBJECT_DEPARTMENT", "/admin/exam"); // Tổ bộ môn
+        // roleTargetUrlMap.put("ROLE_SUBJECT_TEACHER", "/admin/exam");   // Giáo viên bộ môn → Quản lý kỳ thi
+        // roleTargetUrlMap.put("ROLE_HOMEROOM_TEACHER", "/admin/class"); // Giáo viên chủ nhiệm → Quản lý lớp
 
-    for (GrantedAuthority authority : authentication.getAuthorities()) {
-        String role = authority.getAuthority();
-        if (roleTargetUrlMap.containsKey(role)) {
-            return roleTargetUrlMap.get(role);
-        }
+        // for (GrantedAuthority authority : authentication.getAuthorities()) {
+        //     String role = authority.getAuthority();
+        //     if (roleTargetUrlMap.containsKey(role)) {
+        //         return roleTargetUrlMap.get(role);
+        //     }
+        // }
+
+        return "/";
+        // throw new IllegalStateException("User role not recognized: " + authentication.getAuthorities());
     }
-    throw new IllegalStateException("User role not recognized: " + authentication.getAuthorities());
-}
 
 
     private void setUserSessionAttributes(HttpSession session, Authentication authentication) {
@@ -109,6 +109,17 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
                     .collect(Collectors.toSet());
                 
             session.setAttribute("roles", roleNames); // Lưu dưới dạng Set
+
+             // Lấy tất cả permission (bao gồm method + url)
+            Set<Permission> permissions = this.userService.getPermissionsByUserId(user.getId());
+            
+            // Chuyển thành set String cho dễ check ở view
+            Set<String> permissionKeys = permissions.stream()
+                    .map(p -> p.getMethod() + " " + p.getEndpoint())  // ví dụ: "GET /admin/user"
+                    .collect(Collectors.toSet());
+           
+
+            session.setAttribute("permissions", permissionKeys);
         }
 
     }

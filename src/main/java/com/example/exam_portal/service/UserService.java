@@ -1,12 +1,16 @@
 package com.example.exam_portal.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.exam_portal.domain.Permission;
 import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.User;
 import com.example.exam_portal.domain.response.ResUserDTO;
@@ -78,6 +82,16 @@ public class UserService {
 
     public List<Role> getRolesByNames(List<String> names) {
         return this.roleRepository.findAllByNameIn(names);
+    }
+
+    public Set<Permission> getPermissionsByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return Collections.emptySet();
+
+        // Gom tất cả permission từ các role
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .collect(Collectors.toSet());
     }
 
     public ResUserDTO convertToResUserDTO(User user) {

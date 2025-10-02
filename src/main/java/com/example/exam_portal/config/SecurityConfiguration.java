@@ -101,7 +101,7 @@ public class SecurityConfiguration {
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                 .requestMatchers("/","/courses/**", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**",
-                 "/api/chat/**", "/purchased-course/**", "/admin/**").permitAll()
+                 "/api/chat/**", "/admin/**").permitAll()
                 .anyRequest().authenticated()
             )
 

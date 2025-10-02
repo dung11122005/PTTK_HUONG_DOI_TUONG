@@ -36,7 +36,7 @@ public class Role {
     private Set<User> users = new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "roles_permissions",
         joinColumns = @JoinColumn(name = "role_id"),

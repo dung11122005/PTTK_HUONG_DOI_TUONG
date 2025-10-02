@@ -45,6 +45,8 @@ public class PermissionInterceptor implements HandlerInterceptor{
                 email = (String) principal; // trường hợp đơn giản
             }
 
+
+
             if (!email.isEmpty()) {
                 User user = userService.getUserByEmail(email);
                 if (user != null && user.getRoles() != null) {

@@ -71,7 +71,8 @@
                         <td class="col-limit" th:text="${r.description}">
                           Quản trị hệ thống
                         </td>
-                        <td th:text="${r.permissions.size()}">5</td>
+                        <td th:text="${#lists.size(r.permissions)}">0</td>
+
                         <td>
                           <a
                             th:href="@{'/admin/role/update/' + ${r.id}}"
