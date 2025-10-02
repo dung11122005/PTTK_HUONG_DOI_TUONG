@@ -70,11 +70,11 @@
                     <!-- Danh sách Permissions theo Module -->
                     <div
                       th:each="entry : ${permissionsByModule}"
-                      class="mb-3 border rounded p-2"
+                      class="border rounded p-2"
                     >
                       <!-- Header module -->
                       <div
-                        class="d-flex justify-content-between align-items-center mb-2"
+                        class="d-flex justify-content-between align-items-center mb-1"
                       >
                         <div class="fw-bold" th:text="${entry.key}">
                           Module Name
@@ -114,8 +114,13 @@
                         th:id="'collapse-' + ${#strings.replace(entry.key,' ','-')}"
                         class="collapse ms-3"
                       >
-                        <div th:each="p : ${entry.value}" class="row g-2 mb-2">
-                          <div class="col-md-6">
+                        <!-- row bọc ngoài -->
+                        <div class="row g-2 mb-2">
+                          <!-- mỗi permission chiếm nửa dòng -->
+                          <div
+                            th:each="p,iterStat : ${entry.value}"
+                            class="col-md-6"
+                          >
                             <div class="card p-2 h-100">
                               <div
                                 class="d-flex justify-content-between align-items-start"
@@ -126,9 +131,9 @@
                                     <span
                                       class="badge text-white me-2"
                                       th:classappend="${p.method == 'GET' ? ' bg-primary' :
-                                                   p.method == 'POST' ? ' bg-success' :
-                                                   p.method == 'PUT' ? ' bg-warning text-dark' :
-                                                   p.method == 'DELETE' ? ' bg-danger' : ' bg-secondary'}"
+                                 p.method == 'POST' ? ' bg-success' :
+                                 p.method == 'PUT' ? ' bg-warning text-dark' :
+                                 p.method == 'DELETE' ? ' bg-danger' : ' bg-secondary'}"
                                       th:text="${p.method}"
                                       >GET</span
                                     >
@@ -144,6 +149,7 @@
                                     /api/endpoint
                                   </div>
                                 </div>
+
                                 <!-- Switch -->
                                 <div class="form-check form-switch ms-2">
                                   <input
@@ -168,7 +174,7 @@
                     </div>
 
                     <!-- Nút submit -->
-                    <div class="mb-4">
+                    <div class="mb-4 mt-4">
                       <button type="submit" class="btn btn-warning">
                         Cập nhật
                       </button>
