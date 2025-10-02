@@ -29,10 +29,6 @@ public class PermissionInterceptor implements HandlerInterceptor{
         String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String requestURI = request.getRequestURI();
         String httpMethod = request.getMethod();
-        System.out.println(">>> RUN preHandle");
-        System.out.println(">>> path= " + path);
-        System.out.println(">>> httpMethod= " + httpMethod);
-        System.out.println(">>> requestURI= " + requestURI);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -57,6 +53,7 @@ public class PermissionInterceptor implements HandlerInterceptor{
                                     && p.getMethod().equalsIgnoreCase(httpMethod));
 
                     if (!isAllow) {
+                        System.out.println(">>> BLOCKED: user=" + email + ", method=" + httpMethod + ", path=" + path + ", requestURI=" + requestURI);
                         throw new PermissionException("Bạn không có quyền truy cập endpoint này.");
                     }
                 } else {

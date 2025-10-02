@@ -54,15 +54,9 @@
                       <input
                         type="email"
                         th:field="*{email}"
-                        th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
                         class="form-control"
                         autocomplete="off"
                       />
-                      <div
-                        class="invalid-feedback"
-                        th:if="${#fields.hasErrors('email')}"
-                        th:errors="*{email}"
-                      ></div>
                     </div>
 
                     <!-- Password -->
@@ -71,15 +65,9 @@
                       <input
                         type="password"
                         th:field="*{password}"
-                        th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
                         class="form-control"
                         autocomplete="off"
                       />
-                      <div
-                        class="invalid-feedback"
-                        th:if="${#fields.hasErrors('password')}"
-                        th:errors="*{password}"
-                      ></div>
                     </div>
 
                     <!-- Phone -->
@@ -99,15 +87,9 @@
                       <input
                         type="text"
                         th:field="*{fullName}"
-                        th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
                         class="form-control"
                         autocomplete="off"
                       />
-                      <div
-                        class="invalid-feedback"
-                        th:if="${#fields.hasErrors('fullName')}"
-                        th:errors="*{fullName}"
-                      ></div>
                     </div>
 
                     <!-- Address -->
@@ -125,6 +107,7 @@
                     <div class="mb-3 col-12 col-md-6">
                       <label class="form-label">Roles:</label>
                       <select
+                        id="roleSelect"
                         class="form-select"
                         name="roleIds"
                         multiple="multiple"
@@ -135,10 +118,10 @@
                           th:text="${r.name}"
                         ></option>
                       </select>
-                      <small class="form-text text-muted"
-                        >Giữ Ctrl (Windows/Linux) hoặc Command (Mac) để chọn
-                        nhiều vai trò.</small
-                      >
+                      <small class="form-text text-muted">
+                        Giữ Ctrl (Windows/Linux) hoặc Command (Mac) để chọn
+                        nhiều vai trò.
+                      </small>
                     </div>
 
                     <!-- Avatar -->
@@ -163,6 +146,33 @@
                       />
                     </div>
 
+                    <!-- Teacher Info -->
+                    <div
+                      class="mb-3 col-12"
+                      id="teacherFields"
+                      style="display: none"
+                    >
+                      <label class="form-label mt-2">Department:</label>
+                      <select name="departmentId" class="form-select">
+                        <option value="">-- Chọn tổ bộ môn --</option>
+                        <option
+                          th:each="d : ${allDepartments}"
+                          th:value="${d.id}"
+                          th:text="${d.name}"
+                        ></option>
+                      </select>
+
+                      <label class="form-label mt-2">Subject:</label>
+                      <select name="subjectId" class="form-select">
+                        <option value="">-- Chọn môn --</option>
+                        <option
+                          th:each="s : ${allSubjects}"
+                          th:value="${s.id}"
+                          th:text="${s.name}"
+                        ></option>
+                      </select>
+                    </div>
+
                     <!-- Submit -->
                     <div class="col-12 mb-5">
                       <button type="submit" class="btn btn-primary">
@@ -178,6 +188,23 @@
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>
+    <script>
+      const roleSelect = document.getElementById("roleSelect");
+      const teacherFields = document.getElementById("teacherFields");
+      const studentFields = document.getElementById("studentFields");
+
+      function toggleFields() {
+        const selectedRoles = Array.from(roleSelect.selectedOptions).map(
+          (opt) => opt.text
+        );
+        teacherFields.style.display = selectedRoles.includes("SUBJECT_TEACHER")
+          ? "block"
+          : "none";
+      }
+
+      roleSelect.addEventListener("change", toggleFields);
+      document.addEventListener("DOMContentLoaded", toggleFields);
+    </script>
     <script>
       document
         .getElementById("avatarFile")
