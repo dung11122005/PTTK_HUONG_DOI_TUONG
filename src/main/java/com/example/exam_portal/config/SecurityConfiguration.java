@@ -72,16 +72,6 @@ public class SecurityConfiguration {
     }
 
 
-    // .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN", "PRINCIPAL", "SUBJECT_DEPARTMENT", "SUBJECT_TEACHER", "STUDENT", "HOMEROOM_TEACHER")
-    // .requestMatchers("/admin/user/**").hasAnyRole("ADMIN","PRINCIPAL")
-    // .requestMatchers("/admin/exam/**").hasAnyRole("VICE_PRINCIPAL","SUBJECT_DEPARTMENT","PRINCIPAL", "SUBJECT_TEACHER")
-    // .requestMatchers("/admin/course/**", "/admin/send-mail/**", "/admin/email/**").hasAnyRole("SUBJECT_TEACHER", "PRINCIPAL")
-    // .requestMatchers("/admin/test/**").hasAnyRole("VICE_PRINCIPAL", "PRINCIPAL")
-    // // .requestMatchers( "/admin/test/**").hasAnyRole("SUBJECT_TEACHER","PRINCIPAL")
-    // .requestMatchers("/admin/class/**").hasAnyRole("VICE_PRINCIPAL", "HOMEROOM_TEACHER", "PRINCIPAL")
-    // .requestMatchers("/admin/school-year/**", "/admin/grade/**", "/admin/subject/**").hasAnyRole("VICE_PRINCIPAL", "PRINCIPAL")
-    // .requestMatchers("/admin/**","/api/v1/activity-logs/**" ).hasRole("PRINCIPAL
-    // .requestMatchers("/shipped/**").hasAnyRole("SHIPPED", "ADMIN")
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

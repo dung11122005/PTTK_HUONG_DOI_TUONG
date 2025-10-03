@@ -30,9 +30,9 @@
             <h1 class="mt-4">Manage User</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">
-                <a th:href="@{/admin}">Dashboard</a>
+                <a th:href="@{/admin/user}">User</a>
               </li>
-              <li class="breadcrumb-item active">Users</li>
+              <li class="breadcrumb-item active">Create User</li>
             </ol>
 
             <div class="mt-5">
@@ -109,7 +109,7 @@
                       <select
                         id="roleSelect"
                         class="form-select"
-                        name="roleIds"
+                        name="selectedRoleIds"
                         multiple="multiple"
                       >
                         <option
@@ -118,6 +118,7 @@
                           th:text="${r.name}"
                         ></option>
                       </select>
+
                       <small class="form-text text-muted">
                         Giữ Ctrl (Windows/Linux) hoặc Command (Mac) để chọn
                         nhiều vai trò.

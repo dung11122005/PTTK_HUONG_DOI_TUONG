@@ -28,6 +28,10 @@ public class RoleService {
         return year;
     }
 
+    public List<Role> getRolesByIds(List<Long> ids) {
+        return roleRepository.findAllById(ids);
+    }
+
 
     public Optional<Role> getRoleById(long id) {
         return this.roleRepository.findById(id);

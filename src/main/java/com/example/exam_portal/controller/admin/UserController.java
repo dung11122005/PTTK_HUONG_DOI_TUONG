@@ -106,7 +106,7 @@ public class UserController {
             @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,
             @RequestParam(value = "anhFile", required = false) MultipartFile file,
-            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,
+            @RequestParam(value = "selectedRoleIds", required = false) List<Long> roleIds,
             @RequestParam(value = "teacherCode", required = false) String teacherCode,
             @RequestParam(value = "departmentId", required = false) Long departmentId,
             @RequestParam(value = "subjectId", required = false) Long subjectId, // CHỈ 1 MÔN
@@ -136,7 +136,7 @@ public class UserController {
         User savedUser = this.userService.handleSaveUser(hoidanit);
 
         // Tạo Teacher nếu có role TEACHER
-        if (savedUser.getRoles().stream().anyMatch(r -> "TEACHER".equalsIgnoreCase(r.getName()))) {
+        if (savedUser.getRoles().stream().anyMatch(r -> "SUBJECT_TEACHER".equalsIgnoreCase(r.getName()))) {
             Teacher teacher = new Teacher();
             teacher.setUser(savedUser);
             teacher.setTeacherCode(teacherCode);
