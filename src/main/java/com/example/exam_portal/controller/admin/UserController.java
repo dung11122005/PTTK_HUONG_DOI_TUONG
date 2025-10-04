@@ -23,10 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.exam_portal.domain.Role;
 import com.example.exam_portal.domain.Student;
-import com.example.exam_portal.domain.Subject;
-import com.example.exam_portal.domain.SubjectDepartment;
 import com.example.exam_portal.domain.Teacher;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.domain.dto.UserDTO;
 import com.example.exam_portal.repository.RoleRepository;
 import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.StudentService;
@@ -93,88 +92,88 @@ public class UserController {
 
     @GetMapping("/admin/user/create")
     public String getCreateUserPage(Model model) {
-        model.addAttribute("newUser", new User());
+        model.addAttribute("newUser", new UserDTO()); // dùng DTO chứ không dùng User entity
         model.addAttribute("allRoles", this.roleRepository.findAll());
-
         model.addAttribute("allSubjects", this.subjectService.getAllSubject());
         model.addAttribute("allDepartments", this.subjectDepartmentService.getAllSubjectDepartment());
         return "admin/user/create";
     }
 
-    @PostMapping("/admin/user/create")
-    public String createUserPage(Model model,
-            @ModelAttribute("newUser") @Valid User hoidanit,
-            BindingResult newUserBindingResult,
-            @RequestParam(value = "anhFile", required = false) MultipartFile file,
-            @RequestParam(value = "selectedRoleIds", required = false) List<Long> roleIds,
-            @RequestParam(value = "teacherCode", required = false) String teacherCode,
-            @RequestParam(value = "departmentId", required = false) Long departmentId,
-            @RequestParam(value = "subjectId", required = false) Long subjectId, // CHỈ 1 MÔN
-            @RequestParam(value = "studentCode", required = false) String studentCode,
-            @AuthenticationPrincipal UserDetails userDetails,
-            HttpServletRequest request) {
 
-        if (newUserBindingResult.hasErrors()) {
+    @PostMapping("/admin/user/create")
+    public String createUserPage(@ModelAttribute("newUser") UserDTO userDTO,
+                                 BindingResult bindingResult,
+                                 @RequestParam(value = "anhFile", required = false) MultipartFile file,
+                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 HttpServletRequest request,
+                                 Model model) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("allRoles", this.userService.getAllRoles());
             model.addAttribute("allSubjects", this.subjectService.getAllSubject());
             model.addAttribute("allDepartments", this.subjectDepartmentService.getAllSubjectDepartment());
             return "admin/user/create";
         }
-
-        // Upload avatar + encode password
+    
+        // Upload avatar
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatars");
-        hoidanit.setAvatar(avatar);
-        hoidanit.setPassword(passwordEncoder.encode(hoidanit.getPassword()));
-
-        // Gán roles nếu có
-        if (roleIds != null && !roleIds.isEmpty()) {
-            Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(roleIds));
-            hoidanit.setRoles(roles);
+    
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPhone(userDTO.getPhone());
+        user.setFullName(userDTO.getFullName());
+        user.setAddress(userDTO.getAddress());
+        user.setAvatar(avatar);
+    
+        // Gán roles
+        if (userDTO.getRoleIds() != null && !userDTO.getRoleIds().isEmpty()) {
+            Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(userDTO.getRoleIds()));
+            user.setRoles(roles);
         }
-
-        // Save user trước
-        User savedUser = this.userService.handleSaveUser(hoidanit);
-
-        // Tạo Teacher nếu có role TEACHER
+    
+        User savedUser = this.userService.handleSaveUser(user);
+    
+        // Nếu có role teacher
         if (savedUser.getRoles().stream().anyMatch(r -> "SUBJECT_TEACHER".equalsIgnoreCase(r.getName()))) {
             Teacher teacher = new Teacher();
             teacher.setUser(savedUser);
-            teacher.setTeacherCode(teacherCode);
-
-            if (departmentId != null) {
-                SubjectDepartment dept = this.subjectDepartmentService.getSubjectDepartmentById(departmentId).orElse(null);
-                teacher.setSubjectDepartment(dept);
+        
+            if (userDTO.getDepartmentId() != null) {
+                teacher.setSubjectDepartment(
+                    this.subjectDepartmentService.getSubjectDepartmentById(userDTO.getDepartmentId()).orElse(null)
+                );
             }
-
-            if (subjectId != null) {
-                Subject subject = this.subjectService.getSubjectById(subjectId).orElse(null);
-                teacher.getSubjects().add(subject); // vẫn dùng Set nhưng chỉ add 1
+        
+            if (userDTO.getSubjectId() != null) {
+                teacher.getSubjects().add(
+                    this.subjectService.getSubjectById(userDTO.getSubjectId()).orElse(null)
+                );
             }
-
+        
             this.teacherService.handleSaveTeacher(teacher);
         }
-
-        // Tạo Student nếu có role STUDENT
+    
+        // Nếu có role student
         if (savedUser.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName()))) {
             Student student = new Student();
             student.setUser(savedUser);
-            student.setStudentCode(studentCode);
             this.studentService.handleSaveStudent(student);
         }
-
+    
         // Activity log
-        String ip = request.getRemoteAddr();
         activityLogService.handleSaveActivityLog(
                 userDetails.getUsername(),
                 "Tạo user",
                 "POST",
                 "/admin/user/create",
-                ip,
+                request.getRemoteAddr(),
                 200
         );
-
+    
         return "redirect:/admin/user";
     }
+
+
 
 
 

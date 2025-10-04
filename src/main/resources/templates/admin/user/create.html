@@ -19,6 +19,18 @@
       src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
       crossorigin="anonymous"
     ></script>
+    <style>
+      #teacherFields {
+        visibility: hidden;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease; /* cho mượt hơn */
+      }
+      #teacherFields.show {
+        visibility: visible;
+        height: auto;
+      }
+    </style>
   </head>
   <div th:replace="admin/layout/header"></div>
   <body class="sb-nav-fixed sb-sidenav-toggled">
@@ -66,7 +78,6 @@
                         type="password"
                         th:field="*{password}"
                         class="form-control"
-                        autocomplete="off"
                       />
                     </div>
 
@@ -77,7 +88,6 @@
                         type="text"
                         th:field="*{phone}"
                         class="form-control"
-                        autocomplete="off"
                       />
                     </div>
 
@@ -88,7 +98,6 @@
                         type="text"
                         th:field="*{fullName}"
                         class="form-control"
-                        autocomplete="off"
                       />
                     </div>
 
@@ -99,7 +108,6 @@
                         type="text"
                         th:field="*{address}"
                         class="form-control"
-                        autocomplete="off"
                       />
                     </div>
 
@@ -108,9 +116,9 @@
                       <label class="form-label">Roles:</label>
                       <select
                         id="roleSelect"
+                        th:field="*{roleIds}"
                         class="form-select"
-                        name="selectedRoleIds"
-                        multiple="multiple"
+                        multiple
                       >
                         <option
                           th:each="r : ${allRoles}"
@@ -148,13 +156,9 @@
                     </div>
 
                     <!-- Teacher Info -->
-                    <div
-                      class="mb-3 col-12"
-                      id="teacherFields"
-                      style="display: none"
-                    >
+                    <div class="mb-3 col-12" id="teacherFields">
                       <label class="form-label mt-2">Department:</label>
-                      <select name="departmentId" class="form-select">
+                      <select th:field="*{departmentId}" class="form-select">
                         <option value="">-- Chọn tổ bộ môn --</option>
                         <option
                           th:each="d : ${allDepartments}"
@@ -164,7 +168,7 @@
                       </select>
 
                       <label class="form-label mt-2">Subject:</label>
-                      <select name="subjectId" class="form-select">
+                      <select th:field="*{subjectId}" class="form-select">
                         <option value="">-- Chọn môn --</option>
                         <option
                           th:each="s : ${allSubjects}"
@@ -192,20 +196,22 @@
     <script>
       const roleSelect = document.getElementById("roleSelect");
       const teacherFields = document.getElementById("teacherFields");
-      const studentFields = document.getElementById("studentFields");
 
       function toggleFields() {
         const selectedRoles = Array.from(roleSelect.selectedOptions).map(
           (opt) => opt.text
         );
-        teacherFields.style.display = selectedRoles.includes("SUBJECT_TEACHER")
-          ? "block"
-          : "none";
+        if (selectedRoles.includes("SUBJECT_TEACHER")) {
+          teacherFields.classList.add("show");
+        } else {
+          teacherFields.classList.remove("show");
+        }
       }
 
       roleSelect.addEventListener("change", toggleFields);
       document.addEventListener("DOMContentLoaded", toggleFields);
     </script>
+
     <script>
       document
         .getElementById("avatarFile")
@@ -238,8 +244,7 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"
       crossorigin="anonymous"
     ></script>
-    <script src="/assets/demo/chart-area-demo1.js"></script>
-    <script src="/assets/demo/chart-bar-demo1.js"></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
       crossorigin="anonymous"

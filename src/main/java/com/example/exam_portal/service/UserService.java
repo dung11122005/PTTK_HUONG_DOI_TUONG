@@ -1,5 +1,6 @@
 package com.example.exam_portal.service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -76,9 +77,10 @@ public class UserService {
         return this.userRepository.existsByEmail(email);
     }
 
-    public List<Role> getRolesByIds(List<Long> ids) {
-        return this.roleRepository.findAllByIdIn(ids);
+    public List<Role> getRolesByIds(Collection<Long> ids) {
+        return roleRepository.findAllById(ids);
     }
+
 
     public List<Role> getRolesByNames(List<String> names) {
         return this.roleRepository.findAllByNameIn(names);
