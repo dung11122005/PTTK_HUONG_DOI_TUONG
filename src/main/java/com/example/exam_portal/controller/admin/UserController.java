@@ -22,10 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.exam_portal.domain.Role;
-import com.example.exam_portal.domain.Student;
 import com.example.exam_portal.domain.Teacher;
 import com.example.exam_portal.domain.User;
-import com.example.exam_portal.domain.dto.UserDTO;
 import com.example.exam_portal.repository.RoleRepository;
 import com.example.exam_portal.service.ActivityLogService;
 import com.example.exam_portal.service.StudentService;
@@ -92,90 +90,70 @@ public class UserController {
 
     @GetMapping("/admin/user/create")
     public String getCreateUserPage(Model model) {
-        model.addAttribute("newUser", new UserDTO()); // dùng DTO chứ không dùng User entity
+        model.addAttribute("newUser", new User());
         model.addAttribute("allRoles", this.roleRepository.findAll());
-        model.addAttribute("allSubjects", this.subjectService.getAllSubject());
-        model.addAttribute("allDepartments", this.subjectDepartmentService.getAllSubjectDepartment());
         return "admin/user/create";
     }
 
 
-    @PostMapping("/admin/user/create")
-    public String createUserPage(@ModelAttribute("newUser") UserDTO userDTO,
-                                 BindingResult bindingResult,
-                                 @RequestParam(value = "anhFile", required = false) MultipartFile file,
-                                 @AuthenticationPrincipal UserDetails userDetails,
-                                 HttpServletRequest request,
-                                 Model model) {
-        if (bindingResult.hasErrors()) {
+    @PostMapping(value = "/admin/user/create")
+    public String createUserPage(Model model,
+            @ModelAttribute("newUser") @Valid User hoidanit,
+            BindingResult newUserBindingResult,
+            @RequestParam("anhFile") MultipartFile file,
+            @RequestParam(value = "roleIds", required = false) List<Long> roleIds,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
+
+        if (newUserBindingResult.hasErrors()) {
+            // load lại allRoles để hiển thị lại form khi có lỗi
             model.addAttribute("allRoles", this.userService.getAllRoles());
-            model.addAttribute("allSubjects", this.subjectService.getAllSubject());
-            model.addAttribute("allDepartments", this.subjectDepartmentService.getAllSubjectDepartment());
             return "admin/user/create";
         }
-    
+
         // Upload avatar
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatars");
-    
-        User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setPhone(userDTO.getPhone());
-        user.setFullName(userDTO.getFullName());
-        user.setAddress(userDTO.getAddress());
-        user.setAvatar(avatar);
-    
-        // Gán roles
-        if (userDTO.getRoleIds() != null && !userDTO.getRoleIds().isEmpty()) {
-            Set<Role> roles = new HashSet<>(this.userService.getRolesByIds(userDTO.getRoleIds()));
-            user.setRoles(roles);
+        String hashPassword = this.passwordEncoder.encode(hoidanit.getPassword());
+
+        hoidanit.setAvatar(avatar);
+        hoidanit.setPassword(hashPassword);
+
+        // Lấy danh sách role từ DB theo roleIds
+        Set<Role> roles = new HashSet<>();
+        if (roleIds != null && !roleIds.isEmpty()) {
+            roles.addAll(this.userService.getRolesByIds(roleIds));
+            hoidanit.setRoles(roles);
         }
-    
-        User savedUser = this.userService.handleSaveUser(user);
-    
-        // Nếu có role teacher
-        if (savedUser.getRoles().stream().anyMatch(r -> "SUBJECT_TEACHER".equalsIgnoreCase(r.getName()))) {
+
+        // Nếu role là SUBJECT_TEACHER thì tạo Teacher entity
+        boolean isTeacher = roles.stream()
+                .anyMatch(r -> "SUBJECT_TEACHER".equals(r.getName()));
+
+        if (isTeacher) {
             Teacher teacher = new Teacher();
-            teacher.setUser(savedUser);
-        
-            if (userDTO.getDepartmentId() != null) {
-                teacher.setSubjectDepartment(
-                    this.subjectDepartmentService.getSubjectDepartmentById(userDTO.getDepartmentId()).orElse(null)
-                );
-            }
-        
-            if (userDTO.getSubjectId() != null) {
-                teacher.getSubjects().add(
-                    this.subjectService.getSubjectById(userDTO.getSubjectId()).orElse(null)
-                );
-            }
-        
-            this.teacherService.handleSaveTeacher(teacher);
+            teacher.setUser(hoidanit);
+            // teacherCode có thể sinh tự động
+            teacher.setTeacherCode("TCH" + System.currentTimeMillis());
+            // Chưa gán department hay subject
+            hoidanit.setTeacher(teacher);
         }
-    
-        // Nếu có role student
-        if (savedUser.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName()))) {
-            Student student = new Student();
-            student.setUser(savedUser);
-            this.studentService.handleSaveStudent(student);
-        }
-    
-        // Activity log
+
+        // ActivityLog
+        String ip = request.getRemoteAddr();
         activityLogService.handleSaveActivityLog(
                 userDetails.getUsername(),
                 "Tạo user",
                 "POST",
                 "/admin/user/create",
-                request.getRemoteAddr(),
+                ip,
                 200
         );
-    
+
+        // Save user (cascade sẽ lưu luôn Teacher)
+        this.userService.handleSaveUser(hoidanit);
+
         return "redirect:/admin/user";
     }
-
-
-
-
 
 
 
@@ -183,6 +161,7 @@ public class UserController {
     public String getUserDetailPage(Model model, @PathVariable long id) {
         User currentUser = this.userService.getUserById(id);
         model.addAttribute("newUser", currentUser);
+        model.addAttribute("allRoles", this.roleRepository.findAll());
         return "admin/user/detail";
     }
 

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Dashboard - SB Admin</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css"
+      rel="stylesheet"
+    />
+    <link href="/css/styles1.css" rel="stylesheet" />
+    <script
+      src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <div th:replace="admin/layout/header"></div>
+  <body class="sb-nav-fixed sb-sidenav-toggled">
+    <div id="layoutSidenav">
+      <div th:replace="admin/layout/sidebar"></div>
+      <div id="layoutSidenav_content">
+        <main>
+          <div class="container-fluid px-4">
+            <h1 class="mt-4">Cập nhật giáo viên</h1>
+            <ol class="breadcrumb mb-4">
+              <li class="breadcrumb-item">
+                <a th:href="@{/admin/teacher}">Teacher</a>
+              </li>
+              <li class="breadcrumb-item active">Cập nhật giáo viên</li>
+            </ol>
+
+            <div class="mt-4">
+              <div class="row">
+                <div class="col-md-8 col-12 mx-auto">
+                  <form
+                    th:action="@{/admin/teacher/update/{id}(id=${teacher.id})}"
+                    th:object="${teacher}"
+                    method="post"
+                    class="row"
+                  >
+                    <!-- Họ tên (disabled) -->
+                    <div class="mb-3">
+                      <label class="form-label">Họ tên:</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        th:value="${teacher.user.fullName}"
+                        disabled
+                      />
+                    </div>
+
+                    <!-- Mã giáo viên (disabled) -->
+                    <div class="mb-3">
+                      <label class="form-label">Mã giáo viên:</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        th:value="${teacher.teacherCode}"
+                        disabled
+                      />
+                    </div>
+
+                    <!-- Tổ môn -->
+                    <div class="mb-3">
+                      <label class="form-label">Tổ môn:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{subjectDepartment}"
+                        required
+                      >
+                        <option
+                          th:each="dept : ${departments}"
+                          th:value="${dept.id}"
+                          th:text="${dept.name}"
+                          th:selected="${dept.id} == ${teacher.subjectDepartment?.id}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Môn dạy -->
+                    <div class="mb-3">
+                      <label class="form-label">Môn dạy:</label>
+                      <select
+                        class="form-select"
+                        th:field="*{subject}"
+                        required
+                      >
+                        <option
+                          th:each="subj : ${subjects}"
+                          th:value="${subj.id}"
+                          th:text="${subj.name}"
+                          th:selected="${subj.id} == ${teacher.subject?.id}"
+                        ></option>
+                      </select>
+                    </div>
+
+                    <!-- Nút submit -->
+                    <div class="mb-4">
+                      <button type="submit" class="btn btn-warning">
+                        Cập nhật
+                      </button>
+                      <a
+                        th:href="@{/admin/teacher}"
+                        class="btn btn-secondary ms-2"
+                        >Hủy</a
+                      >
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div th:replace="admin/layout/footer"></div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/js/scripts1.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/js/datatables-simple-demo1.js"></script>
+  </body>
+</html>

@@ -132,16 +132,24 @@
 
                     <!-- Role -->
                     <div class="mb-3 col-12 col-md-6">
-                      <label class="form-label">Role:</label>
+                      <label class="form-label">Roles:</label>
                       <select
                         class="form-select"
-                        th:field="*{role.name}"
+                        name="roleIds"
+                        multiple="multiple"
                         disabled
                       >
-                        <option value="STUDENT">STUDENT</option>
-                        <option value="TEACHER">TEACHER</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option
+                          th:each="r : ${allRoles}"
+                          th:value="${r.id}"
+                          th:text="${r.name}"
+                          th:selected="${#lists.contains(newUser.roles, r)}"
+                        ></option>
                       </select>
+                      <small class="form-text text-muted">
+                        Giữ Ctrl (Windows/Linux) hoặc Command (Mac) để chọn
+                        nhiều vai trò.
+                      </small>
                     </div>
 
                     <!-- Avatar -->
