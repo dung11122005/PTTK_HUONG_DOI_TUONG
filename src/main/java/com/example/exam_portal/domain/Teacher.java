@@ -1,13 +1,8 @@
 package com.example.exam_portal.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
@@ -34,11 +29,7 @@ public class Teacher {
     private SubjectDepartment subjectDepartment;
 
 
-    @ManyToMany
-    @JoinTable(
-        name = "teacher_subjects",
-        joinColumns = @JoinColumn(name = "teacher_id"),
-        inverseJoinColumns = @JoinColumn(name = "subject_id")
-    )
-    private Set<Subject> subjects = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "subject_id") // <--- đây sẽ tạo cột subject_id trong bảng teachers
+    private Subject subject;
 }

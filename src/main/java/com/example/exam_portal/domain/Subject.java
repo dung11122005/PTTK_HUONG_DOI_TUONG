@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -31,7 +30,7 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     private List<Exam> exams;
 
-    // Quan hệ n-n: nhiều môn có nhiều giáo viên
-    @ManyToMany(mappedBy = "subjects")
+    @OneToMany(mappedBy = "subject")
     private Set<Teacher> teachers = new HashSet<>();
+
 }
