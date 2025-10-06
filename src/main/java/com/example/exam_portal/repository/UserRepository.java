@@ -2,6 +2,8 @@ package com.example.exam_portal.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +24,10 @@ public interface UserRepository extends JpaRepository<User, Long>{
     boolean existsByEmail(String email);
 
     User findByEmail(String email);
+
+    // Lấy tất cả user có role nằm trong danh sách roleNames
+    List<User> findDistinctByRoles_NameIn(List<String> roleNames);
+
+    // Lấy Page<User> hỗ trợ phân trang
+    Page<User> findDistinctByRoles_NameIn(List<String> roleNames, Pageable pageable);
 }

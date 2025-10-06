@@ -1,14 +1,43 @@
-<div>
-  <footer class="py-4 bg-light mt-auto">
-    <div class="container-fluid px-4">
-      <div class="d-flex align-items-center justify-content-between small">
-        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-        <div>
-          <a href="#">Privacy Policy</a>
-          &middot;
-          <a href="#">Terms &amp; Conditions</a>
-        </div>
+<!-- Footer -->
+<footer role="contentinfo" class="py-4 bg-light mt-auto">
+  <div class="container-fluid px-4">
+    <div
+      class="d-flex flex-column flex-md-row align-items-center justify-content-between small"
+    >
+      <div class="text-muted mb-2 mb-md-0">
+        &copy; <span id="app-year"></span>
+        <strong>Quản lý học tập và thi trực tuyến</strong>
+      </div>
+
+      <div>
+        <a href="/privacy" aria-label="Chính sách bảo mật"
+          >Chính sách bảo mật</a
+        >
+        <span class="mx-2 text-muted">&middot;</span>
+        <a href="/terms" aria-label="Điều khoản sử dụng">Điều khoản sử dụng</a>
+        <span class="mx-2 text-muted">&middot;</span>
+        <a href="/help" aria-label="Trợ giúp">Trợ giúp</a>
       </div>
     </div>
-  </footer>
-</div>
+  </div>
+</footer>
+
+<!-- Optional small CSS to improve spacing -->
+<style>
+  footer a {
+    text-decoration: none;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<!-- JS để tự cập nhật năm (không cần sửa tay hàng năm) -->
+<script>
+  (function () {
+    const el = document.getElementById("app-year");
+    if (el) {
+      el.textContent = new Date().getFullYear();
+    }
+  })();
+</script>

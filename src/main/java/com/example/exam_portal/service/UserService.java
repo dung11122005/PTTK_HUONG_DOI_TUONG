@@ -112,4 +112,15 @@ public class UserService {
         return res;
     }
 
+
+    public Page<User> getUsersByRole(String roleName, Pageable pageable) {
+        // Lấy user theo 1 role
+        return userRepository.findDistinctByRoles_NameIn(List.of(roleName), pageable);
+    }
+
+    public Page<User> getUsersByRoles(List<String> roleNames, Pageable pageable) {
+        // Lấy user theo nhiều role
+        return userRepository.findDistinctByRoles_NameIn(roleNames, pageable);
+    }
+
 }

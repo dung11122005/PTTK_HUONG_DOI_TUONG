@@ -27,6 +27,10 @@ public class PermissionService {
         return this.permissionRepository.findAll();
     }
 
+    public Page<Permission> getPermissionByModule(String module, Pageable pageable) {
+        return this.permissionRepository.findByModule(module, pageable);
+    }
+
     public Permission handleSavePermission(Permission Permission) {
         Permission year = this.permissionRepository.save(Permission);
         return year;

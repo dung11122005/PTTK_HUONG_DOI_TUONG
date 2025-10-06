@@ -1,7 +1,11 @@
 package com.example.exam_portal.controller.admin;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,26 +30,38 @@ public class PermissionController {
         this.permissionService=permissionService;
     }
 
-    @GetMapping("/admin/permission")
-    public String getPermissionPage(Model model, @RequestParam("page") Optional<String> pageOptional) {
-        int page = 1;
-        try {
-            if (pageOptional.isPresent()) {
-                page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
-            }
-        } catch (Exception e) {
 
-        }
+    @GetMapping("/admin/permission")
+    public String getModuleListPage(Model model) {
+        // Lấy toàn bộ permissions
+        List<Permission> permissions = this.permissionService.getAllPermission();
+    
+        // Lấy danh sách module duy nhất
+        Set<String> modules = permissions.stream()
+                .map(Permission::getModule)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    
+        model.addAttribute("modules", modules);
+        return "admin/permission/modules";
+    }
+
+
+
+    @GetMapping("/admin/permission/module/{moduleName}")
+    public String getPermissionByModule(@PathVariable("moduleName") String moduleName,
+                                        Model model,
+                                        @RequestParam(value = "page", defaultValue = "1") int page) {
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Permission> pe = this.permissionService.getAllPermissionPagination(pageable);
-        List<Permission> permissison = pe.getContent();
-        model.addAttribute("permissison", permissison);
+        Page<Permission> pe = permissionService.getPermissionByModule(moduleName, pageable);
+                                        
+        model.addAttribute("moduleName", moduleName);
+        model.addAttribute("permissison", pe.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", pe.getTotalPages());
-        return "admin/permission/show";
+        return "admin/permission/detail";
     }
+
 
     @GetMapping("/admin/permission/create")
     public String getCreateAcademicYearPage(Model model) {

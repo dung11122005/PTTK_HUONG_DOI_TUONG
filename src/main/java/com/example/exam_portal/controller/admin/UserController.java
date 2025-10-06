@@ -2,7 +2,6 @@ package com.example.exam_portal.controller.admin;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -68,25 +67,40 @@ public class UserController {
 
 
     @GetMapping("/admin/user")
-    public String getUserPage(Model model, @RequestParam("page") Optional<String> pageOptional) {
-        int page = 1;
-        try {
-            if (pageOptional.isPresent()) {
-                page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
-            }
-        } catch (Exception e) {
+    public String getUserGroupsPage(Model model) {
+        // Tạo 2 nhóm:
+        // 1. STUDENT
+        // 2. Staff (gộp tất cả role còn lại)
+        List<String> groups = List.of("STUDENT", "STAFF");
+        model.addAttribute("groups", groups);
+        return "admin/user/index";
+    }
 
-        }
+    @GetMapping("/admin/user/group/{groupName}")
+    public String getUsersByGroup(@PathVariable("groupName") String groupName,
+                                  Model model,
+                                  @RequestParam(value = "page", defaultValue = "1") int page) {
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<User> us = this.userService.getAllUserPagination(pageable);
-        List<User> users = us.getContent();
-        model.addAttribute("users", users);
+        Page<User> users;
+
+        if ("STUDENT".equals(groupName)) {
+            users = userService.getUsersByRole("STUDENT", pageable);
+        } else { // STAFF
+            List<String> staffRoles = List.of(
+                "ACADEMIC_AFFAIRS_OFFICE", "PRINCIPAL", "VICE_PRINCIPAL",
+                "SUBJECT_DEPARTMENT", "SUBJECT_TEACHER", "HOMEROOM_TEACHER"
+            );
+            users = userService.getUsersByRoles(staffRoles, pageable);
+        }
+
+        model.addAttribute("groupName", groupName);
+        model.addAttribute("users", users.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", us.getTotalPages());
+        model.addAttribute("totalPages", users.getTotalPages());
+
         return "admin/user/show";
     }
+
 
     @GetMapping("/admin/user/create")
     public String getCreateUserPage(Model model) {
