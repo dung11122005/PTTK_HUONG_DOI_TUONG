@@ -53,15 +53,6 @@ public class TeachingAssignmentService {
         return teachingAssignmentRepository.findByTeacher_Id(teacherId);
     }
 
-    // 🔹 Lấy phân công theo môn
-    public List<TeachingAssignment> getBySubjectId(Long subjectId) {
-        return teachingAssignmentRepository.findBySubject_Id(subjectId);
-    }
-
-    // 🔹 Tìm phân công theo lớp + giáo viên + môn (check trùng)
-    // public Optional<TeachingAssignment> findUnique(Long classId, Long teacherId, Long subjectId) {
-    //     return teachingAssignmentRepository.findByClassroom_IdAndTeacher_IdAndSubject_Id(classId, teacherId, subjectId);
-    // }
 
 
 }
