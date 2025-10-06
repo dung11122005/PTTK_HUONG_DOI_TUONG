@@ -29,7 +29,6 @@ import com.example.exam_portal.domain.Grade;
 import com.example.exam_portal.domain.Subject;
 import com.example.exam_portal.domain.TeachingAssignment;
 import com.example.exam_portal.domain.User;
-import com.example.exam_portal.domain.enums.TeachingRole;
 import com.example.exam_portal.service.AcademicYearService;
 import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.GradeService;
@@ -154,8 +153,7 @@ public class ClassController {
             TeachingAssignment assignment = new TeachingAssignment();
             assignment.setTeacher(teacher);
             assignment.setClassroom(classroom);
-            assignment.setSubject(subject.get());
-            assignment.setRole(TeachingRole.SUBJECT_TEACHER);
+            
 
             this.teachingAssignmentService.handleSaveTeachingAssignment(assignment);
             i++;
@@ -217,8 +215,6 @@ public class ClassController {
             TeachingAssignment assignment = new TeachingAssignment();
             assignment.setTeacher(teacher);
             assignment.setClassroom(classroom);
-            assignment.setSubject(subject.get());
-            assignment.setRole(TeachingRole.SUBJECT_TEACHER);
 
             teachingAssignmentService.handleSaveTeachingAssignment(assignment);
             i++;

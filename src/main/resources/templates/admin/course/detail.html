@@ -46,6 +46,7 @@
                     th:text="'Chương ' + ${chapStat.index + 1} + ': ' + ${chapter.title}"
                   ></span>
                   <a
+                    th:if="${permissions.contains('GET /admin/course/chapter/delete/{id}')}"
                     th:href="@{'/admin/course/chapter/delete/' + ${chapter.id}}"
                     class="btn btn-sm btn-danger float-end"
                     onclick="return confirm('Xóa chương này?')"
@@ -64,6 +65,7 @@
                     >
                       <div class="row g-2 align-items-center">
                         <form
+                          th:if="${permissions.contains('POST /admin/course/lesson/update/{id}')}"
                           th:action="@{'/admin/course/lesson/update/' + ${lesson.id}}"
                           method="post"
                           class="row g-2 align-items-center col-md-10"
@@ -134,6 +136,7 @@
                         <!-- Xóa (bên ngoài form) -->
                         <div class="col-md-2 d-flex align-items-center">
                           <a
+                            th:if="${permissions.contains('GET /admin/course/lesson/delete/{id}')}"
                             th:href="@{'/admin/course/lesson/delete/' + ${lesson.id}}"
                             class="btn btn-sm btn-danger"
                             onclick="return confirm('Bạn có chắc muốn xóa bài học này?')"
@@ -154,6 +157,7 @@
 
                 <!-- FORM THÊM VIDEO MỚI (KHÔNG LỒNG TRONG FORM KHÁC) -->
                 <form
+                  th:if="${permissions.contains('POST /admin/course/lesson/create/{chapterId}')}"
                   th:action="@{'/admin/course/lesson/create/' + ${chapter.id}}"
                   method="post"
                   class="mt-3 border-top pt-3"
@@ -213,6 +217,7 @@
                 <div class="card-header">Thêm chương mới</div>
                 <div class="card-body">
                   <form
+                    th:if="${permissions.contains('POST /admin/course/chapter/create/{courseId}')}"
                     th:action="@{'/admin/course/chapter/create/' + ${course.id}}"
                     method="post"
                   >

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.ExamSession;
-import com.example.exam_portal.domain.TeachingAssignment;
 import com.example.exam_portal.repository.TeachingAssignmentRepository;
 import com.example.exam_portal.repository.TestRepository;
 
@@ -55,18 +54,17 @@ public class TestService {
         this.testRepositoty.deleteById(id);
     }
 
-    public Page<ExamSession> getAllExamSessionByTeacherSubject(Long teacherId, Pageable pageable) {
-        // Lấy TeachingAssignment của GV
-        List<TeachingAssignment> tas = this.teachingAssignmentRepository.findByTeacher_Id(teacherId);
+    // public Page<ExamSession> getAllExamSessionByTeacherSubject(Long teacherId, Pageable pageable) {
+    //     // Lấy TeachingAssignment của GV
+    //     List<TeachingAssignment> tas = this.teachingAssignmentRepository.findByTeacher_Id(teacherId);
 
-        if (tas.isEmpty()) {
-            return Page.empty(pageable);
-        }
+    //     if (tas.isEmpty()) {
+    //         return Page.empty(pageable);
+    //     }
 
-        // Lấy cặp (classId, subjectId) từ TA
-        List<Long> classIds = tas.stream().map(ta -> ta.getClassroom().getId()).toList();
-        List<Long> subjectIds = tas.stream().map(ta -> ta.getSubject().getId()).toList();
+    //     // Lấy cặp (classId, subjectId) từ TA
+    //     List<Long> classIds = tas.stream().map(ta -> ta.getClassroom().getId()).toList();
 
-        return this.testRepositoty.findByClassroom_IdInAndExam_Subject_IdIn(classIds, subjectIds, pageable);
-    }
+    //     return this.testRepositoty.findByClassroom_IdInAndExam_Subject_IdIn(classIds, pageable);
+    // }
 }

@@ -1,7 +1,6 @@
 package com.example.exam_portal.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +21,5 @@ public interface TeachingAssignmentRepository extends JpaRepository<TeachingAssi
 
     List<TeachingAssignment> findBySubject_Id(Long subjectId);
 
-    Optional<TeachingAssignment> findByClassroom_IdAndTeacher_IdAndSubject_Id(Long classId, Long teacherId, Long subjectId);
 }
 

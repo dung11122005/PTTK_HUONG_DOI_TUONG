@@ -36,6 +36,7 @@
             </ol>
             <div class="d-flex mb-4 gap-2">
               <a
+                th:if="${permissions.contains('GET /admin/test/{id}/export')}"
                 th:href="@{'/admin/test/' + ${id} + '/export'}"
                 class="btn btn-success"
                 target="_blank"
@@ -87,6 +88,7 @@
                           sec:authorize="hasAnyRole('SUBJECT_DEPARTMENT', 'PRINCIPAL')"
                         >
                           <a
+                            th:if="${permissions.contains('GET /admin/test/result/{id}')}"
                             th:href="@{'/admin/test/result/' + ${res.id} + '?testId=' + ${id}}"
                             class="btn btn-danger btn-sm"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa kết quả này không?');"

@@ -59,9 +59,9 @@ public class TeachingAssignmentService {
     }
 
     // 🔹 Tìm phân công theo lớp + giáo viên + môn (check trùng)
-    public Optional<TeachingAssignment> findUnique(Long classId, Long teacherId, Long subjectId) {
-        return teachingAssignmentRepository.findByClassroom_IdAndTeacher_IdAndSubject_Id(classId, teacherId, subjectId);
-    }
+    // public Optional<TeachingAssignment> findUnique(Long classId, Long teacherId, Long subjectId) {
+    //     return teachingAssignmentRepository.findByClassroom_IdAndTeacher_IdAndSubject_Id(classId, teacherId, subjectId);
+    // }
 
 
 }

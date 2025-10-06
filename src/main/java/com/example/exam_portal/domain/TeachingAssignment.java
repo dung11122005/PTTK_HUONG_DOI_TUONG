@@ -2,11 +2,7 @@ package com.example.exam_portal.domain;
 
 import java.time.LocalDate;
 
-import com.example.exam_portal.domain.enums.TeachingRole;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,13 +32,6 @@ public class TeachingAssignment {
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
     private ClassRoom classroom;
-
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    private Subject subject; // null nếu role == HOMEROOM
-
-    @Enumerated(EnumType.STRING)
-    private TeachingRole role;
 
     private LocalDate startDate;
     private LocalDate endDate;

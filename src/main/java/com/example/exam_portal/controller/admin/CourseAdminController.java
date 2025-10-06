@@ -104,9 +104,6 @@ public class CourseAdminController {
         course.setThumbnail(avatar);
         course.setTeacher(teacher);
 
-        // mặc định free
-        course.setPrice(0F);
-        course.setIsFree(true);
 
         // Save
         this.courseService.handleSaveCourse(course);
@@ -156,10 +153,6 @@ public class CourseAdminController {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khối id=" + gradeId))
         );
             
-
-        // Mặc định free
-        course.setPrice(0F);
-        course.setIsFree(true);
 
         // Nếu có ảnh mới thì lưu, không thì giữ ảnh cũ
         if (!file.isEmpty()) {

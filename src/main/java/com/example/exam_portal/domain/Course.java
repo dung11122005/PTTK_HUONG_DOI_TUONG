@@ -33,10 +33,6 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Float price;
-
-    @Column(name = "is_free")
-    private Boolean isFree = false;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)

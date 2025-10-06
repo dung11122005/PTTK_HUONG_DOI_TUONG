@@ -40,6 +40,7 @@
                   >
                     <h3>Danh sách khóa học</h3>
                     <a
+                      th:if="${permissions.contains('GET /admin/course/create')}"
                       th:href="@{/admin/course/create}"
                       class="btn btn-primary"
                     >
@@ -81,16 +82,19 @@
                         </td>
                         <td>
                           <a
+                            th:if="${permissions.contains('GET /admin/course/{id}')}"
                             th:href="@{'/admin/course/' + ${course.id}}"
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
                           <a
+                            th:if="${permissions.contains('GET /admin/course/update/{id}')}"
                             th:href="@{'/admin/course/update/' + ${course.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a
                           >
                           <a
+                            th:if="${permissions.contains('GET /admin/course/delete/{id}')}"
                             th:href="@{'/admin/course/delete/' + ${course.id}}"
                             class="btn btn-danger btn-sm"
                             >Xóa</a

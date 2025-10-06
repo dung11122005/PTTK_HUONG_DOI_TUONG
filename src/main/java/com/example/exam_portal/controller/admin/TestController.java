@@ -80,7 +80,7 @@ public class TestController {
         boolean isAcademic = teacher.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("VICE_PRINCIPAL"));
                             
-        Page<ExamSession> ex;
+        Page<ExamSession> ex = Page.empty();;
                             
         if (isPrincipal || isAcademic) {
             ex = this.testService.getAllExamSessionPagination(pageable);
@@ -92,7 +92,7 @@ public class TestController {
                 ex = this.testService.getAllExamSessionByClassIds(classIds, pageable);
             } else {
                 // GVBM
-                ex = this.testService.getAllExamSessionByTeacherSubject(teacher.getId(), pageable);
+                // ex = this.testService.getAllExamSessionByTeacherSubject(teacher.getId(), pageable);
             }
         }
     
