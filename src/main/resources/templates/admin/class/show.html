@@ -43,7 +43,6 @@
                       th:if="${permissions.contains('GET /admin/class/create')}"
                       th:href="@{/admin/class/create}"
                       class="btn btn-primary"
-                      sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                     >
                       + Tạo lớp
                     </a>
@@ -93,14 +92,12 @@
                             th:if="${permissions.contains('GET /admin/class/update/{id}')}"
                             th:href="@{'/admin/class/update/' + ${classRoom.id}}"
                             class="btn btn-warning btn-sm mx-1"
-                            sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                             >Sửa</a
                           >
                           <a
                             th:if="${permissions.contains('GET /admin/class/delete/{id}')}"
                             th:href="@{'/admin/class/delete/' + ${classRoom.id}}"
                             class="btn btn-danger btn-sm"
-                            sec:authorize="hasAnyRole('VICE_PRINCIPAL', 'PRINCIPAL')"
                             >Xóa</a
                           >
                         </td>

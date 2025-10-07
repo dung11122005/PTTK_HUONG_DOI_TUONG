@@ -42,7 +42,7 @@ public class AcademicYearController {
         } catch (Exception e) {
 
         }
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<AcademicYear> academicYear = this.academicYearService.getAllAcademicYearPaginationDate(pageable);
         List<AcademicYear> academicYears = academicYear.getContent();
         model.addAttribute("academicYear", academicYears);

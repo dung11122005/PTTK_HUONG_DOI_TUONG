@@ -37,7 +37,7 @@ public class GradeController {
         } catch (Exception e) {
 
         }
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<Grade> gr = this.gradeService.getAllGradePagination(pageable);
         List<Grade> grades = gr.getContent();
         model.addAttribute("grades", grades);

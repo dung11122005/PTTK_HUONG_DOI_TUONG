@@ -37,7 +37,7 @@ public class SubjectController {
             page = 1;
         }
     
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<Subject> sub = this.subjectService.getAllSubjectPagination(pageable);
         List<Subject> subjects = sub.getContent();
     

@@ -80,7 +80,7 @@ public class UserController {
     public String getUsersByGroup(@PathVariable("groupName") String groupName,
                                   Model model,
                                   @RequestParam(value = "page", defaultValue = "1") int page) {
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<User> users;
 
         if ("STUDENT".equals(groupName)) {

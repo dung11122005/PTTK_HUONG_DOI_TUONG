@@ -45,7 +45,7 @@ public class TeacherController {
             page = 1;
         }
     
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<Teacher> tes = this.teacherService.getAllTeacherPagination(pageable);
         List<Teacher> teachers = tes.getContent();
     

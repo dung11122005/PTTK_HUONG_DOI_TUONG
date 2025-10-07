@@ -105,7 +105,7 @@
                       </select>
                     </div>
 
-                    <!-- Giáo viên chủ nhiệm (nhập email) -->
+                    <!-- Giáo viên chủ nhiệm -->
                     <div class="mb-3">
                       <label class="form-label"
                         >Email giáo viên chủ nhiệm:</label
@@ -119,38 +119,35 @@
                         autocomplete="off"
                       />
                     </div>
-                    <!-- Giáo viên bộ môn -->
+
+                    <!-- Giáo viên bộ môn (chỉ email) -->
                     <div class="mb-3">
-                      <label class="form-label">Giáo viên bộ môn:</label>
+                      <label class="form-label"
+                        >Danh sách giáo viên bộ môn:</label
+                      >
                       <div id="teacher-assignments">
-                        <div class="row mb-2">
-                          <div class="col">
+                        <div class="row mb-2 align-items-center">
+                          <div class="col-10">
                             <input
                               type="email"
                               class="form-control"
-                              name="subjectTeachers[0].teacherEmail"
-                              placeholder="Email giáo viên"
+                              name="subjectTeacherEmails"
+                              placeholder="Email giáo viên bộ môn"
                               required
                             />
                           </div>
-                          <div class="col">
-                            <select
-                              class="form-select"
-                              name="subjectTeachers[0].subjectId"
-                              required
+                          <div class="col-2 text-end">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-danger"
+                              disabled
                             >
-                              <option value="" disabled selected>
-                                -- Chọn môn --
-                              </option>
-                              <option
-                                th:each="s : ${subjects}"
-                                th:value="${s.id}"
-                                th:text="${s.name}"
-                              ></option>
-                            </select>
+                              <i class="fa fa-trash"></i>
+                            </button>
                           </div>
                         </div>
                       </div>
+
                       <button
                         type="button"
                         class="btn btn-sm btn-outline-primary"
@@ -183,27 +180,29 @@
     </div>
 
     <script>
-      let teacherIndex = 1;
       function addTeacherRow() {
         const container = document.getElementById("teacher-assignments");
         const row = document.createElement("div");
-        row.classList.add("row", "mb-2");
+        row.classList.add("row", "mb-2", "align-items-center");
+
         row.innerHTML = `
-      <div class="col">
-        <input type="email" class="form-control" name="subjectTeachers[${teacherIndex}].teacherEmail"
-               placeholder="Email giáo viên" required />
+      <div class="col-10">
+        <input type="email" class="form-control"
+               name="subjectTeacherEmails"
+               placeholder="Email giáo viên bộ môn" required />
       </div>
-      <div class="col">
-        <select class="form-select" name="subjectTeachers[${teacherIndex}].subjectId" required>
-          <option value="" disabled selected>-- Chọn môn --</option>
-          ${
-            document.querySelector("[name='subjectTeachers[0].subjectId']")
-              .innerHTML
-          }
-        </select>
-      </div>`;
+      <div class="col-2 text-end">
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeTeacherRow(this)">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    `;
         container.appendChild(row);
-        teacherIndex++;
+      }
+
+      function removeTeacherRow(button) {
+        const row = button.closest(".row");
+        row.remove();
       }
     </script>
 

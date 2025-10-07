@@ -80,14 +80,12 @@ public class ClassController {
         Pageable pageable = PageRequest.of(page - 1, 10);
         Page<ClassRoom> cl;
 
-        boolean isPrincipal = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
-        boolean isAcademicAffairs = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("VICE_PRINCIPAL"));
+        boolean is = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS_OFFICE"));
         boolean isHomeroomTeacher = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
 
-        if (isPrincipal || isAcademicAffairs) {
+        if (is) {
             cl = this.classService.getAllClassRoomPagination(pageable);
         } else if (isHomeroomTeacher) {
             cl = this.classService.getAllClassRoomPaginationteId(user.getId(), pageable);
@@ -128,39 +126,39 @@ public class ClassController {
     public String postCreateClass(
             @ModelAttribute("newClass") ClassRoom classroom,
             @RequestParam("teacherEmail") String homeroomEmail,
-            @RequestParam Map<String, String> requestParams) {
-
-        // Tìm giáo viên chủ nhiệm
+            @RequestParam(value = "subjectTeacherEmails", required = false) List<String> subjectTeacherEmails) {
+            
+        // Tìm và gán giáo viên chủ nhiệm
         User homeroom = userService.getUserByEmail(homeroomEmail);
         if (homeroom == null) {
             throw new RuntimeException("Không tìm thấy giáo viên chủ nhiệm với email: " + homeroomEmail);
         }
         classroom.setHomeroomTeacher(homeroom);
-
+    
         // Lưu lớp trước (để có classroom_id)
         classService.handleSaveClassRoom(classroom);
-
-        // Duyệt qua các subjectTeachers[i]
-        int i = 0;
-        while (true) {
-            String email = requestParams.get("subjectTeachers[" + i + "].teacherEmail");
-            String subjectIdStr = requestParams.get("subjectTeachers[" + i + "].subjectId");
-            if (email == null || subjectIdStr == null) break;
-
-            User teacher = this.userService.getUserByEmail(email);
-            Optional<Subject> subject = this.subjectService.getSubjectById(Long.parseLong(subjectIdStr));
-
-            TeachingAssignment assignment = new TeachingAssignment();
-            assignment.setTeacher(teacher);
-            assignment.setClassroom(classroom);
-            
-
-            this.teachingAssignmentService.handleSaveTeachingAssignment(assignment);
-            i++;
+    
+        // Lưu danh sách giáo viên bộ môn (chỉ email, không có môn)
+        if (subjectTeacherEmails != null && !subjectTeacherEmails.isEmpty()) {
+            for (String email : subjectTeacherEmails) {
+                if (email != null && !email.trim().isEmpty()) {
+                    User teacher = userService.getUserByEmail(email.trim());
+                    if (teacher == null) {
+                        throw new RuntimeException("Không tìm thấy giáo viên với email: " + email);
+                    }
+                
+                    TeachingAssignment assignment = new TeachingAssignment();
+                    assignment.setTeacher(teacher);
+                    assignment.setClassroom(classroom);
+                
+                    this.teachingAssignmentService.handleSaveTeachingAssignment(assignment);
+                }
+            }
         }
-
+    
         return "redirect:/admin/class";
     }
+
 
 
     @GetMapping("/admin/class/update/{id}")
@@ -234,7 +232,7 @@ public class ClassController {
     @PostMapping("/admin/class/delete")
     public String postDeleteUser(@RequestParam("id") Long id) {
         this.classService.deleteAClassRoom(id);
-        return "redirect:/admin/exam";
+        return "redirect:/admin/class";
     }
 
 

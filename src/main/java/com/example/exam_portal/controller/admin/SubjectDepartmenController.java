@@ -45,7 +45,7 @@ public class SubjectDepartmenController {
             page = 1;
         }
     
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        Pageable pageable = PageRequest.of(page - 1, 12);
         Page<SubjectDepartment> sub = this.subjectDepartmentService.getAllSubjectDepartmentPagination(pageable);
         List<SubjectDepartment> department = sub.getContent();
     
