@@ -24,5 +24,11 @@ public interface ClassRepository extends JpaRepository<ClassRoom, Long>{
     Page<ClassRoom> findByHomeroomTeacherId(Long teacherId, Pageable pageable);
 
     List<ClassRoom> findByHomeroomTeacherId(Long teacherId);
+
+     // Lấy tất cả lớp theo niên khóa (có phân trang)
+    Page<ClassRoom> findByAcademicYear_Id(Long academicYearId, Pageable pageable);
+
+    // Lấy lớp theo giáo viên chủ nhiệm + niên khóa
+    Page<ClassRoom> findByHomeroomTeacher_IdAndAcademicYear_Id(Long teacherId, Long academicYearId, Pageable pageable);
     
 }

@@ -108,33 +108,42 @@
                   <!-- Pagination -->
                   <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
-                      <li class="page-item">
+                      <!-- Nút Previous -->
+                      <li
+                        class="page-item"
+                        th:classappend="${currentPage == 1} ? ' disabled'"
+                      >
                         <a
                           class="page-link"
-                          th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/class?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/class/' + ${yearId} + '?page=' + (${currentPage} - 1)}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
                         </a>
                       </li>
+
+                      <!-- Các trang số -->
                       <li
                         class="page-item"
                         th:each="i : ${#numbers.sequence(1, totalPages)}"
+                        th:classappend="${i == currentPage} ? ' active'"
                       >
                         <a
                           class="page-link"
-                          th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/class?page=' + ${i}}"
+                          th:href="@{'/admin/class/' + ${yearId} + '?page=' + ${i}}"
                           th:text="${i}"
-                          >1</a
                         >
+                        </a>
                       </li>
-                      <li class="page-item">
+
+                      <!-- Nút Next -->
+                      <li
+                        class="page-item"
+                        th:classappend="${currentPage == totalPages} ? ' disabled'"
+                      >
                         <a
                           class="page-link"
-                          th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/class?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/class/' + ${yearId} + '?page=' + (${currentPage} + 1)}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>

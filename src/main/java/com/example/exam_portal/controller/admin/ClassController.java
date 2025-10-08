@@ -61,46 +61,45 @@ public class ClassController {
     }
 
     @GetMapping("/admin/class")
-    public String getClassPage(
+    public String getAcademicYearPage(Model model) {
+        List<AcademicYear> years = academicYearService.getAllAcademicYear();
+        model.addAttribute("years", years);
+        return "admin/class/years";
+    }
+
+
+    @GetMapping("/admin/class/{yearId}")
+    public String getClassByAcademicYear(
+            @PathVariable("yearId") long yearId,
             Model model,
-            @RequestParam("page") Optional<String> pageOptional,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = this.userService.getUserByEmail(userDetails.getUsername());
-        int page = 1;
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        Pageable pageable = PageRequest.of(page - 1, 12);
+        Page<ClassRoom> classPage;
 
-        try {
-            if (pageOptional.isPresent()) {
-                page = Integer.parseInt(pageOptional.get());
-            }
-        } catch (Exception e) {
-            page = 1;
-        }
-
-        Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<ClassRoom> cl;
-
-        boolean is = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS_OFFICE"));
+        boolean isAcademicAffairs = user.getRoles().stream()
+                .anyMatch(r -> r.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS_OFFICE"));
         boolean isHomeroomTeacher = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
+                .anyMatch(r -> r.getName().equalsIgnoreCase("HOMEROOM_TEACHER"));
 
-        if (is) {
-            cl = this.classService.getAllClassRoomPagination(pageable);
+        if (isAcademicAffairs) {
+            classPage = classService.getClassByAcademicYear(yearId, pageable);
         } else if (isHomeroomTeacher) {
-            cl = this.classService.getAllClassRoomPaginationteId(user.getId(), pageable);
+            classPage = classService.getClassByTeacherAndAcademicYear(user.getId(), yearId, pageable);
         } else {
-            // Nếu là role khác, có thể trả về rỗng
-            cl = Page.empty(pageable);
+            classPage = Page.empty(pageable);
         }
 
-        List<ClassRoom> classRooms = cl.getContent();
-        model.addAttribute("classRooms", classRooms);
+        model.addAttribute("classRooms", classPage.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", cl.getTotalPages());
+        model.addAttribute("totalPages", classPage.getTotalPages());
+        model.addAttribute("yearId", yearId);
 
-        return "admin/class/show";
+        return "admin/class/show"; // file Thymeleaf hiển thị lớp
     }
+
 
 
 

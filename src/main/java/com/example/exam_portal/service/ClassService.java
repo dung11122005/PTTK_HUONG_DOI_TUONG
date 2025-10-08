@@ -32,6 +32,14 @@ public class ClassService {
         this.classStudentRepository=classStudentRepository;
     }
 
+    public Page<ClassRoom> getClassByAcademicYear(Long yearId, Pageable pageable) {
+        return classRepository.findByAcademicYear_Id(yearId, pageable);
+    }
+
+    public Page<ClassRoom> getClassByTeacherAndAcademicYear(Long teacherId, Long yearId, Pageable pageable) {
+        return classRepository.findByHomeroomTeacher_IdAndAcademicYear_Id(teacherId, yearId, pageable);
+    }
+
     public Page<ClassRoom> getAllClassRoomPaginationByIdTeacher(Long id, Pageable page) {
         return this.classRepository.findByAssignments_Teacher_Id(id, page);
     }
