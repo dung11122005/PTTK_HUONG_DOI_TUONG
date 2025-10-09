@@ -44,13 +44,14 @@
                     </a>
                   </div>
                   <hr />
-                  <table class="table table-bordered table-hover">
-                    <thead>
+                  <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
                       <tr>
                         <th>#</th>
                         <th>Tên đề</th>
                         <th>Mô tả</th>
                         <th>Thời gian (phút)</th>
+                        <th>Trạng thái</th>
                         <th>Hành động</th>
                       </tr>
                     </thead>
@@ -62,12 +63,33 @@
                           Kiểm tra chương 1–3
                         </td>
                         <td th:text="${exam.timeLimit}">45</td>
+
+                        <td>
+                          <span
+                            th:text="${exam.status}"
+                            th:classappend="|badge text-uppercase fw-bold ${
+                      exam.status.name() == 'APPROVED' ? 'bg-success' :
+                      exam.status.name() == 'PENDING' ? 'bg-warning text-dark' :
+                      exam.status.name() == 'REJECTED' ? 'bg-danger' :
+                      'bg-secondary'
+                    }|"
+                          ></span>
+                        </td>
+
                         <td>
                           <a
                             th:href="@{'/admin/exam/' + ${exam.id}}"
                             class="btn btn-success btn-sm"
                             >Xem</a
                           >
+
+                          <a
+                            th:if="${permissions.contains('GET /admin/exam/approve/{examId}')}"
+                            th:href="@{'/admin/exam/approve/' + ${exam.id}}"
+                            class="btn btn-primary btn-sm mx-1"
+                            >Duyệt Đề</a
+                          >
+
                           <a
                             th:href="@{'/admin/exam/update/' + ${exam.id}}"
                             class="btn btn-warning btn-sm mx-1"
@@ -113,7 +135,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/exams?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/exam?page=' + ${currentPage + 1}}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>
@@ -126,6 +148,7 @@
             </div>
           </div>
         </main>
+
         <div th:replace="admin/layout/footer"></div>
       </div>
     </div>

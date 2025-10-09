@@ -1,6 +1,7 @@
 package com.example.exam_portal.controller.admin;
 
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +22,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.exam_portal.domain.Choice;
 import com.example.exam_portal.domain.Exam;
+import com.example.exam_portal.domain.ExamBank;
 import com.example.exam_portal.domain.Grade;
 import com.example.exam_portal.domain.Question;
 import com.example.exam_portal.domain.Subject;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.domain.enums.ExamStatus;
+import com.example.exam_portal.domain.enums.ExamType;
 import com.example.exam_portal.domain.enums.QuestionType;
+import com.example.exam_portal.service.ExamBankService;
 import com.example.exam_portal.service.ExamService;
 import com.example.exam_portal.service.GradeService;
 import com.example.exam_portal.service.QuestionService;
@@ -41,49 +46,86 @@ public class ExamController {
     private final QuestionService questionService;
     private final SubjectService subjectService;
     private final GradeService gradeService;
-
+    private final ExamBankService examBankService;
 
     public ExamController(ExamService examService, UserService userService, 
-    QuestionService questionService, SubjectService subjectService, GradeService gradeService){
+    QuestionService questionService, SubjectService subjectService, GradeService gradeService,
+    ExamBankService examBankService){
         this.examService=examService;
         this.userService=userService;
         this.questionService=questionService;
         this.subjectService=subjectService;
         this.gradeService=gradeService;
+        this.examBankService=examBankService;
     }
 
     @GetMapping("/admin/exam")
-    public String getExamPage(Model model, @RequestParam("page") Optional<String> pageOptional,
-    @AuthenticationPrincipal UserDetails userDetails) {
+    public String getExamTypePage(Model model) {
+        // Lấy tất cả ExamType để hiển thị
+        model.addAttribute("examTypes", ExamType.values());
+        return "admin/exam/type_list";
+    }
+
+    @GetMapping("/admin/exam/type/{type}")
+    public String getExamPageByType(
+            @PathVariable("type") ExamType type,
+            Model model,
+            @RequestParam("page") Optional<String> pageOptional,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         int page = 1;
         try {
             if (pageOptional.isPresent()) {
                 page = Integer.parseInt(pageOptional.get());
-            } else {
-                page = 1;
             }
         } catch (Exception e) {
+            page = 1;
+        }
 
-        }
-        Page<Exam> us;
         Pageable pageable = PageRequest.of(page - 1, 10);
-        boolean isAdmin = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
-        boolean isvice = teacher.getRoles().stream()
-        .anyMatch(role -> role.getName().equalsIgnoreCase("SUBJECT_DEPARTMENT"));
-        if(isAdmin || isvice){
-            us = this.examService.getAllExamPagination(pageable);
-        }else{
-            us = this.examService.getAllExamPaginationTeacherId(teacher.getId(), pageable);
+        Page<Exam> examPage;
+
+        // boolean isAdmin = teacher.getRoles().stream()
+        //         .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
+        boolean isVice = teacher.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("SUBJECT_DEPARTMENT"));
+
+        if (isVice) {
+            examPage = this.examService.getAllExamByTypeAndSubject(type, teacher.getTeacher().getSubject() , pageable);
+        } else {
+            examPage = this.examService.getAllExamByTypeAndTeacherId(type, teacher.getId(), pageable);
         }
-        
-        List<Exam> exams = us.getContent();
-        model.addAttribute("exams", exams);
+
+        model.addAttribute("exams", examPage.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", us.getTotalPages());
+        model.addAttribute("totalPages", examPage.getTotalPages());
+        model.addAttribute("selectedType", type);
         return "admin/exam/show";
     }
+
+
+    @GetMapping("/admin/exam/approve/{examId}")
+    public String approveExam(@PathVariable("examId") Long examId) {
+        Exam exam = examService.getExamById(examId);
+        if (exam != null) {
+
+            // Cập nhật trạng thái đề thi
+            exam.setStatus(ExamStatus.APPROVED);
+            examService.handleSaveExam(exam);
+
+            // Thêm bản ghi vào ExamBank nếu chưa có
+            ExamBank bank = new ExamBank();
+            bank.setExam(exam);
+            bank.setCreatedAt(LocalDateTime.now());
+            bank.setUpdatedAt(LocalDateTime.now());
+            examBankService.handleSaveExam(bank);
+        }
+        exam.getExamType();
+
+        return "redirect:/admin/exam/type/" + exam.getExamType(); // quay lại trang danh sách đề
+    }
+
     
     @GetMapping("/admin/exam/create")
     public String getCreateExamPage(Model model) {

@@ -2,6 +2,7 @@ package com.example.exam_portal.domain;
 
 import java.util.List;
 
+import com.example.exam_portal.domain.enums.ExamStatus;
 import com.example.exam_portal.domain.enums.ExamType;
 
 import jakarta.persistence.CascadeType;
@@ -51,6 +52,10 @@ public class Exam {
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ExamStatus status = ExamStatus.PENDING;
 
     @Column(name = "time_limit", nullable = false)
     private Integer timeLimit; // phút

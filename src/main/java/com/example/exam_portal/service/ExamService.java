@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.Exam;
+import com.example.exam_portal.domain.Subject;
+import com.example.exam_portal.domain.enums.ExamType;
 import com.example.exam_portal.repository.ExamRepository;
 
 @Service
@@ -16,6 +18,19 @@ public class ExamService {
 
     public ExamService(ExamRepository examRepository){
         this.examRepository=examRepository;
+    }
+
+    public Page<Exam> getAllExamByType(ExamType examType, Pageable pageable) {
+        return examRepository.findByExamType(examType, pageable);
+    }
+
+    public Page<Exam> getAllExamByTypeAndSubject(ExamType examType, Subject subject, Pageable pageable) {
+        return examRepository.findByExamTypeAndSubject(examType, subject, pageable);
+    }
+
+
+    public Page<Exam> getAllExamByTypeAndTeacherId(ExamType examType, Long teacherId, Pageable pageable) {
+        return examRepository.findByExamTypeAndCreatedBy_Id(examType, teacherId, pageable);
     }
 
     public Page<Exam> getAllExamPaginationTeacherId(Long id, Pageable page) {
