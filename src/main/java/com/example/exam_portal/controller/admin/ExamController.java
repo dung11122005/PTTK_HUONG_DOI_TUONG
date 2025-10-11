@@ -66,6 +66,45 @@ public class ExamController {
         return "admin/exam/type_list";
     }
 
+    @GetMapping("/admin/examapprove")
+    public String getExamAmapproveTypePage(Model model) {
+        // Lấy tất cả ExamType để hiển thị
+        model.addAttribute("examTypes", ExamType.values());
+        return "admin/examapprove/type_list";
+    }
+
+    @GetMapping("/admin/examapprove/type/{type}")
+    public String getExamAmapprovePageByType(
+            @PathVariable("type") ExamType type,
+            Model model,
+            @RequestParam("page") Optional<String> pageOptional,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        User teacher = this.userService.getUserByEmail(userDetails.getUsername());
+        int page = 1;
+        try {
+            if (pageOptional.isPresent()) {
+                page = Integer.parseInt(pageOptional.get());
+            }
+        } catch (Exception e) {
+            page = 1;
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        Page<Exam> examPage;
+
+        
+        examPage = this.examService.getAllExamByTypeAndSubject(type, teacher.getTeacher().getSubject() , pageable);
+        
+
+        model.addAttribute("exams", examPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", examPage.getTotalPages());
+        model.addAttribute("selectedType", type);
+        return "admin/examapprove/show";
+    }
+
+
     @GetMapping("/admin/exam/type/{type}")
     public String getExamPageByType(
             @PathVariable("type") ExamType type,
@@ -88,14 +127,10 @@ public class ExamController {
 
         // boolean isAdmin = teacher.getRoles().stream()
         //         .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
-        boolean isVice = teacher.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("SUBJECT_DEPARTMENT"));
-
-        if (isVice) {
-            examPage = this.examService.getAllExamByTypeAndSubject(type, teacher.getTeacher().getSubject() , pageable);
-        } else {
-            examPage = this.examService.getAllExamByTypeAndTeacherId(type, teacher.getId(), pageable);
-        }
+        
+        
+        examPage = this.examService.getAllExamByTypeAndTeacherId(type, teacher.getId(), pageable);
+        
 
         model.addAttribute("exams", examPage.getContent());
         model.addAttribute("currentPage", page);
@@ -104,8 +139,7 @@ public class ExamController {
         return "admin/exam/show";
     }
 
-
-    @GetMapping("/admin/exam/approve/{examId}")
+    @GetMapping("/admin/examapprove/approve/{examId}")
     public String approveExam(@PathVariable("examId") Long examId) {
         Exam exam = examService.getExamById(examId);
         if (exam != null) {
@@ -226,6 +260,15 @@ public class ExamController {
         model.addAttribute("exam", exam);
         model.addAttribute("questions", questions);
         return "admin/question/create";
+    }
+
+    @GetMapping("/admin/examapprove/{id}")
+    public String getQuestionsexamapprove(@PathVariable Long id, Model model) {
+        Exam exam = this.examService.getExamById(id);
+        List<Question> questions = this.questionService.getQuestionsByExamId(id);
+        model.addAttribute("exam", exam);
+        model.addAttribute("questions", questions);
+        return "admin/question/view";
     }
 
     @PostMapping("/admin/exam/question/create/{id}")
