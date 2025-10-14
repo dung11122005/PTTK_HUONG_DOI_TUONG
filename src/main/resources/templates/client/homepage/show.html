@@ -78,6 +78,16 @@
         text-overflow: ellipsis;
         min-height: 48px; /* giữ chiều cao ổn định */
       }
+
+      .short-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 3em; /* giữ chiều cao 2 dòng, tránh bị thấp hơn */
+        line-height: 1.5em;
+      }
     </style>
   </head>
 
@@ -133,7 +143,10 @@
                       >Tên Khóa học</a
                     >
                   </h3>
-                  <p th:text="${course.shortDescription}">mô tả ngắn</p>
+                  <p th:text="${course.shortDescription}" class="short-text">
+                    mô tả ngắn
+                  </p>
+
                   <div
                     class="properties__footer d-flex justify-content-between align-items-center"
                   >
@@ -150,17 +163,13 @@
                     </div>
 
                     <div class="price">
-                      <span th:if="${course.isFree}" th:text="'Free'"></span>
-                      <span
-                        th:unless="${course.isFree}"
-                        th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
-                      ></span>
+                      <span th:text="'Free'"></span>
                     </div>
                   </div>
 
                   <a
                     th:href="@{'/course/detail/' + ${course.id}}"
-                    th:classappend="${course.isFree} ? ' green-btn border-btn border-btn2' : ' border-btn border-btn2'"
+                    class="green-btn border-btn border-btn2"
                   >
                     Find out more
                   </a>

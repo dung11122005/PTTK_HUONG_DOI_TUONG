@@ -122,9 +122,7 @@
 
             <div class="mb-3">
               <strong>Giá: </strong>
-              <span
-                th:text="${course.isFree} ? 'Miễn phí' : ${#numbers.formatDecimal(course.price, 0, 'COMMA', 2, 'POINT') + ' VNĐ'}"
-              ></span>
+              <span>Miễn phí</span>
             </div>
 
             <div class="mb-4">
@@ -189,7 +187,6 @@
                                 class="btn btn-primary lesson-btn"
                                 th:attr="data-url=${lesson.videoUrl}"
                                 onclick="showVideoFromButton(this)"
-                                th:if="${course.isFree or check}"
                               >
                                 Xem
                               </button>
@@ -237,16 +234,6 @@
                   <strong>Tổng thời lượng:</strong>
                   <span th:text="${totalDuration + ' Giờ'}">0 Giờ</span>
                 </p>
-                <div th:if="${!course.isFree and !check}">
-                  <form
-                    th:action="@{/course/purchase/{id}(id=${course.id})}"
-                    method="post"
-                  >
-                    <button type="submit" class="btn w-100 mt-3 green-btn">
-                      Mua khóa học
-                    </button>
-                  </form>
-                </div>
               </div>
             </div>
           </div>
