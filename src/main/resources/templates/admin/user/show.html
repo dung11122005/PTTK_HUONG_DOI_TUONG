@@ -101,7 +101,7 @@
                         <a
                           class="page-link"
                           th:classappend="${currentPage == 1} ? ' disabled'"
-                          th:href="@{'/admin/user/group/STAFF?page=' + ${currentPage - 1}}"
+                          th:href="@{'/admin/user/group/' + ${groupName} + '?page=' + (${currentPage - 1})}"
                           aria-label="Previous"
                         >
                           <span aria-hidden="true">&laquo;</span>
@@ -115,17 +115,16 @@
                         <a
                           class="page-link"
                           th:classappend="${i == currentPage} ? ' active'"
-                          th:href="@{'/admin/user/group/STAFF?page=' + ${i}}"
+                          th:href="@{'/admin/user/group/' + ${groupName} + '?page=' + ${i}}"
                           th:text="${i}"
-                          >1</a
-                        >
+                        ></a>
                       </li>
 
                       <li class="page-item">
                         <a
                           class="page-link"
                           th:classappend="${currentPage == totalPages} ? ' disabled'"
-                          th:href="@{'/admin/user/group/STAFF?page=' + ${currentPage + 1}}"
+                          th:href="@{'/admin/user/group/' + ${groupName} + '?page=' + (${currentPage + 1})}"
                           aria-label="Next"
                         >
                           <span aria-hidden="true">&raquo;</span>

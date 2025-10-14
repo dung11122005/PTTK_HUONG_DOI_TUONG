@@ -27,6 +27,7 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
+            <h1 class="mt-4">Cập nhật User</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">
                 <a th:href="@{/admin/user}">User</a>
@@ -37,9 +38,6 @@
             <div class="mt-5">
               <div class="row">
                 <div class="col-md-6 col-12 mx-auto">
-                  <h3>Update a User</h3>
-                  <hr />
-
                   <form
                     th:action="@{/admin/user/update}"
                     th:object="${newUser}"
@@ -136,7 +134,6 @@
                         class="form-select"
                         name="roleIds"
                         multiple="multiple"
-                        disabled
                       >
                         <option
                           th:each="r : ${allRoles}"

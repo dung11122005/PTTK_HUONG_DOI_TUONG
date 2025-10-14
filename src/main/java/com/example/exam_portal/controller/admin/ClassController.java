@@ -184,7 +184,7 @@ public class ClassController {
             @ModelAttribute("newClass") ClassRoom classroom,
             @PathVariable Long id,
             @RequestParam("homeroomTeacherEmail") String homeroomEmail,
-            @RequestParam Map<String, String> requestParams) {
+            @RequestParam(value = "subjectTeacherEmails", required = false) List<String> subjectTeacherEmails) {
 
         // Gán GVCN
         User homeroom = userService.getUserByEmail(homeroomEmail);
@@ -199,22 +199,19 @@ public class ClassController {
         // Xóa phân công cũ
         teachingAssignmentService.deleteByClassRoomId(id);
 
-        // Thêm phân công mới từ form
-        int i = 0;
-        while (true) {
-            String email = requestParams.get("subjectTeachers[" + i + "].teacherEmail");
-            String subjectIdStr = requestParams.get("subjectTeachers[" + i + "].subjectId");
-            if (email == null || subjectIdStr == null) break;
-
-            User teacher = userService.getUserByEmail(email);
-            Optional<Subject> subject = subjectService.getSubjectById(Long.parseLong(subjectIdStr));
-
-            TeachingAssignment assignment = new TeachingAssignment();
-            assignment.setTeacher(teacher);
-            assignment.setClassroom(classroom);
-
-            teachingAssignmentService.handleSaveTeachingAssignment(assignment);
-            i++;
+        // Thêm phân công mới từ form (chỉ email giống create)
+        if (subjectTeacherEmails != null) {
+            for (String email : subjectTeacherEmails) {
+                if (email == null || email.trim().isEmpty()) continue;
+                User teacher = userService.getUserByEmail(email.trim());
+                if (teacher == null) {
+                    throw new RuntimeException("Không tìm thấy giáo viên với email: " + email);
+                }
+                TeachingAssignment assignment = new TeachingAssignment();
+                assignment.setTeacher(teacher);
+                assignment.setClassroom(classroom);
+                this.teachingAssignmentService.handleSaveTeachingAssignment(assignment);
+            }
         }
 
         return "redirect:/admin/class";

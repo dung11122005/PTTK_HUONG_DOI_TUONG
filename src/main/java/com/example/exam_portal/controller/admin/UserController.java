@@ -110,7 +110,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/admin/user/create")
+    @PostMapping("/admin/user/create")
     public String createUserPage(Model model,
             @ModelAttribute("newUser") @Valid User hoidanit,
             BindingResult newUserBindingResult,

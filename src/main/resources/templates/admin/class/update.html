@@ -9,7 +9,7 @@
     />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Dashboard - SB Admin</title>
+    <title>Cập nhật lớp học</title>
     <link
       href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css"
       rel="stylesheet"
@@ -44,7 +44,6 @@
                     method="post"
                     class="row"
                   >
-                    <!-- Mã lớp học -->
                     <div class="mb-3">
                       <label class="form-label">Mã lớp học:</label>
                       <input
@@ -56,7 +55,6 @@
                       />
                     </div>
 
-                    <!-- Tên lớp học -->
                     <div class="mb-3">
                       <label class="form-label">Tên lớp học:</label>
                       <input
@@ -68,7 +66,6 @@
                       />
                     </div>
 
-                    <!-- Niên khóa -->
                     <div class="mb-3">
                       <label class="form-label">Niên khóa:</label>
                       <select
@@ -85,7 +82,6 @@
                       </select>
                     </div>
 
-                    <!-- Khối -->
                     <div class="mb-3">
                       <label class="form-label">Khối:</label>
                       <select class="form-select" th:field="*{grade}" required>
@@ -98,7 +94,6 @@
                       </select>
                     </div>
 
-                    <!-- Email giáo viên chủ nhiệm -->
                     <div class="mb-3">
                       <label class="form-label"
                         >Email giáo viên chủ nhiệm:</label
@@ -106,72 +101,79 @@
                       <input
                         type="email"
                         class="form-control"
-                        th:name="homeroomTeacherEmail"
+                        name="homeroomTeacherEmail"
                         th:value="${newClass.homeroomTeacher != null ? newClass.homeroomTeacher.email : ''}"
                         placeholder="Nhập email giáo viên"
                         required
                       />
                     </div>
 
-                    <!-- Giáo viên bộ môn -->
+                    <!-- Giáo viên bộ môn: đơn giản như create (chỉ email, nhiều input cùng name) -->
                     <div class="mb-3">
-                      <label class="form-label">Giáo viên bộ môn:</label>
+                      <label class="form-label"
+                        >Danh sách giáo viên bộ môn:</label
+                      >
                       <div id="teacher-assignments">
                         <div
-                          class="row mb-2"
-                          th:each="assign, iterStat : ${teachingAssignments}"
+                          class="row mb-2 align-items-center"
+                          th:each="assign : ${teachingAssignments}"
                         >
-                          <div class="col">
+                          <div class="col-10">
                             <input
                               type="email"
                               class="form-control"
-                              th:name="subjectTeachers[__${iterStat.index}__].teacherEmail"
-                              th:value="${assign.teacher.email}"
-                              placeholder="Email giáo viên"
+                              name="subjectTeacherEmails"
+                              th:value="${assign.teacher != null ? assign.teacher.email : ''}"
+                              placeholder="Email giáo viên bộ môn"
                               required
                             />
                           </div>
-                          <div class="col">
-                            <select
-                              class="form-select"
-                              th:name="subjectTeachers[__${iterStat.index}__].subjectId"
-                              required
+                          <div class="col-2 text-end">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-danger"
+                              onclick="removeTeacherRow(this)"
                             >
-                              <option value="" disabled>-- Chọn môn --</option>
-                              <option
-                                th:each="s : ${subjects}"
-                                th:value="${s.id}"
-                                th:text="${s.name}"
-                                th:selected="${assign.subject != null and s.id == assign.subject.id}"
-                              ></option>
-                            </select>
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- nếu không có phân công thì hiển thị một hàng trống -->
+                        <div
+                          class="row mb-2 align-items-center"
+                          th:if="${teachingAssignments == null or #lists.isEmpty(teachingAssignments)}"
+                        >
+                          <div class="col-10">
+                            <input
+                              type="email"
+                              class="form-control"
+                              name="subjectTeacherEmails"
+                              placeholder="Email giáo viên bộ môn"
+                              required
+                            />
+                          </div>
+                          <div class="col-2 text-end">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-danger"
+                              disabled
+                            >
+                              <i class="fa fa-trash"></i>
+                            </button>
                           </div>
                         </div>
                       </div>
 
-                      <!-- template option -->
-                      <template id="subject-options">
-                        <option value="" disabled selected>
-                          -- Chọn môn --
-                        </option>
-                        <option
-                          th:each="s : ${subjects}"
-                          th:value="${s.id}"
-                          th:text="${s.name}"
-                        ></option>
-                      </template>
-
-                      <!-- nút thêm hàng mới -->
                       <button
                         type="button"
-                        class="btn btn-sm btn-outline-primary mt-2"
+                        class="btn btn-sm btn-outline-primary"
                         onclick="addTeacherRow()"
                       >
                         + Thêm giáo viên
                       </button>
                     </div>
 
-                    <!-- Nút submit -->
                     <div class="mb-4">
                       <button type="submit" class="btn btn-warning">
                         Cập nhật
@@ -193,31 +195,30 @@
       </div>
     </div>
 
-    <script th:inline="javascript">
-      let teacherIndex = /*[[${#lists.size(teachingAssignments)}]]*/ 0;
+    <script>
       function addTeacherRow() {
         const container = document.getElementById("teacher-assignments");
         const row = document.createElement("div");
-        row.classList.add("row", "mb-2");
-
-        // lấy option từ template
-        const options = document.getElementById("subject-options").innerHTML;
+        row.classList.add("row", "mb-2", "align-items-center");
 
         row.innerHTML = `
-      <div class="col">
+      <div class="col-10">
         <input type="email" class="form-control"
-               name="subjectTeachers[${teacherIndex}].teacherEmail"
-               placeholder="Email giáo viên" required />
+               name="subjectTeacherEmails"
+               placeholder="Email giáo viên bộ môn" required />
       </div>
-      <div class="col">
-        <select class="form-select"
-                name="subjectTeachers[${teacherIndex}].subjectId"
-                required>
-          ${options}
-        </select>
-      </div>`;
+      <div class="col-2 text-end">
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeTeacherRow(this)">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    `;
         container.appendChild(row);
-        teacherIndex++;
+      }
+
+      function removeTeacherRow(button) {
+        const row = button.closest(".row");
+        row.remove();
       }
     </script>
 
@@ -226,15 +227,5 @@
       crossorigin="anonymous"
     ></script>
     <script src="/js/scripts1.js"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"
-      crossorigin="anonymous"
-    ></script>
-
-    <script
-      src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="/js/datatables-simple-demo1.js"></script>
   </body>
 </html>
