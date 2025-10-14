@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thống kê Hiệu trưởng - Quản trị</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="/css/styles1.css" rel="stylesheet" />
+    <script
+      src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 1050;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        pointer-events: all;
+      }
+      .loading-spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #007bff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="sb-nav-fixed">
+    <div th:replace="admin/layout/header"></div>
+
+    <div id="layoutSidenav">
+      <div th:replace="admin/layout/sidebar"></div>
+
+      <div id="layoutSidenav_content">
+        <main class="container-fluid px-4 py-4">
+          <h1 class="mb-4">Dashboard Hiệu trưởng</h1>
+
+          <div class="row gy-4">
+            <div class="col-12 col-lg-6">
+              <div class="card">
+                <div class="card-header">Điểm trung bình theo khối</div>
+                <div class="card-body">
+                  <canvas
+                    id="avgByGradeChart"
+                    width="600"
+                    height="250"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="card">
+                <div class="card-header">Tỷ lệ đạt theo môn</div>
+                <div class="card-body">
+                  <canvas
+                    id="passBySubjectChart"
+                    width="600"
+                    height="250"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">Top 10 học sinh (theo điểm TB)</div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Họ tên</th>
+                          <th>Điểm TB</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          th:each="s,iterStat : ${topStudents}"
+                          th:if="${topStudents != null}"
+                        >
+                          <td th:text="${iterStat.index + 1}">1</td>
+                          <td th:text="${s['label']}">Tên</td>
+                          <td th:text="${s['value']}">9.0</td>
+                        </tr>
+                        <tr
+                          th:if="${topStudents == null or #lists.isEmpty(topStudents)}"
+                        >
+                          <td colspan="3" class="text-center">
+                            Không có dữ liệu
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  Số kỳ/đề theo tháng (12 tháng gần nhất)
+                </div>
+                <div class="card-body">
+                  <canvas
+                    id="examsMonthlyChart"
+                    width="800"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div th:replace="admin/layout/footer"></div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/js/scripts1.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/js/datatables-simple-demo1.js"></script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const avgByGrade = /*[[${avgByGradeData}]]*/ "[]";
+      const passBySubject = /*[[${passBySubjectData}]]*/ "[]";
+      const examsMonthly = /*[[${examsMonthlyData}]]*/ "[]";
+      const examsByTeacher = /*[[${examsByTeacherData}]]*/ "[]";
+
+      function labelsValues(arr) {
+        const labels = [],
+          values = [];
+        try {
+          JSON.parse(arr || "[]").forEach((it) => {
+            labels.push(it.label || "");
+            values.push(Number(it.value) || 0);
+          });
+        } catch (e) {
+          // fallback empty
+        }
+        return { labels, values };
+      }
+
+      // avgByGrade chart
+      (function () {
+        const d = labelsValues(avgByGrade);
+        const ctx = document.getElementById("avgByGradeChart");
+        if (!ctx) return;
+        new Chart(ctx.getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                label: "Điểm TB",
+                data: d.values,
+                backgroundColor: "rgba(54,162,235,0.6)",
+              },
+            ],
+          },
+          options: { responsive: true, scales: { y: { beginAtZero: true } } },
+        });
+      })();
+
+      // passBySubject chart
+      (function () {
+        const d = labelsValues(passBySubject);
+        const ctx = document.getElementById("passBySubjectChart");
+        if (!ctx) return;
+        new Chart(ctx.getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                label: "Tỷ lệ đạt (%)",
+                data: d.values,
+                backgroundColor: "rgba(75,192,192,0.6)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: 100 } },
+          },
+        });
+      })();
+
+      // exams monthly
+      (function () {
+        const d = labelsValues(examsMonthly);
+        const ctx = document.getElementById("examsMonthlyChart");
+        if (!ctx) return;
+        new Chart(ctx.getContext("2d"), {
+          type: "line",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                label: "Số kỳ/đề",
+                data: d.values,
+                fill: false,
+                borderColor: "#f39c12",
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+      })();
+      /*]]>*/
+    </script>
+  </body>
+</html>

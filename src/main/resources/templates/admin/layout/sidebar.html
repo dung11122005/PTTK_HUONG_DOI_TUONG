@@ -3,10 +3,23 @@
     <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
       <div class="sb-sidenav-menu">
         <div class="nav">
+          <!-- Mục: Số liệu thống kê -->
+          <div th:if="${permissions.contains('GET /admin/stats/principal')}">
+            <a class="nav-link" href="/admin/stats/principal">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-chart-line"></i>
+                <!-- Icon biểu đồ thống kê -->
+              </div>
+              Số liệu thống kê
+            </a>
+          </div>
+
+          <!-- Mục: Bảng điều khiển -->
           <div th:if="${permissions.contains('GET /admin')}">
             <a class="nav-link" href="/admin">
               <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-sliders-h"></i>
+                <!-- Icon bảng điều khiển -->
               </div>
               Bảng điều khiển
             </a>
