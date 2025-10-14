@@ -81,11 +81,12 @@
                           >
 
                           <a
-                            th:if="${permissions.contains('GET /admin/examapprove/approve/{examId}')}"
+                            th:if="${permissions.contains('GET /admin/examapprove/approve/{examId}') and exam.status.name() != 'APPROVED'}"
                             th:href="@{'/admin/examapprove/approve/' + ${exam.id}}"
                             class="btn btn-primary btn-sm mx-1"
-                            >Duyệt Đề</a
                           >
+                            Duyệt Đề
+                          </a>
                         </td>
                       </tr>
                     </tbody>

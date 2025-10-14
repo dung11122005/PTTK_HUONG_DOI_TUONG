@@ -33,4 +33,11 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     private Set<Teacher> teachers = new HashSet<>();
 
+    public Subject(){};
+
+    public Subject(String code, String name){
+        this.code=code;
+        this.name=name;
+    }
+
 }

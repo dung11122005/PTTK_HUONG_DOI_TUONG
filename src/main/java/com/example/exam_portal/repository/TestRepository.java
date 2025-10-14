@@ -31,5 +31,6 @@ public interface TestRepository extends JpaRepository<ExamSession, Long> {
     // Lấy tất cả ExamSession theo danh sách classIds, có phân trang
     Page<ExamSession> findByClassroom_IdIn(List<Long> classIds, Pageable pageable);
 
+    Page<ExamSession> findByClassroom_AcademicYear_Id(Long yearId, Pageable pageable);
 
 }

@@ -157,7 +157,7 @@ public class ExamController {
         }
         exam.getExamType();
 
-        return "redirect:/admin/exam/type/" + exam.getExamType(); // quay lại trang danh sách đề
+        return "redirect:/admin/examapprove/type/" + exam.getExamType(); // quay lại trang danh sách đề
     }
 
     

@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.exam_portal.domain.AcademicYear;
 import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.Exam;
+import com.example.exam_portal.domain.ExamBank;
 import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.ExamSession;
 import com.example.exam_portal.domain.User;
@@ -28,6 +30,7 @@ import com.example.exam_portal.domain.dto.ClassRoomDTO;
 import com.example.exam_portal.domain.dto.ExamDTO;
 import com.example.exam_portal.service.AcademicYearService;
 import com.example.exam_portal.service.ClassService;
+import com.example.exam_portal.service.ExamBankService;
 import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.service.ExamService;
 import com.example.exam_portal.service.GradeService;
@@ -50,12 +53,13 @@ public class TestController {
     private final SubjectService subjectService;
     private final AcademicYearService academicYearService;
     private final GradeService gradeService;
+    private final ExamBankService examBankService;
 
 
     public TestController(TestService testService, UserService userService, 
         ExamService examService, ClassService classService,
         ExamResultService examResultService, SubjectService subjectService, AcademicYearService academicYearService, 
-        GradeService gradeService){
+        GradeService gradeService, ExamBankService examBankService){
         this.testService=testService;
         this.userService=userService;
         this.examService=examService;
@@ -64,35 +68,47 @@ public class TestController {
         this.subjectService=subjectService;
         this.academicYearService=academicYearService;
         this.gradeService=gradeService;
+        this.examBankService=examBankService;
     }
 
 
     @GetMapping("/admin/test")
+    public String getTestAcademicYearPage(Model model) {
+        List<AcademicYear> years = academicYearService.getAllAcademicYear();
+        model.addAttribute("years", years);
+        return "admin/test/years";
+    }
+
+    @GetMapping("/admin/test/year/{yearId}")
     public String getTestPage(Model model,
                               @RequestParam("page") Optional<String> pageOptional,
-                              @AuthenticationPrincipal UserDetails userDetails) {
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              @PathVariable Long yearId) {
         User teacher = this.userService.getUserByEmail(userDetails.getUsername());
         int page = pageOptional.map(Integer::parseInt).orElse(1);
         Pageable pageable = PageRequest.of(page - 1, 10);
                             
-        boolean isPrincipal = teacher.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("PRINCIPAL"));
+        boolean isaao = teacher.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ACADEMIC_AFFAIRS_OFFICE"));
         boolean isAcademic = teacher.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("VICE_PRINCIPAL"));
                             
-        Page<ExamSession> ex = Page.empty();;
+        Page<ExamSession> ex = Page.empty();
                             
-        if (isPrincipal || isAcademic) {
-            ex = this.testService.getAllExamSessionPagination(pageable);
+        if (isaao) {
+            ex = this.testService.getAllExamSessionByYear(yearId, pageable);
         } else {
             // GVCN
             List<ClassRoom> homeroomClasses = this.classService.getClassesByHomeroomTeacherId(teacher.getId());
             if (!homeroomClasses.isEmpty()) {
-                List<Long> classIds = homeroomClasses.stream().map(ClassRoom::getId).toList();
+                List<Long> classIds = homeroomClasses.stream()
+                    .filter(c -> c.getAcademicYear() != null && c.getAcademicYear().getId().equals(yearId))
+                    .map(ClassRoom::getId)
+                    .toList();
                 ex = this.testService.getAllExamSessionByClassIds(classIds, pageable);
             } else {
                 // GVBM
-                // ex = this.testService.getAllExamSessionByTeacherSubject(teacher.getId(), pageable);
+                ex = this.testService.getAllExamSessionByTeacherSubjectAndYear(teacher.getId(), yearId, pageable);
             }
         }
     
@@ -154,22 +170,25 @@ public class TestController {
 
     @GetMapping("/admin/test/create")
     public String getCreateTestPage(Model model) throws JsonProcessingException {
-        // Lấy exam từ DB
-        List<Exam> exams = examService.getAllExam();
+        // Lấy examBank từ DB (chứa các đề đã duyệt)
+        List<ExamBank> examBanks = this.examBankService.getAllExam();
 
-        // Map sang DTO nhẹ
-        List<ExamDTO> examDTOs = exams.stream()
-            .map(e -> new ExamDTO(
-                e.getId(),
-                e.getName(),
-                e.getGrade().getId(),
-                e.getSubject().getId(),
-                e.getSubject().getName(),
-                e.getExamType().name()
-            ))
+        // Map từ ExamBank → ExamDTO
+        List<ExamDTO> examDTOs = examBanks.stream()
+            .map(e -> {
+                Exam exam = e.getExam(); // Lấy ra exam thực sự
+                return new ExamDTO(
+                    exam.getId(),
+                    exam.getName(),
+                    exam.getGrade().getId(),
+                    exam.getSubject().getId(),
+                    exam.getSubject().getName(),
+                    exam.getExamType().name()
+                );
+            })
             .toList();
 
-        // Lấy lớp (ClassRoom) để filter theo academicYear + grade
+        // Lấy danh sách lớp học để filter
         List<ClassRoom> classRooms = classService.getAllClassRoom();
         List<ClassRoomDTO> classDTOs = classRooms.stream()
             .map(c -> new ClassRoomDTO(
@@ -181,12 +200,10 @@ public class TestController {
             ))
             .toList();
 
+        // Chuyển sang JSON cho FE
         ObjectMapper mapper = new ObjectMapper();
-        String examsJson = mapper.writeValueAsString(examDTOs);
-        String classesJson = mapper.writeValueAsString(classDTOs);
-
-        model.addAttribute("examsJson", examsJson);                      // JSON string
-        model.addAttribute("classesJson", classesJson);                  // JSON string
+        model.addAttribute("examsJson", mapper.writeValueAsString(examDTOs));
+        model.addAttribute("classesJson", mapper.writeValueAsString(classDTOs));
         model.addAttribute("academicYears", this.academicYearService.getAllAcademicYear());
         model.addAttribute("grades", this.gradeService.getAllGrade());
         model.addAttribute("subjects", subjectService.getAllSubject());
@@ -194,6 +211,7 @@ public class TestController {
 
         return "admin/test/create";
     }
+
 
 
 

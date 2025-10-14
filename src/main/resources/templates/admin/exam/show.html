@@ -84,13 +84,6 @@
                           >
 
                           <a
-                            th:if="${permissions.contains('GET /admin/exam/approve/{examId}')}"
-                            th:href="@{'/admin/exam/approve/' + ${exam.id}}"
-                            class="btn btn-primary btn-sm mx-1"
-                            >Duyệt Đề</a
-                          >
-
-                          <a
                             th:href="@{'/admin/exam/update/' + ${exam.id}}"
                             class="btn btn-warning btn-sm mx-1"
                             >Sửa</a

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.exam_portal.domain.ExamSession;
+import com.example.exam_portal.domain.TeachingAssignment;
 import com.example.exam_portal.repository.TeachingAssignmentRepository;
 import com.example.exam_portal.repository.TestRepository;
 
@@ -54,17 +55,43 @@ public class TestService {
         this.testRepositoty.deleteById(id);
     }
 
-    // public Page<ExamSession> getAllExamSessionByTeacherSubject(Long teacherId, Pageable pageable) {
-    //     // Lấy TeachingAssignment của GV
-    //     List<TeachingAssignment> tas = this.teachingAssignmentRepository.findByTeacher_Id(teacherId);
+    // Lấy tất cả ExamSession theo năm học
+    public Page<ExamSession> getAllExamSessionByYear(Long yearId, Pageable pageable) {
+        return this.testRepositoty.findByClassroom_AcademicYear_Id(yearId, pageable);
+    }
+    
+    // Lấy ExamSession theo giáo viên bộ môn và năm học
+    public Page<ExamSession> getAllExamSessionByTeacherSubjectAndYear(Long teacherId, Long yearId, Pageable pageable) {
+        List<TeachingAssignment> tas = this.teachingAssignmentRepository.findByTeacher_Id(teacherId);
+        if (tas == null || tas.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        List<Long> classIds = tas.stream()
+            .filter(ta -> ta.getClassroom().getAcademicYear() != null && ta.getClassroom().getAcademicYear().getId().equals(yearId))
+            .map(ta -> ta.getClassroom().getId())
+            .distinct()
+            .toList();
+        if (classIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return this.testRepositoty.findByClassroom_IdIn(classIds, pageable);
+    }
 
-    //     if (tas.isEmpty()) {
-    //         return Page.empty(pageable);
-    //     }
+    public Page<ExamSession> getAllExamSessionByTeacherSubject(Long teacherId, Pageable pageable) {
+        List<TeachingAssignment> tas = this.teachingAssignmentRepository.findByTeacher_Id(teacherId);
+        if (tas == null || tas.isEmpty()) {
+            return Page.empty(pageable);
+        }
 
-    //     // Lấy cặp (classId, subjectId) từ TA
-    //     List<Long> classIds = tas.stream().map(ta -> ta.getClassroom().getId()).toList();
+        List<Long> classIds = tas.stream()
+                                 .map(ta -> ta.getClassroom().getId())
+                                 .distinct()
+                                 .toList();
 
-    //     return this.testRepositoty.findByClassroom_IdInAndExam_Subject_IdIn(classIds, pageable);
-    // }
+        if (classIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        return this.testRepositoty.findByClassroom_IdIn(classIds, pageable);
+    }
 }

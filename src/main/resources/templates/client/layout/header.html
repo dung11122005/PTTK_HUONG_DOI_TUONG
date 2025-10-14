@@ -85,21 +85,6 @@
                           </a>
                         </li>
 
-                        <li>
-                          <a
-                            class="dropdown-item"
-                            href="/purchased-course"
-                            style="
-                              width: 100%;
-                              padding: 10px 20px;
-                              color: #212529;
-                              text-decoration: none;
-                              background-color: #fff;
-                            "
-                          >
-                            Khóa học đã mua
-                          </a>
-                        </li>
                         <div
                           sec:authorize="hasAnyRole('SUBJECT_TEACHER', 'HOMEROOM_TEACHER')"
                         >
@@ -136,7 +121,9 @@
                             </a>
                           </li>
                         </div>
-                        <div sec:authorize="hasAnyRole('PRINCIPAL')">
+                        <div
+                          sec:authorize="hasAnyRole('PRINCIPAL', 'VICE_PRINCIPAL')"
+                        >
                           <li>
                             <a
                               class="dropdown-item"
@@ -149,11 +136,13 @@
                                 background-color: #fff;
                               "
                             >
-                              Trang hiệu trưởng
+                              Trang ban giám hiệu
                             </a>
                           </li>
                         </div>
-                        <div sec:authorize="hasAnyRole('SUBJECT_DEPARTMENT')">
+                        <div
+                          sec:authorize="hasAnyRole('ACADEMIC_AFFAIRS_OFFICE')"
+                        >
                           <li>
                             <a
                               class="dropdown-item"
@@ -166,7 +155,7 @@
                                 background-color: #fff;
                               "
                             >
-                              Trang phòng đào tạo
+                              Trang phòng giáo vụ
                             </a>
                           </li>
                         </div>

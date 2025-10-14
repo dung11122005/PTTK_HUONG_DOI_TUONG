@@ -22,4 +22,11 @@ public class Grade {
     private String name; // "10", "11", "12"
 
     private Integer orderIndex;
+
+    public Grade(){};
+
+    public Grade(String name, Integer orderIndex){
+        this.name=name;
+        this.orderIndex=orderIndex;
+    }
 }

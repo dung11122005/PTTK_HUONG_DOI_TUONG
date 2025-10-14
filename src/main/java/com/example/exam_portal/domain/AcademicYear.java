@@ -32,4 +32,13 @@ public class AcademicYear {
     private LocalDate endDate;
 
     private boolean active = true;
+
+    public AcademicYear(){};
+
+    public AcademicYear(String name, LocalDate starDate, LocalDate endDate, boolean active ){
+        this.name=name;
+        this.startDate=starDate;
+        this.endDate=endDate;
+        this.active=active;
+    }
 }

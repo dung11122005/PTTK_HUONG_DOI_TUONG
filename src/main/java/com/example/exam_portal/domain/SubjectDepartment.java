@@ -35,4 +35,12 @@ public class SubjectDepartment {
     // Quan hệ 1-n: Một tổ có nhiều giáo viên
     @OneToMany(mappedBy = "subjectDepartment", cascade = CascadeType.ALL)
     private List<Teacher> teachers;
+
+
+    public SubjectDepartment(){};
+
+    public SubjectDepartment(String name, Subject subject){
+        this.name=name;
+        this.subject=subject;
+    }
 }
