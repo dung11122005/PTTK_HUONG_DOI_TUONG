@@ -3,6 +3,8 @@ package com.example.exam_portal.service;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StatisticsService {
+    private final Logger logger = LoggerFactory.getLogger(StatisticsService.class);
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
@@ -194,7 +197,95 @@ public class StatisticsService {
         return jdbcTemplate.queryForList(sql);
     }
 
-        // Phương thức kiểm tra loại database đang sử dụng
+    // Lấy điểm trung bình toàn trường
+    public Double getSchoolAvgScore(Long yearId) {
+        // Sửa lại tên bảng để phù hợp với schema
+        String sql = "SELECT AVG(er.score) FROM exam_results er " +
+                 "JOIN exam_sessions es ON er.exam_session_id = es.id " +
+                 "JOIN exams e ON es.exam_id = e.id " +
+                 (yearId != null ? "WHERE e.academic_year_id = :yearId" : "");
+                 
+        try {
+            if (yearId != null) {
+                MapSqlParameterSource params = new MapSqlParameterSource();
+                params.addValue("yearId", yearId);
+                return namedJdbcTemplate.queryForObject(sql, params, Double.class);
+            } else {
+                return jdbcTemplate.queryForObject(sql, Double.class);
+            }
+        } catch (Exception e) {
+            logger.error("Error calculating school average score", e);
+            return null;
+        }
+    }
+
+    // Lấy tỷ lệ đạt toàn trường
+    public Double getSchoolPassRate(Long yearId, double passThreshold) {
+        // Sửa lại tên bảng
+        String sql = "SELECT (COUNT(CASE WHEN er.score >= :threshold THEN 1 END) * 100.0 / COUNT(*)) " +
+                 "FROM exam_results er " +
+                 "JOIN exam_sessions es ON er.exam_session_id = es.id " +
+                 "JOIN exams e ON es.exam_id = e.id " +
+                 (yearId != null ? "WHERE e.academic_year_id = :yearId" : "");
+                 
+        try {
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("threshold", passThreshold);
+            if (yearId != null) {
+                params.addValue("yearId", yearId);
+            }
+            return namedJdbcTemplate.queryForObject(sql, params, Double.class);
+        } catch (Exception e) {
+            logger.error("Error calculating school pass rate", e);
+            return null;
+        }
+    }
+
+    // Lấy số kỳ thi
+    public Long getExamCount(Long yearId) {
+        // Sửa lại tên bảng
+        String sql = "SELECT COUNT(DISTINCT es.id) FROM exam_sessions es " +
+                 "JOIN exams e ON es.exam_id = e.id " +
+                 (yearId != null ? "WHERE e.academic_year_id = :yearId" : "");
+                 
+        try {
+            if (yearId != null) {
+                MapSqlParameterSource params = new MapSqlParameterSource();
+                params.addValue("yearId", yearId);
+                return namedJdbcTemplate.queryForObject(sql, params, Long.class);
+            } else {
+                return jdbcTemplate.queryForObject(sql, Long.class);
+            }
+        } catch (Exception e) {
+            // Sửa lỗi System.Logger thành logger
+            logger.error("Error calculating exam count", e);
+            return null;
+        }
+    }
+
+    // Lấy số học sinh tham gia
+    public Long getStudentCount(Long yearId) {
+        // Sửa lại tên bảng
+        String sql = "SELECT COUNT(DISTINCT er.student_id) FROM exam_results er " +
+                 "JOIN exam_sessions es ON er.exam_session_id = es.id " +
+                 "JOIN exams e ON es.exam_id = e.id " +
+                 (yearId != null ? "WHERE e.academic_year_id = :yearId" : "");
+                 
+        try {
+            if (yearId != null) {
+                MapSqlParameterSource params = new MapSqlParameterSource();
+                params.addValue("yearId", yearId);
+                return namedJdbcTemplate.queryForObject(sql, params, Long.class);
+            } else {
+                return jdbcTemplate.queryForObject(sql, Long.class);
+            }
+        } catch (Exception e) {
+            logger.error("Error calculating student count", e);
+            return null;
+        }
+    }
+
+    // Phương thức kiểm tra loại database đang sử dụng
     private boolean isH2Database() {
         try {
             String dbProductName = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName();

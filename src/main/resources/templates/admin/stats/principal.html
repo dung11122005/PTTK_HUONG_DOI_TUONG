@@ -72,6 +72,18 @@
       .card-body {
         padding: 20px;
       }
+      @media print {
+        .no-print {
+          display: none;
+        }
+        .card {
+          break-inside: avoid;
+          box-shadow: none;
+        }
+        .chart-container {
+          height: 300px !important;
+        }
+      }
     </style>
   </head>
 
@@ -85,7 +97,7 @@
         <main class="container-fluid px-4 py-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Dashboard Hiệu trưởng</h1>
-            <div>
+            <div class="d-flex gap-2">
               <select
                 class="form-select"
                 id="academicYearFilter"
@@ -96,10 +108,73 @@
                   th:each="year : ${academicYears}"
                   th:value="${year.id}"
                   th:text="${year.name}"
+                  th:selected="${year.id == selectedYearId}"
                 >
                   Năm học 2023-2024
                 </option>
               </select>
+              <button
+                class="btn btn-outline-primary no-print"
+                onclick="window.print()"
+              >
+                <i class="fas fa-print me-1"></i>In báo cáo
+              </button>
+            </div>
+          </div>
+
+          <!-- Thẻ chỉ số tổng quan -->
+          <div class="row mb-5">
+            <div class="col-md-3">
+              <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Điểm TB toàn trường</h5>
+                  <h2
+                    class="display-4"
+                    th:text="${avgScore != null ? avgScore : '—'}"
+                  >
+                    7.5
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Tỷ lệ đạt</h5>
+                  <h2
+                    class="display-4"
+                    th:text="${passRate != null ? passRate + '%' : '—'}"
+                  >
+                    85%
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Tổng số kỳ thi</h5>
+                  <h2
+                    class="display-4"
+                    th:text="${examCount != null ? examCount : '—'}"
+                  >
+                    125
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Học sinh tham gia</h5>
+                  <h2
+                    class="display-4"
+                    th:text="${studentCount != null ? studentCount : '—'}"
+                  >
+                    850
+                  </h2>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -220,6 +295,69 @@
               </div>
             </div>
           </div>
+
+          <!-- Phân tích AI - đặt sau các biểu đồ -->
+          <div class="row mb-5">
+            <div class="col-12">
+              <div class="card">
+                <div
+                  class="card-header d-flex justify-content-between align-items-center"
+                >
+                  <span>Phân tích thông minh và Khuyến nghị</span>
+                  <button
+                    class="btn btn-primary btn-sm no-print"
+                    id="refreshAiInsights"
+                  >
+                    <i class="fas fa-sync-alt me-1"></i>Cập nhật phân tích
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div
+                    id="ai-loading"
+                    class="text-center p-5"
+                    style="display: none"
+                  >
+                    <div
+                      class="spinner-border text-primary"
+                      role="status"
+                    ></div>
+                    <p class="mt-2">Đang phân tích dữ liệu...</p>
+                  </div>
+                  <div id="ai-insights">
+                    <h5 class="card-title mb-4">Nhận định tổng quan</h5>
+                    <div id="ai-summary" class="alert alert-primary">
+                      <!-- Nội dung phân tích AI -->
+                    </div>
+
+                    <h5 class="card-title mb-3">Các phát hiện chính</h5>
+                    <div id="ai-findings" class="mb-4">
+                      <!-- Danh sách phát hiện -->
+                    </div>
+
+                    <h5 class="card-title mb-3">Khuyến nghị hành động</h5>
+                    <div id="ai-recommendations">
+                      <!-- Danh sách khuyến nghị -->
+                    </div>
+
+                    <!-- Thêm phần phân tích AI từ Gemini -->
+                    <h5 class="card-title mb-3" th:if="${aiInsight != null}">
+                      Phân tích AI
+                    </h5>
+                    <div
+                      id="ai-gemini"
+                      th:if="${aiInsight != null}"
+                      class="alert alert-info"
+                    >
+                      <h6 th:text="${aiInsight.title}">Phân tích AI</h6>
+                      <p th:text="${aiInsight.content}">
+                        Nội dung phân tích từ AI
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
 
         <div th:replace="admin/layout/footer"></div>
@@ -239,6 +377,7 @@
 
     <script th:inline="javascript">
       /*<![CDATA[*/
+      // 1. Khởi tạo dữ liệu từ server
       const avgByGrade = /*[[${avgByGradeData}]]*/ "[]";
       const passBySubject = /*[[${passBySubjectData}]]*/ "[]";
       const examsMonthly = /*[[${examsMonthlyData}]]*/ "[]";
@@ -247,6 +386,7 @@
       const avgDuration = /*[[${avgDurationData}]]*/ "[]";
       const scoreDistribution = /*[[${scoreDistributionData}]]*/ "[]";
 
+      // 2. Các hàm tiện ích
       function labelsValues(arr) {
         const labels = [],
           values = [];
@@ -256,170 +396,11 @@
             values.push(Number(it.value) || 0);
           });
         } catch (e) {
-          // fallback empty
+          console.error("Error parsing data:", e);
         }
         return { labels, values };
       }
 
-      // avgByGrade chart
-      (function () {
-        const d = labelsValues(avgByGrade);
-        const ctx = document.getElementById("avgByGradeChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                label: "Điểm TB",
-                data: d.values,
-                backgroundColor: "rgba(54,162,235,0.6)",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } },
-          },
-        });
-      })();
-
-      // passBySubject chart
-      (function () {
-        const d = labelsValues(passBySubject);
-        const ctx = document.getElementById("passBySubjectChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                label: "Tỷ lệ đạt (%)",
-                data: d.values,
-                backgroundColor: "rgba(75,192,192,0.6)",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, max: 100 } },
-          },
-        });
-      })();
-
-      // exams monthly
-      (function () {
-        const d = labelsValues(examsMonthly);
-        const ctx = document.getElementById("examsMonthlyChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                label: "Số kỳ/đề",
-                data: d.values,
-                fill: false,
-                borderColor: "#f39c12",
-                tension: 0.1,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-          },
-        });
-      })();
-
-      // Hiệu suất học tập theo lớp
-      (function () {
-        const d = labelsValues(classPerformance);
-        const ctx = document.getElementById("classPerformanceChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                label: "Điểm TB",
-                data: d.values,
-                backgroundColor: "rgba(153, 102, 255, 0.6)",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } },
-          },
-        });
-      })();
-
-      // Thời gian làm bài TB theo môn học
-      (function () {
-        const d = labelsValues(avgDuration);
-        const ctx = document.getElementById("avgDurationChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                label: "Thời gian (phút)",
-                data: d.values,
-                backgroundColor: "rgba(255, 159, 64, 0.6)",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } },
-          },
-        });
-      })();
-
-      // Phân phối điểm toàn trường
-      (function () {
-        const d = labelsValues(scoreDistribution);
-        const ctx = document.getElementById("scoreDistributionChart");
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: "pie",
-          data: {
-            labels: d.labels,
-            datasets: [
-              {
-                data: d.values,
-                backgroundColor: [
-                  "rgba(255, 99, 132, 0.7)",
-                  "rgba(255, 159, 64, 0.7)",
-                  "rgba(255, 205, 86, 0.7)",
-                  "rgba(75, 192, 192, 0.7)",
-                  "rgba(54, 162, 235, 0.7)",
-                ],
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: "right",
-              },
-            },
-          },
-        });
-      })();
       function filterByYear(yearId) {
         if (yearId) {
           window.location.href = "/admin/stats/principal?yearId=" + yearId;
@@ -428,12 +409,275 @@
         }
       }
 
-      // Đặt giá trị năm học đang chọn (nếu có)
+      function loadAiInsights() {
+        const aiSummary = document.getElementById("ai-summary");
+        const aiFindings = document.getElementById("ai-findings");
+        const aiRecommendations = document.getElementById("ai-recommendations");
+        const aiLoading = document.getElementById("ai-loading");
+        const aiInsights = document.getElementById("ai-insights");
+
+        // Hiển thị loading
+        aiLoading.style.display = "block";
+        aiInsights.style.display = "none";
+
+        // Lấy yearId từ URL nếu có
+        const urlParams = new URLSearchParams(window.location.search);
+        const yearId = urlParams.get("yearId") || "";
+
+        // Gọi API
+        fetch(`/api/ai/dashboard-insights?yearId=${yearId}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok: " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            // Hiển thị tổng quan
+            if (data.summary) {
+              aiSummary.textContent = data.summary;
+            } else {
+              aiSummary.textContent = "Không có dữ liệu phân tích tổng quan.";
+            }
+
+            // Hiển thị phát hiện
+            aiFindings.innerHTML = "";
+            if (data.findings && data.findings.length > 0) {
+              data.findings.forEach((finding) => {
+                const div = document.createElement("div");
+                div.className =
+                  "mb-3 border-start border-3 border-warning ps-3";
+                div.innerHTML = `
+                  <h6 class="mb-1">${finding.title}</h6>
+                  <p class="mb-0">${finding.content}</p>
+                `;
+                aiFindings.appendChild(div);
+              });
+            } else {
+              aiFindings.innerHTML =
+                "<p class='text-muted'>Không có phát hiện nào.</p>";
+            }
+
+            // Hiển thị khuyến nghị
+            aiRecommendations.innerHTML = "";
+            if (data.recommendations && data.recommendations.length > 0) {
+              data.recommendations.forEach((rec) => {
+                const div = document.createElement("div");
+                div.className =
+                  "mb-3 border-start border-3 border-success ps-3";
+                div.innerHTML = `
+                  <h6 class="mb-1">${rec.title}</h6>
+                  <p class="mb-0">${rec.content}</p>
+                `;
+                aiRecommendations.appendChild(div);
+              });
+            } else {
+              aiRecommendations.innerHTML =
+                "<p class='text-muted'>Không có khuyến nghị nào.</p>";
+            }
+
+            // Ẩn loading
+            aiLoading.style.display = "none";
+            aiInsights.style.display = "block";
+          })
+          .catch((error) => {
+            console.error("Error loading AI insights:", error);
+            aiSummary.textContent =
+              "Đã xảy ra lỗi khi tải phân tích thông minh: " + error.message;
+            aiFindings.innerHTML =
+              "<p class='text-muted'>Không thể tải phát hiện.</p>";
+            aiRecommendations.innerHTML =
+              "<p class='text-muted'>Không thể tải khuyến nghị.</p>";
+            aiLoading.style.display = "none";
+            aiInsights.style.display = "block";
+          });
+      }
+
+      // 3. Khởi tạo biểu đồ
+      function initCharts() {
+        // avgByGrade chart
+        (function () {
+          const d = labelsValues(avgByGrade);
+          const ctx = document.getElementById("avgByGradeChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  label: "Điểm TB",
+                  data: d.values,
+                  backgroundColor: "rgba(54,162,235,0.6)",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        })();
+
+        // passBySubject chart
+        (function () {
+          const d = labelsValues(passBySubject);
+          const ctx = document.getElementById("passBySubjectChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  label: "Tỷ lệ đạt (%)",
+                  data: d.values,
+                  backgroundColor: "rgba(75,192,192,0.6)",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true, max: 100 } },
+            },
+          });
+        })();
+
+        // exams monthly
+        (function () {
+          const d = labelsValues(examsMonthly);
+          const ctx = document.getElementById("examsMonthlyChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  label: "Số kỳ/đề",
+                  data: d.values,
+                  fill: false,
+                  borderColor: "#f39c12",
+                  tension: 0.1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+            },
+          });
+        })();
+
+        // Hiệu suất học tập theo lớp
+        (function () {
+          const d = labelsValues(classPerformance);
+          const ctx = document.getElementById("classPerformanceChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  label: "Điểm TB",
+                  data: d.values,
+                  backgroundColor: "rgba(153, 102, 255, 0.6)",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        })();
+
+        // Thời gian làm bài TB theo môn học
+        (function () {
+          const d = labelsValues(avgDuration);
+          const ctx = document.getElementById("avgDurationChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  label: "Thời gian (phút)",
+                  data: d.values,
+                  backgroundColor: "rgba(255, 159, 64, 0.6)",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        })();
+
+        // Phân phối điểm toàn trường
+        (function () {
+          const d = labelsValues(scoreDistribution);
+          const ctx = document.getElementById("scoreDistributionChart");
+          if (!ctx) return;
+          new Chart(ctx, {
+            type: "pie",
+            data: {
+              labels: d.labels,
+              datasets: [
+                {
+                  data: d.values,
+                  backgroundColor: [
+                    "rgba(255, 99, 132, 0.7)",
+                    "rgba(255, 159, 64, 0.7)",
+                    "rgba(255, 205, 86, 0.7)",
+                    "rgba(75, 192, 192, 0.7)",
+                    "rgba(54, 162, 235, 0.7)",
+                  ],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "right",
+                },
+              },
+            },
+          });
+        })();
+      }
+
+      // 4. Xử lý sự kiện khi trang tải xong
       document.addEventListener("DOMContentLoaded", function () {
+        // Khởi tạo tất cả các biểu đồ
+        initCharts();
+
+        // Đặt giá trị năm học đã chọn
         const urlParams = new URLSearchParams(window.location.search);
         const yearId = urlParams.get("yearId");
         if (yearId) {
-          document.getElementById("academicYearFilter").value = yearId;
+          const select = document.getElementById("academicYearFilter");
+          if (select) select.value = yearId;
+        }
+
+        // Tải phân tích AI sau khi trang đã tải
+        setTimeout(loadAiInsights, 1000);
+
+        // Xử lý sự kiện nút Refresh
+        const refreshButton = document.getElementById("refreshAiInsights");
+        if (refreshButton) {
+          refreshButton.addEventListener("click", loadAiInsights);
         }
       });
       /*]]>*/
