@@ -20,4 +20,6 @@ public interface  ClassStudentRepository extends JpaRepository<ClassStudent, Lon
 
     List<ClassStudent> findByClassroomIn(List<ClassRoom> classrooms);
 
+    List<ClassStudent> findByStudent_Id(Long studentId);
+
 }

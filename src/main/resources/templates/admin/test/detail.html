@@ -46,10 +46,8 @@
               </a>
 
               <a
-                th:href="'http://localhost:3000/score/' + ${id}"
+                th:href="@{'/admin/exam/result/statistics/' + ${id}}"
                 class="btn btn-primary"
-                target="_blank"
-                download
               >
                 Thống kê
               </a>

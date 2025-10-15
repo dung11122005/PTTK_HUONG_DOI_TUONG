@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,12 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.exam_portal.domain.Choice;
+import com.example.exam_portal.domain.ClassRoom;
 import com.example.exam_portal.domain.Exam;
 import com.example.exam_portal.domain.ExamResult;
 import com.example.exam_portal.domain.ExamSession;
 import com.example.exam_portal.domain.Question;
-import com.example.exam_portal.domain.Student;
 import com.example.exam_portal.domain.User;
+import com.example.exam_portal.service.ClassService;
 import com.example.exam_portal.service.ExamResultService;
 import com.example.exam_portal.service.StudentService;
 import com.example.exam_portal.service.TestService;
@@ -37,13 +37,15 @@ public class TestClientController {
     private final UserService userService;
     private final ExamResultService examResultService;
     private final StudentService studentService;
+    private final ClassService classService;
 
     public TestClientController(TestService testService, UserService userService, ExamResultService examResultService,
-    StudentService studentService){
+    StudentService studentService, ClassService classService){
         this.testService=testService;
         this.userService=userService;
         this.examResultService=examResultService;
         this.studentService=studentService;
+        this.classService=classService;
     }
 
     @GetMapping("/exam")
@@ -51,15 +53,16 @@ public class TestClientController {
         // Lấy User
         User user = this.userService.getUserByEmail(userDetails.getUsername());
     
-        // Tìm Student từ User.id
-        Optional<Student> student = this.studentService.getStudentById(user.getId());
+        // Lấy danh sách lớp mà học sinh đang học
+        List<ClassRoom> classRooms = this.classService.getClassRoomByStudentId(user.getId());
     
-        if (student.get().getClassRoom() == null) {
+        if (classRooms.isEmpty()) {
             model.addAttribute("message", "Bạn chưa được thêm vào lớp nào.");
             return "client/exam/examclient";
         }
     
-        Long classId = student.get().getClassRoom().getId();
+        // Giả sử học sinh chỉ thuộc 1 lớp
+        Long classId = classRooms.get(0).getId();
     
         // Lấy các kỳ thi thuộc lớp đó
         List<ExamSession> allExamSessions = this.testService.getAllExamSessionListClassId(List.of(classId));
@@ -72,6 +75,10 @@ public class TestClientController {
         model.addAttribute("examSessions", examSessions);
         return "client/exam/examclient";
     }
+
+
+
+
     
     
     @GetMapping("/exam/confirm/{id}")
@@ -94,42 +101,48 @@ public class TestClientController {
                                      RedirectAttributes redirectAttributes) {
         // Lấy user
         User user = this.userService.getUserByEmail(userDetails.getUsername());
-
-        // Lấy student từ userId
-        Optional<Student> student = this.studentService.getStudentById(user.getId());
-
-        ExamSession examSession = this.testService.getExamSessionById(id);
-
-        // Kiểm tra quyền truy cập (học sinh có thuộc lớp của kỳ thi không)
-        boolean isStudentInClass = student.get().getClassRoom() != null
-                && student.get().getClassRoom().getId().equals(examSession.getClassroom().getId());
-
-        if (!isStudentInClass) {
-            return "redirect:/exam?error=unauthorized";
+                                    
+        // Lấy danh sách lớp học của học sinh (qua bảng class_students)
+        List<ClassRoom> studentClasses = this.classService.getClassRoomByStudentId(user.getId());
+                                    
+        if (studentClasses.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa được thêm vào lớp nào.");
+            return "redirect:/exam";
         }
-
-        // Kiểm tra đã làm bài chưa
+    
+        ExamSession examSession = this.testService.getExamSessionById(id);
+    
+        // Kiểm tra học sinh có thuộc lớp thi này không
+        boolean isStudentInClass = studentClasses.stream()
+                .anyMatch(c -> c.getId().equals(examSession.getClassroom().getId()));
+    
+        if (!isStudentInClass) {
+            redirectAttributes.addFlashAttribute("error", "Bạn không thuộc lớp của kỳ thi này.");
+            return "redirect:/exam";
+        }
+    
         Exam exam = examSession.getExam();
-        boolean hasSubmitted = examResultService.hasStudentSubmittedExam(student.get().getId(), exam.getId());
+    
+        // Kiểm tra đã làm bài chưa
+        boolean hasSubmitted = examResultService.hasStudentSubmittedExam(user.getId(), exam.getId());
         if (hasSubmitted) {
             redirectAttributes.addFlashAttribute("error", "Bạn đã hoàn thành kỳ thi này.");
             return "redirect:/exam";
         }
-
-        // Kiểm tra thời gian thi
+    
+        // Kiểm tra thời gian
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(examSession.getStartTime()) || now.isAfter(examSession.getEndTime())) {
             redirectAttributes.addFlashAttribute("error", "Chưa đến hoặc đã quá thời gian làm bài.");
             return "redirect:/exam";
         }
-
-        List<Question> questions = exam.getQuestions();
-
+    
         model.addAttribute("examSession", examSession);
-        model.addAttribute("questions", questions);
-
-        return "client/exam/startexam"; // HTML quiz
+        model.addAttribute("questions", exam.getQuestions());
+    
+        return "client/exam/startexam";
     }
+
 
 
     @PostMapping("/exam/submit")

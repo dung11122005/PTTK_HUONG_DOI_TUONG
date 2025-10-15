@@ -2,7 +2,10 @@ package com.example.exam_portal.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -90,6 +93,42 @@ public class ExamResultService {
 
         workbook.write(outputStream);
         workbook.close();
+    }
+
+
+    public List<ExamResult> getResultsByExamSession(Long examSessionId) {
+        return examResultRepository.findByExamSessionId(examSessionId);
+    }
+
+    // ✅ Tạo dữ liệu phổ điểm (0–1, 1–2, ..., 9–10)
+    public Map<String, Long> getScoreDistribution(Long examSessionId) {
+        List<ExamResult> results = examResultRepository.findByExamSessionId(examSessionId);
+        if (results == null || results.isEmpty()) return Collections.emptyMap();
+
+        // Tạo bins 0–1, 1–2, ... 9–10
+        Map<String, Long> distribution = new LinkedHashMap<>();
+        for (int i = 0; i < 10; i++) {
+            String range = i + "–" + (i + 1);
+            distribution.put(range, 0L);
+        }
+
+        // Đếm số lượng học sinh trong từng khoảng
+        for (ExamResult r : results) {
+            double score = r.getScore();
+            int index = (int) Math.floor(score);
+            if (index < 0) index = 0;
+            if (index > 9) index = 9;
+            String range = index + "–" + (index + 1);
+            distribution.put(range, distribution.get(range) + 1);
+        }
+
+        return distribution;
+    }
+
+    // ✅ Tính điểm trung bình
+    public double getAverageScore(Long examSessionId) {
+        List<ExamResult> results = examResultRepository.findByExamSessionId(examSessionId);
+        return results.stream().mapToDouble(ExamResult::getScore).average().orElse(0.0);
     }
 
     

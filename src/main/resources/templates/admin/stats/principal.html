@@ -51,6 +51,27 @@
           transform: rotate(360deg);
         }
       }
+      .chart-container {
+        position: relative;
+        min-height: 300px;
+        margin-bottom: 20px;
+      }
+      .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+        margin-bottom: 30px;
+      }
+      .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+      .card-header {
+        font-weight: 600;
+        background-color: #f8f9fa;
+        padding: 15px;
+      }
+      .card-body {
+        padding: 20px;
+      }
     </style>
   </head>
 
@@ -62,37 +83,80 @@
 
       <div id="layoutSidenav_content">
         <main class="container-fluid px-4 py-4">
-          <h1 class="mb-4">Dashboard Hiệu trưởng</h1>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Dashboard Hiệu trưởng</h1>
+            <div>
+              <select
+                class="form-select"
+                id="academicYearFilter"
+                onchange="filterByYear(this.value)"
+              >
+                <option value="">Tất cả năm học</option>
+                <option
+                  th:each="year : ${academicYears}"
+                  th:value="${year.id}"
+                  th:text="${year.name}"
+                >
+                  Năm học 2023-2024
+                </option>
+              </select>
+            </div>
+          </div>
 
-          <div class="row gy-4">
+          <!-- Hàng 1: Biểu đồ chính -->
+          <div class="row mb-5">
             <div class="col-12 col-lg-6">
-              <div class="card">
+              <div class="card h-100">
                 <div class="card-header">Điểm trung bình theo khối</div>
                 <div class="card-body">
-                  <canvas
-                    id="avgByGradeChart"
-                    width="600"
-                    height="250"
-                  ></canvas>
+                  <div class="chart-container">
+                    <canvas id="avgByGradeChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="col-12 col-lg-6">
-              <div class="card">
+              <div class="card h-100">
                 <div class="card-header">Tỷ lệ đạt theo môn</div>
                 <div class="card-body">
-                  <canvas
-                    id="passBySubjectChart"
-                    width="600"
-                    height="250"
-                  ></canvas>
+                  <div class="chart-container">
+                    <canvas id="passBySubjectChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hàng 2: Hiệu suất lớp và phân phối điểm -->
+          <div class="row mb-5">
+            <div class="col-12 col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">Hiệu suất học tập theo lớp</div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="classPerformanceChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="col-12">
-              <div class="card">
+            <div class="col-12 col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">Phân phối điểm toàn trường</div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="scoreDistributionChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hàng 3: Top học sinh và thời gian làm bài -->
+          <div class="row mb-5">
+            <div class="col-12 col-lg-6">
+              <div class="card h-100">
                 <div class="card-header">Top 10 học sinh (theo điểm TB)</div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -127,17 +191,31 @@
               </div>
             </div>
 
+            <div class="col-12 col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">
+                  Thời gian làm bài TB theo môn học (phút)
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="avgDurationChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hàng 4: Số đề thi theo tháng -->
+          <div class="row mb-5">
             <div class="col-12">
               <div class="card">
                 <div class="card-header">
                   Số kỳ/đề theo tháng (12 tháng gần nhất)
                 </div>
                 <div class="card-body">
-                  <canvas
-                    id="examsMonthlyChart"
-                    width="800"
-                    height="200"
-                  ></canvas>
+                  <div class="chart-container">
+                    <canvas id="examsMonthlyChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -165,6 +243,9 @@
       const passBySubject = /*[[${passBySubjectData}]]*/ "[]";
       const examsMonthly = /*[[${examsMonthlyData}]]*/ "[]";
       const examsByTeacher = /*[[${examsByTeacherData}]]*/ "[]";
+      const classPerformance = /*[[${classPerformanceData}]]*/ "[]";
+      const avgDuration = /*[[${avgDurationData}]]*/ "[]";
+      const scoreDistribution = /*[[${scoreDistributionData}]]*/ "[]";
 
       function labelsValues(arr) {
         const labels = [],
@@ -185,7 +266,7 @@
         const d = labelsValues(avgByGrade);
         const ctx = document.getElementById("avgByGradeChart");
         if (!ctx) return;
-        new Chart(ctx.getContext("2d"), {
+        new Chart(ctx, {
           type: "bar",
           data: {
             labels: d.labels,
@@ -197,7 +278,11 @@
               },
             ],
           },
-          options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+          },
         });
       })();
 
@@ -206,7 +291,7 @@
         const d = labelsValues(passBySubject);
         const ctx = document.getElementById("passBySubjectChart");
         if (!ctx) return;
-        new Chart(ctx.getContext("2d"), {
+        new Chart(ctx, {
           type: "bar",
           data: {
             labels: d.labels,
@@ -220,6 +305,7 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: { y: { beginAtZero: true, max: 100 } },
           },
         });
@@ -230,7 +316,7 @@
         const d = labelsValues(examsMonthly);
         const ctx = document.getElementById("examsMonthlyChart");
         if (!ctx) return;
-        new Chart(ctx.getContext("2d"), {
+        new Chart(ctx, {
           type: "line",
           data: {
             labels: d.labels,
@@ -240,12 +326,116 @@
                 data: d.values,
                 fill: false,
                 borderColor: "#f39c12",
+                tension: 0.1,
               },
             ],
           },
-          options: { responsive: true },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
         });
       })();
+
+      // Hiệu suất học tập theo lớp
+      (function () {
+        const d = labelsValues(classPerformance);
+        const ctx = document.getElementById("classPerformanceChart");
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                label: "Điểm TB",
+                data: d.values,
+                backgroundColor: "rgba(153, 102, 255, 0.6)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+      })();
+
+      // Thời gian làm bài TB theo môn học
+      (function () {
+        const d = labelsValues(avgDuration);
+        const ctx = document.getElementById("avgDurationChart");
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                label: "Thời gian (phút)",
+                data: d.values,
+                backgroundColor: "rgba(255, 159, 64, 0.6)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+      })();
+
+      // Phân phối điểm toàn trường
+      (function () {
+        const d = labelsValues(scoreDistribution);
+        const ctx = document.getElementById("scoreDistributionChart");
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: d.labels,
+            datasets: [
+              {
+                data: d.values,
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.7)",
+                  "rgba(255, 159, 64, 0.7)",
+                  "rgba(255, 205, 86, 0.7)",
+                  "rgba(75, 192, 192, 0.7)",
+                  "rgba(54, 162, 235, 0.7)",
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "right",
+              },
+            },
+          },
+        });
+      })();
+      function filterByYear(yearId) {
+        if (yearId) {
+          window.location.href = "/admin/stats/principal?yearId=" + yearId;
+        } else {
+          window.location.href = "/admin/stats/principal";
+        }
+      }
+
+      // Đặt giá trị năm học đang chọn (nếu có)
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const yearId = urlParams.get("yearId");
+        if (yearId) {
+          document.getElementById("academicYearFilter").value = yearId;
+        }
+      });
       /*]]>*/
     </script>
   </body>

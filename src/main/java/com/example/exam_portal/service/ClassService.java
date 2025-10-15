@@ -32,6 +32,14 @@ public class ClassService {
         this.classStudentRepository=classStudentRepository;
     }
 
+    public List<ClassRoom> getClassRoomByStudentId(Long studentId) {
+        List<ClassStudent> classStudents = this.classStudentRepository.findByStudent_Id(studentId);
+        return classStudents.stream()
+                .map(ClassStudent::getClassroom)
+                .collect(Collectors.toList());
+    }
+
+
     public Page<ClassRoom> getClassByAcademicYear(Long yearId, Pageable pageable) {
         return classRepository.findByAcademicYear_Id(yearId, pageable);
     }

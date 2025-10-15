@@ -89,7 +89,7 @@ public class SecurityConfiguration {
 
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
-                .requestMatchers("/","/courses/**", "/course/**", "/login/**", "/register", "/product/**", "/products/**",
+                .requestMatchers("/","/courses/**", "/exam/**", "/course/**", "/login/**", "/register", "/product/**", "/products/**",
                  "/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**", "/api/v1/listresult/**",
                  "/api/chat/**", "/admin/**").permitAll()
                 .anyRequest().authenticated()
