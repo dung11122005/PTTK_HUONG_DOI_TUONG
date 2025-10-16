@@ -124,7 +124,7 @@
                   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
                 "
               >
-                Khóa học đã mua
+                bài giảng đã mua
               </h1>
               <nav aria-label="breadcrumb">
                 <ol
@@ -139,7 +139,7 @@
                     aria-current="page"
                     style="color: #fff"
                   >
-                    Khóa học đã mua
+                    bài giảng đã mua
                   </li>
                 </ol>
               </nav>
@@ -158,7 +158,7 @@
           </div>
           <!-- Nếu không có kỳ thi -->
           <div th:if="${#lists.isEmpty(courses)}" class="text-center">
-            <h1 class="text-danger">Hiện tại bạn chưa mua khóa học nào!</h1>
+            <h1 class="text-danger">Hiện tại bạn chưa mua bài giảng nào!</h1>
           </div>
           <div class="row">
             <div class="col-lg-4" th:each="course : ${courses}">
@@ -177,7 +177,7 @@
                       <a
                         th:href="@{'/course/detail/' + ${course.id}}"
                         th:text="${course.name}"
-                        >Tên Khóa học</a
+                        >Tên bài giảng</a
                       >
                     </h3>
                     <p th:text="${course.shortDescription}">mô tả ngắn</p>

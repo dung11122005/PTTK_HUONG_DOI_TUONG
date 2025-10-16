@@ -28,12 +28,12 @@
         <main>
           <div class="container-fluid px-4">
             <div th:if="${course != null}">
-              <h2 class="mt-4" th:text="'Khóa học: ' + ${course.name}">
+              <h2 class="mt-4" th:text="'bài giảng: ' + ${course.name}">
                 Chương trình học
               </h2>
 
               <a th:href="@{/admin/course}" class="btn btn-secondary mb-3"
-                >← Quay lại danh sách khóa học</a
+                >← Quay lại danh sách bài giảng</a
               >
 
               <!-- DANH SÁCH CÁC CHƯƠNG -->
@@ -252,7 +252,7 @@
             </div>
 
             <div th:if="${course == null}" class="alert alert-danger mt-4">
-              Không tìm thấy khóa học.
+              Không tìm thấy bài giảng.
             </div>
           </div>
         </main>

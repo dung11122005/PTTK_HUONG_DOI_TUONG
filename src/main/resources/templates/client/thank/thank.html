@@ -74,20 +74,20 @@
               🎉 Thanh toán thành công!
             </h1>
             <h1 class="medium-title">
-              Cảm ơn bạn đã đăng ký khóa học
-              <strong th:text="${course.name}">[Tên khóa học]</strong>.
+              Cảm ơn bạn đã đăng ký bài giảng
+              <strong th:text="${course.name}">[Tên bài giảng]</strong>.
             </h1>
             <h1 class="small-title">
-              Chúng tôi đã gửi thông tin khóa học vào email của bạn.
+              Chúng tôi đã gửi thông tin bài giảng vào email của bạn.
             </h1>
 
             <a
               th:href="@{'/course/detail/'+${course.id}}"
               class="btn btn-lg btn-primary mt-3"
-              >Khóa học vừa mua</a
+              >bài giảng vừa mua</a
             >
             <a href="/purchased-course" class="btn btn-lg btn-success mt-3 ms-2"
-              >Xem các khóa học đã mua</a
+              >Xem các bài giảng đã mua</a
             >
           </div>
         </div>

@@ -241,7 +241,7 @@ public class CourseAdminController {
         // Lưu vào database
         this.courseService.handleSaveCourseLesson(lesson);
 
-        // Redirect về trang chi tiết khóa học (giả sử route là như sau)
+        // Redirect về trang chi tiết bài giảng (giả sử route là như sau)
         return "redirect:/admin/course/" + chapter.getCourse().getId();
     }
 

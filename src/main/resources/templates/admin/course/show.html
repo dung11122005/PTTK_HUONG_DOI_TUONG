@@ -27,9 +27,9 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Khóa học</h1>
+            <h1 class="mt-4">bài giảng</h1>
             <ol class="breadcrumb mb-4">
-              <li class="breadcrumb-item active">Danh sách khóa học</li>
+              <li class="breadcrumb-item active">Danh sách bài giảng</li>
             </ol>
 
             <div class="mt-5">
@@ -38,13 +38,13 @@
                   <div
                     class="d-flex justify-content-between align-items-center"
                   >
-                    <h3>Danh sách khóa học</h3>
+                    <h3>Danh sách bài giảng</h3>
                     <a
                       th:if="${permissions.contains('GET /admin/course/create')}"
                       th:href="@{/admin/course/create}"
                       class="btn btn-primary"
                     >
-                      + Tạo khóa học
+                      + Tạo bài giảng
                     </a>
                   </div>
                   <hr />
@@ -52,7 +52,7 @@
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Tên khóa học</th>
+                        <th>Tên bài giảng</th>
                         <th>Mô tả</th>
                         <th>Môn học</th>
                         <th>Khối</th>

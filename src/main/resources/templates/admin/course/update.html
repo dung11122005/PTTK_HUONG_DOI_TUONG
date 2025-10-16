@@ -27,18 +27,18 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Quản lí khóa học</h1>
+            <h1 class="mt-4">Quản lí bài giảng</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">
                 <a th:href="@{/admin/course}">Course</a>
               </li>
-              <li class="breadcrumb-item active">Cập nhật khóa học</li>
+              <li class="breadcrumb-item active">Cập nhật bài giảng</li>
             </ol>
 
             <div class="mt-5">
               <div class="row">
                 <div class="col-md-8 col-12 mx-auto">
-                  <h3>Cập nhật khóa học</h3>
+                  <h3>Cập nhật bài giảng</h3>
 
                   <form
                     th:action="@{/admin/course/update/{id}(id=${newCourse.id})}"
@@ -49,7 +49,7 @@
                   >
                     <!-- Name -->
                     <div class="mb-3 col-12 col-md-6">
-                      <label class="form-label">Tên khóa học:</label>
+                      <label class="form-label">Tên bài giảng:</label>
                       <input
                         type="text"
                         th:field="*{name}"
@@ -118,7 +118,7 @@
                     <!-- Thumbnail -->
                     <div class="mb-3 col-12 col-md-6">
                       <label for="thumbnailFile" class="form-label"
-                        >Ảnh khóa học:</label
+                        >Ảnh bài giảng:</label
                       >
                       <input
                         class="form-control"
@@ -136,7 +136,7 @@
                         id="thumbnailPreview"
                         style="max-height: 500px; display: [[${newCourse.thumbnail != null} ? 'block' : 'none']]"
                         th:src="${newCourse.thumbnail != null} ? @{/uploads/images/avatarcourses/{img}(img=${newCourse.thumbnail})} : ''"
-                        alt="Xem trước ảnh khóa học"
+                        alt="Xem trước ảnh bài giảng"
                       />
                     </div>
 

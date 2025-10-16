@@ -115,7 +115,7 @@
         <div class="row">
           <!-- Phần trái: 8 cột -->
           <div class="col-md-8">
-            <h1 th:text="${course.name}">Tên khóa học</h1>
+            <h1 th:text="${course.name}">Tên bài giảng</h1>
             <p class="text-muted" th:text="${course.shortDescription}">
               Mô tả ngắn
             </p>
@@ -136,7 +136,7 @@
             </div>
 
             <div>
-              <h4>Nội dung khóa học</h4>
+              <h4>Nội dung bài giảng</h4>
               <div class="accordion" id="courseAccordion">
                 <div
                   th:each="chapter, chapStat : ${course.chapters}"

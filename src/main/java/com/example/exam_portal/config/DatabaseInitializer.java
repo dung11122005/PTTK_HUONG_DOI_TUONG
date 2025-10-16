@@ -499,7 +499,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 1
                 c = new Course();
                 c.setName("Toán nâng cao 10");
-                c.setShortDescription("Khóa học giúp học sinh nắm vững kiến thức Toán nâng cao lớp 10.");
+                c.setShortDescription("bài giảng giúp học sinh nắm vững kiến thức Toán nâng cao lớp 10.");
                 c.setDescription("Ôn tập kiến thức nâng cao lớp 10");
                 c.setThumbnail("toan1.jpg");
                 c.setSubject(findSubject.apply("MATH"));
@@ -521,7 +521,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 3
                 c = new Course();
                 c.setName("Luyện thi THPT Toán");
-                c.setShortDescription("Khóa học tổng hợp kiến thức từ lớp 10 đến 12 cho kỳ thi THPT.");
+                c.setShortDescription("bài giảng tổng hợp kiến thức từ lớp 10 đến 12 cho kỳ thi THPT.");
                 c.setDescription("Ôn luyện thi THPT Quốc gia môn Toán");
                 c.setThumbnail("toan3.jpg");
                 c.setSubject(findSubject.apply("MATH"));
@@ -554,7 +554,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 6
                 c = new Course();
                 c.setName("Hóa học 10 cơ bản");
-                c.setShortDescription("Khóa học giải thích sâu về nguyên tố và phản ứng hóa học.");
+                c.setShortDescription("bài giảng giải thích sâu về nguyên tố và phản ứng hóa học.");
                 c.setDescription("Cấu tạo nguyên tử và bảng tuần hoàn");
                 c.setThumbnail("hoa1.jpg");
                 c.setSubject(findSubject.apply("CHEM"));
@@ -598,7 +598,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 10
                 c = new Course();
                 c.setName("Luyện viết nghị luận xã hội");
-                c.setShortDescription("Khóa học giúp học sinh đạt điểm cao trong phần viết.");
+                c.setShortDescription("bài giảng giúp học sinh đạt điểm cao trong phần viết.");
                 c.setDescription("Phát triển kỹ năng viết bài thi THPT");
                 c.setThumbnail("van2.jpg");
                 c.setSubject(findSubject.apply("LIT"));
@@ -609,7 +609,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 11
                 c = new Course();
                 c.setName("Tiếng Anh giao tiếp cơ bản");
-                c.setShortDescription("Khóa học cho học sinh phổ thông và người mới bắt đầu.");
+                c.setShortDescription("bài giảng cho học sinh phổ thông và người mới bắt đầu.");
                 c.setDescription("Phát âm và hội thoại đơn giản");
                 c.setThumbnail("anh1.jpg");
                 c.setSubject(findSubject.apply("ENG"));
@@ -620,7 +620,7 @@ public class DatabaseInitializer implements CommandLineRunner{
                 // 12
                 c = new Course();
                 c.setName("Luyện thi IELTS 5.5+");
-                c.setShortDescription("Khóa học hướng đến mục tiêu IELTS từ 5.5 trở lên.");
+                c.setShortDescription("bài giảng hướng đến mục tiêu IELTS từ 5.5 trở lên.");
                 c.setDescription("Phát triển kỹ năng nghe nói đọc viết");
                 c.setThumbnail("anh2.jpg");
                 c.setSubject(findSubject.apply("ENG"));

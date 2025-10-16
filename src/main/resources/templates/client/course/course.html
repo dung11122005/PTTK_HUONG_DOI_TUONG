@@ -164,7 +164,7 @@
                   <input
                     type="text"
                     name="name"
-                    placeholder="Tìm kiếm khóa học..."
+                    placeholder="Tìm kiếm bài giảng..."
                     style="
                       flex: 1;
                       padding: 10px 15px;
@@ -232,7 +232,7 @@
               </div>
             </div>
 
-            <!-- Danh sách khóa học -->
+            <!-- Danh sách bài giảng -->
             <div class="row">
               <div class="col-lg-4 mb-4" th:each="course : ${courses}">
                 <div class="properties properties2 h-100">
@@ -252,7 +252,7 @@
                         <a
                           th:href="@{'/course/detail/' + ${course.id}}"
                           th:text="${course.name}"
-                          >Tên Khóa học</a
+                          >Tên bài giảng</a
                         >
                       </h3>
                       <p
